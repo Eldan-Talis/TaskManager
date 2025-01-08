@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const taskForm = document.getElementById("task-form");
     const closeModal = document.querySelector(".close-btn");
 
-    // îéôåé ñèèåñéí ìöáòé ìåçåú
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     const statusToBoardClass = {
         "backlog": "red",
         "in-progress": "yellow",
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "done": "blue"
     };
 
-    // ôåð÷öéä ìòãëåï îñôø äîùéîåú áìåç
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     const updateTaskCount = (boardClass) => {
         const boardHeader = document.querySelector(`.board.${boardClass} header h4`);
         const taskList = document.querySelector(`.board.${boardClass} .board-content ul`);
@@ -22,14 +22,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // òãëåï îñôø äîùéîåú áëì äìåçåú
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     const updateAllTaskCounts = () => {
         Object.values(statusToBoardClass).forEach((boardClass) => {
             updateTaskCount(boardClass);
         });
     };
 
-    // ôúéçú çìåðéú ìéöéøú îùéîä çãùä
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     document.getElementById("new-task-btn").addEventListener("click", (e) => {
         e.preventDefault();
         modalTitle.textContent = "Create Task";
@@ -37,28 +37,28 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.style.display = "block";
     });
 
-    // ùîéøú äîùéîä äçãùä
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     taskForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        // ÷øéàú äðúåðéí îäèåôñ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         const title = document.getElementById("task-title").value;
-        const assignee = document.getElementById("task-assignee").value; // ìîé äîùéîä îéåòãú
+        const assignee = document.getElementById("task-assignee").value; // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         const description = document.getElementById("task-description").value;
-        const deadline = document.getElementById("task-deadline").value; // äããìééï
+        const deadline = document.getElementById("task-deadline").value; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         const status = document.getElementById("task-status").value;
-        // áãé÷ú ðúåðéí øé÷éí
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
         if (!title || !assignee || !description || !deadline) {
             alert("All fields are required!");
             return;
         }
-        // ÷áéòú äìåç òì ôé ñèèåñ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
         const boardClass = statusToBoardClass[status];
         if (!boardClass) {
             console.error(`No board class mapped for status "${status}"`);
             return;
         }
 
-        // éöéøú ä-HTML ìîùéîä çãùä òí ëì äôøèéí
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½-HTML ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         const newTask = document.createElement("li");
         newTask.classList.add("el");
         newTask.innerHTML = `
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             </div>`;
 
-        // äåñôú äîùéîä ììåç äîúàéí
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         const targetBoard = document.querySelector(`.board.${boardClass} .board-content ul`);
         if (targetBoard) {
             targetBoard.appendChild(newTask);
@@ -84,26 +84,81 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error(`Board with class "${boardClass}" not found!`);
         }
 
-        // òãëåï îñôø äîùéîåú áìåç
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         updateTaskCount(boardClass);
 
-        // ñâéøú äçìåðéú åðé÷åé äèåôñ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
         modal.style.display = "none";
         taskForm.reset();
     });
 
-    // ñâéøú äçìåðéú áìçéöä òì ëôúåø ä-X
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½-X
     closeModal.addEventListener("click", () => {
         modal.style.display = "none";
     });
 
-    // ñâéøú äçìåðéú áìçéöä îçåõ ìçìåðéú
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     window.addEventListener("click", (event) => {
         if (event.target === modal) {
             modal.style.display = "none";
         }
     });
 
-    // òãëåï îñôø äîùéîåú áòú èòéðú äòîåã
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     updateAllTaskCounts();
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const dashboard = document.querySelector(".dashboard");
+    const newCategoryBtn = document.getElementById("new-board-btn");
+    
+    // Simulated data structure for categories
+    let categories = [];
+
+    // Render categories in the dashboard
+    const renderCategories = () => {
+        dashboard.innerHTML = ""; // Clear the existing dashboard content
+        categories.forEach((category) => {
+            const categoryDiv = document.createElement("div");
+            categoryDiv.classList.add("category", "col-xl-3", "col-sm-6");
+            categoryDiv.innerHTML = `
+                <div class="category-header">
+                    <h4>${category.name}</h4>
+                    <button class="btn btn-blue add-task-btn" data-category-id="${category.id}">Add Task</button>
+                </div>
+                <ul class="task-list">
+                    ${category.tasks.map(
+                        (task) => `
+                        <li>
+                            <h5>${task.title}</h5>
+                            <p>Deadline: ${task.deadline}</p>
+                        </li>`
+                    ).join("")}
+                </ul>
+            `;
+            dashboard.appendChild(categoryDiv);
+        });
+    };
+
+    // Add a new category
+    const addCategory = (name) => {
+        const newCategory = { id: Date.now(), name, tasks: [] };
+        categories.push(newCategory);
+        renderCategories();
+    };
+
+    // Event listener for "New Category" button
+    newCategoryBtn.addEventListener("click", () => {
+        const categoryName = prompt("Enter category name:");
+        if (categoryName) {
+            addCategory(categoryName);
+        }
+    });
+
+    // Example: Add initial categories (optional)
+    addCategory("Personal Tasks");
+    addCategory("Work Tasks");
+});
+
+
+

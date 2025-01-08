@@ -324,7 +324,7 @@ body {background: #191c2e;font-size: 13px;overflow-x: hidden;direction: ltr;text
 
     .task-content p:nth-child(3) {
         font-weight: bold;
-        color: #e67e22; /* öáò ìããìééï */
+        color: #e67e22; /* ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     }
 
 .task .icon {
@@ -375,12 +375,12 @@ body {background: #191c2e;font-size: 13px;overflow-x: hidden;direction: ltr;text
 
     .task-content p:nth-child(3) {
         font-weight: bold;
-        color: #e67e22; /* öáò ìããìééï */
+        color: #e67e22; /* ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     }
 
     .task-content p:nth-child(4) {
         font-weight: bold;
-        color: #3498db; /* öáò ìñèèåñ */
+        color: #3498db; /* ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     }
 
 .task .icon {
@@ -465,3 +465,60 @@ body {background: #191c2e;font-size: 13px;overflow-x: hidden;direction: ltr;text
         .modal-content form button:hover {
             background-color: #218838;
         }
+
+        .dashboard {
+            display: flex; /* Use flexbox for horizontal layout */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            gap: 20px; /* Add space between categories */
+            padding: 20px;
+            height: 100%; /* Ensure consistent height */
+            white-space: nowrap; /* Prevent categories from wrapping to the next line */
+        }
+        
+        .category {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            width: 250px; /* Fixed width for consistent scrolling experience */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: inline-block; /* Ensure categories stay inline for scrolling */
+        }
+        
+        .category-header h4 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .category-header button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .category-header button:hover {
+            background-color: #0056b3;
+        }
+        
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+        
+        .task-list li {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .task-list li h5 {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
