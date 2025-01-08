@@ -14,6 +14,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <link rel="canonical" href="" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -31,7 +32,7 @@
                     <div class="effect"></div>
                 </div>
                 <figcaption>
-                    <h2 class="text-md">Mohammad Rahmani</h2>
+                    <h2 class="text-md" style="font-weight: bolder; font-size: 20px;">Mau's Task Manager</h2>
                 </figcaption>
             </figure>
         </div>
@@ -47,12 +48,7 @@
             <div class="col-xl-1 col-sm-2">
                 <nav class="menu-left">
                     <ul class="list">
-                        <li>
-                            <a href="#" title="">
-                                <span class="icon flaticon-home"></span>
-                                <span class="text">Home</span>
-                            </a>
-                        </li>
+
                         <li>
                             <a href="#" title="" class="active">
                                 <span class="icon flaticon-notepad-1"></span>
@@ -60,17 +56,17 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" title="">
+                            <a href="../Task Master/Settings.html" title="">
                                 <span class="icon flaticon-settings-5"></span>
                                 <span class="text">Settings</span>
                             </a>
                         </li>
                         <li>
                             <a href="#" title="">
-                                <span class="icon flaticon-power"></span>
-                                <span class="text">Exit</span>
+                                <span class="icon fas fa-sign-out-alt"></span>
+                                <span class="text">Log Out</span>
                             </a>
-                        </li>
+                        </li>                        
                     </ul>
                 </nav>
             </div>
@@ -80,235 +76,30 @@
                         <ul class="list list-inline">
                             <li>
                                 <a href="" title="">
-                                    <span class="state red"></span>
-                                    <span>Task</span>
+                                    <span class="state yellow"></span>
+                                    <span>To-Do</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="" title="">
-                                    <span class="state yellow"></span>
-                                    <span>Story</span>
+                                    <span class="state red"></span>
+                                    <span>Late</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="" title="">
                                     <span class="state green"></span>
-                                    <span>Bug</span>
+                                    <span>Done</span>
                                 </a>
                             </li>
                         </ul>
                         <div class="action">
                             <a href="#" id="new-task-btn" title="">New Task</a>
-                            <button class="btn btn-blue" id="new-board-btn">New Board <span class="flaticon-add"></span></button>
+                            <button class="btn btn-blue" id="new-board-btn">New Category <span class="flaticon-add"></span></button>
                         </div>
                     </header>
                     <div class="dashboard">
-                        <div class="row">
-                            <div class="col-xl-3 col-sm-6">
-                                <article class="board red">
-                                    <header>
-                                        <h4>Backlog <span>(7)</span></h4>
-                                        <span class="icon flaticon-more-1"></span>
-                                    </header>
-                                    <div class="board-content">
-                                        <ul class="list">
-                                            <li class="el">
-                                                <div class="task blue">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li class="el">
-                                                <div class="task red">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li class="el">
-                                                <div class="task green">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li class="el">
-                                                <div class="task yellow">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li class="el">
-                                                <div class="task yellow">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li class="el">
-                                                <div class="task yellow">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </article>
-                            </div>
-                            <div class="col-xl-3 col-sm-6">
-                                <article class="board yellow">
-                                    <header>
-                                        <h4>In progress <span>(2)</span></h4>
-                                        <span class="icon flaticon-more-1"></span>
-                                    </header>
-                                    <div class="board-content">
-                                        <ul class="list">
-                                            <li>
-                                                <div class="task red">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="task green">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </article>
-                            </div>
-                            <div class="col-xl-3 col-sm-6">
-                                <article class="board green">
-                                    <header>
-                                        <h4>Review <span>(3)</span></h4>
-                                        <span class="icon flaticon-more-1"></span>
-                                    </header>
-                                    <div class="board-content">
-                                        <ul class="list">
-                                            <li>
-                                                <div class="task red">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="task green">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="task blue">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </article>
-                            </div>
-                            <div class="col-xl-3 col-sm-6">
-                                <article class="board blue">
-                                    <header>
-                                        <h4>Done <span>(42)</span></h4>
-                                        <span class="icon flaticon-more-1"></span>
-                                    </header>
-                                    <div class="board-content">
-                                        <ul class="list">
-                                            <li>
-                                                <div class="task red">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="task green">
-                                                    <header>
-                                                        <h3>Splash screen</h3>
-                                                        <span class="icon flaticon-link"></span>
-                                                    </header>
-                                                    <div class="task-content">
-                                                        The book itself is surprisingly thin and it's not really a book
-                                                        perse it's a compilation.
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </article>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -357,6 +148,9 @@
 
     <!-- Start Script -->
     <script src="Assets/javascript/min.js"></script>
+</body>
+</html>
+
     <style>
         #task-form {
             display: flex;
@@ -394,5 +188,3 @@
                     background-color: #218838;
                 }
     </style>
-</body>
-</html>
