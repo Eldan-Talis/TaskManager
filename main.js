@@ -261,4 +261,72 @@ function editTask(taskDiv) {
     const taskModal = new bootstrap.Modal(document.getElementById("addTaskModal"));
     taskModal.show();
 }
+// Function to Show Task Details
+function showTaskDetails(taskDiv) {
+    const taskTitle = taskDiv.querySelector("h5").textContent;
+    const taskDescription = taskDiv.querySelector("p").textContent;
+    const taskDateSpan = taskDiv.querySelector(".task-date");
+    const taskDate = taskDateSpan ? taskDateSpan.textContent.replace("TDD: ", "") : "No due date provided.";
+
+    // Update the modal content
+    document.getElementById("taskDetailsModalLabel").textContent = taskTitle; // Change modal title
+    document.getElementById("taskDetailTitle").textContent = taskTitle;
+    document.getElementById("taskDetailDescription").textContent = taskDescription;
+    document.getElementById("taskDetailDate").textContent = `Due Date: ${taskDate}`;
+
+    // Show the modal
+    const taskDetailsModal = new bootstrap.Modal(document.getElementById("taskDetailsModal"));
+    taskDetailsModal.show();
+}
+function addTaskToCategory(categoryContainer, name, description, date) {
+    let taskList = categoryContainer.querySelector(".task-list");
+    if (!taskList) {
+        taskList = document.createElement("div");
+        taskList.classList.add("task-list");
+        categoryContainer.appendChild(taskList);
+    }
+
+    const taskDiv = document.createElement("div");
+    taskDiv.classList.add("task", "position-relative");
+
+    const taskTitle = document.createElement("h5");
+    taskTitle.textContent = name;
+    taskDiv.appendChild(taskTitle);
+
+    const taskDesc = document.createElement("p");
+    taskDesc.textContent = description || "No description provided.";
+    taskDiv.appendChild(taskDesc);
+
+    if (date) {
+        const taskDate = document.createElement("span");
+        taskDate.textContent = "TDD: " + date;
+        taskDate.classList.add("task-date", "position-absolute", "top-0", "end-0", "me-2", "mt-2");
+        taskDiv.appendChild(taskDate);
+    }
+
+    // Add click event to show task details
+    taskDiv.addEventListener("click", () => showTaskDetails(taskDiv));
+
+    // Add Edit Button
+    const editButton = document.createElement("button");
+    editButton.textContent = "Edit";
+    editButton.classList.add("btn", "btn-secondary", "me-2");
+    editButton.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent opening details modal
+        editTask(taskDiv);
+    });
+    taskDiv.appendChild(editButton);
+
+    // Add Delete Button
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.classList.add("btn", "btn-danger");
+    deleteButton.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent opening details modal
+        deleteTask(taskDiv);
+    });
+    taskDiv.appendChild(deleteButton);
+
+    taskList.appendChild(taskDiv);
+}
 
