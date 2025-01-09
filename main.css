@@ -184,24 +184,6 @@ body {
     color: red; /* Red color for the due date */
     font-weight: bold;
 }
-.task button {
-    position: relative;
-    margin-top: 10px;
-}
-.task {
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.task:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-.modal-lg .modal-content {
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
 
 #taskDetailTitle {
     font-size: 24px;
@@ -220,21 +202,25 @@ body {
     margin-top: 10px;
     font-style: italic;
 }
-#categories-grid {
-    display: flex; /* במקום Grid, שימוש ב-Flexbox */
-    flex-wrap: wrap; /* מאפשר לשורות חדשות להיווצר במידת הצורך */
-    gap: 20px; /* רווח בין הקטגוריות */
-    padding: 10px;
+
+/* Ensure text wraps inside the task details modal */
+#taskDetailsModal .modal-body {
+    word-wrap: break-word; /* Ensure long words are wrapped */
+    word-break: break-word; /* Break long words if necessary */
+    white-space: normal; /* Prevent text from overflowing */
+    max-width: 100%; /* Restrict width for better readability */
+    overflow-wrap: anywhere; /* Wrap long strings without spaces */
 }
 
-.category-card {
-    flex: 0 1 calc(33.333% - 20px); /* כל קטגוריה תופסת כשליש רוחב (למשל 3 בעמודה) */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+.task i{
+    padding: 5px; /* Add 5px padding around icons */
+    border-radius: 4px; /* Optional: Add rounded corners */
 }
 
-.task-list {
-    margin-top: 10px;
-    flex-grow: 1; /* תופסת את כל גובה הכרטיס */
+.task i:nth-child(1){
+    padding-right: 0px;
+}
+
+.task i:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* Optional: Add hover effect */
 }

@@ -1,5 +1,4 @@
 let selectedCategoryContainer = null; // Tracks the category container for task creation
-let taskBeingEdited = null; // Tracks the task currently being edited
 
 // Function to handle Add Category Form Submission
 document.getElementById("addCategoryForm").addEventListener("submit", function (e) {
@@ -39,18 +38,17 @@ function addCategory(categoryName) {
 
     // Add Task Button (Plus Icon)
     const addTaskIcon = document.createElement("button");
-    addTaskIcon.innerHTML = "+";
+    addTaskIcon.innerHTML = "+"; // Plus icon
     addTaskIcon.classList.add("btn", "btn-primary", "p-1");
 
     // Event Listener to Open Task Modal
     addTaskIcon.addEventListener("click", function () {
-        taskBeingEdited = null; // Ensure we're not editing
-        openTaskModal(categoryCard);
+        openTaskModal(categoryCard); // Pass the category card to the task modal
     });
 
     // Delete Category Button (Red X Icon)
     const deleteCategoryIcon = document.createElement("button");
-    deleteCategoryIcon.innerHTML = "×";
+    deleteCategoryIcon.innerHTML = "×"; // X icon
     deleteCategoryIcon.classList.add("btn", "text-danger", "p-1");
 
     // Event Listener to Delete the Category
@@ -109,71 +107,87 @@ function addCategoryToSidebar(categoryName) {
         }
     });
 
-    // Add to Sidebar
+    // Add to Sidebar (Categories are added to the list, below the button)
     sidebarList.appendChild(sidebarCategory);
 }
 
+
+
+// Function to Remove Category from Sidebar
+function removeCategoryFromSidebar(categoryName) {
+    const sidebarList = document.getElementById("category-list");
+    const sidebarCategories = sidebarList.getElementsByClassName("category-link");
+
+    for (let i = 0; i < sidebarCategories.length; i++) {
+        if (sidebarCategories[i].textContent === categoryName) {
+            sidebarList.removeChild(sidebarCategories[i]);
+            break;
+        }
+    }
+}
+
+
+
 // Function to Open the Task Modal
 function openTaskModal(categoryContainer) {
+    selectedTaskDiv = null; // Clear editing state for a new task
     selectedCategoryContainer = categoryContainer; // Set the selected category container
+    document.getElementById("addTaskModalLabel").textContent = "Add Task"; // Reset title
+    document.querySelector("#addTaskForm button[type='submit']").textContent = "Add Task"; // Reset button text
+    document.getElementById("addTaskForm").reset(); // Clear input fields
     const taskModal = new bootstrap.Modal(document.getElementById("addTaskModal"));
     taskModal.show();
 }
 
-// Handle Task Form Submission
+
 document.getElementById("addTaskForm").addEventListener("submit", function (e) {
-    e.preventDefault(); // Prevent form refresh
+    e.preventDefault();
 
-    const taskNameInput = document.getElementById("taskNameInput");
-    const taskDescriptionInput = document.getElementById("taskDescriptionInput");
-    const taskDateInput = document.getElementById("taskDateInput");
+    const taskName = document.getElementById("taskNameInput").value.trim();
+    const taskDescription = document.getElementById("taskDescriptionInput").value.trim();
+    const taskDate = document.getElementById("taskDateInput").value;
 
-    const taskName = taskNameInput.value.trim();
-    const taskDescription = taskDescriptionInput.value.trim();
-    const taskDate = taskDateInput.value;
-
-    if (!taskName) {
-        alert("Task Name is required!");
-        return;
-    }
-
-    if (taskBeingEdited) {
-        // Update existing task
-        const taskTitle = taskBeingEdited.querySelector("h5");
-        const taskDesc = taskBeingEdited.querySelector("p");
-        const taskDateSpan = taskBeingEdited.querySelector(".task-date");
-
-        taskTitle.textContent = taskName;
-        taskDesc.textContent = taskDescription || "No description provided.";
-        if (taskDate) {
-            if (!taskDateSpan) {
-                const newTaskDate = document.createElement("span");
-                newTaskDate.classList.add("task-date", "position-absolute", "top-0", "end-0", "me-2", "mt-2");
-                taskBeingEdited.appendChild(newTaskDate);
+    if (taskName) {
+        if (selectedTaskDiv) {
+            // Edit existing task
+            selectedTaskDiv.querySelector("h5").textContent = taskName;
+            selectedTaskDiv.querySelector("p").textContent = taskDescription || "No description provided.";
+            if (taskDate) {
+                const taskDateElement = selectedTaskDiv.querySelector(".task-date");
+                if (taskDateElement) {
+                    taskDateElement.textContent = `TDD: ${taskDate}`;
+                } else {
+                    const newDateElement = document.createElement("span");
+                    newDateElement.textContent = `TDD: ${taskDate}`;
+                    newDateElement.classList.add("task-date", "text-muted", "small");
+                    selectedTaskDiv.appendChild(newDateElement);
+                }
             }
-            taskBeingEdited.querySelector(".task-date").textContent = "TDD: " + taskDate;
-        } else if (taskDateSpan) {
-            taskBeingEdited.removeChild(taskDateSpan);
+        } else {
+            // Add new task
+            addTaskToCategory(selectedCategoryContainer, taskName, taskDescription, taskDate);
         }
 
-        taskBeingEdited = null; // Clear the editing reference
+        // Reset form and variables
+        selectedTaskDiv = null;
+        document.getElementById("addTaskForm").reset();
+
+        // Close the modal
+        const taskModal = bootstrap.Modal.getInstance(document.getElementById("addTaskModal"));
+        taskModal.hide();
     } else {
-        // Create new task
-        addTaskToCategory(selectedCategoryContainer, taskName, taskDescription, taskDate);
+        alert("Task Name is required!");
     }
-
-    // Clear input fields
-    taskNameInput.value = "";
-    taskDescriptionInput.value = "";
-    taskDateInput.value = "";
-
-    // Close the modal
-    const taskModal = bootstrap.Modal.getInstance(document.getElementById("addTaskModal"));
-    taskModal.hide();
 });
 
-// Function to Add a Task to a Category
-// Function to Add a Task to a Category
+document.getElementById("add-category-btn").addEventListener("click", () => {
+    selectedTaskDiv = null; // Clear editing state
+    document.getElementById("addTaskModalLabel").textContent = "Add Task"; // Reset modal title
+    document.querySelector("#addTaskForm button[type='submit']").textContent = "Add Task"; // Reset button text
+    document.getElementById("addTaskForm").reset(); // Clear the form fields
+});
+
+
 function addTaskToCategory(categoryContainer, name, description, date) {
     let taskList = categoryContainer.querySelector(".task-list");
     if (!taskList) {
@@ -184,13 +198,8 @@ function addTaskToCategory(categoryContainer, name, description, date) {
 
     const taskDiv = document.createElement("div");
     taskDiv.classList.add("task", "position-relative", "p-2", "mb-2", "border", "rounded");
-    taskDiv.style.display = "flex";
-    taskDiv.style.justifyContent = "space-between";
-    taskDiv.style.alignItems = "center";
 
     const taskInfo = document.createElement("div");
-    taskInfo.style.flex = "1";
-    taskInfo.style.paddingRight = "10px";
 
     const taskTitle = document.createElement("h5");
     taskTitle.textContent = name;
@@ -209,15 +218,21 @@ function addTaskToCategory(categoryContainer, name, description, date) {
 
     // Icons Container
     const iconsContainer = document.createElement("div");
+    iconsContainer.style.position = "absolute";
+    iconsContainer.style.top = "10px";
+    iconsContainer.style.right = "10px";
     iconsContainer.style.display = "flex";
-    iconsContainer.style.gap = "10px";
+    iconsContainer.style.gap = "5px";
 
     // Add Edit Icon
     const editIcon = document.createElement("i");
     editIcon.classList.add("fas", "fa-edit", "text-secondary", "cursor-pointer");
     editIcon.style.cursor = "pointer";
     editIcon.title = "Edit Task";
-    editIcon.addEventListener("click", () => editTask(taskDiv));
+    editIcon.addEventListener("click", (event) => {
+        event.stopPropagation(); // Prevent event from bubbling to parent
+        editTask(taskDiv);
+    });
     iconsContainer.appendChild(editIcon);
 
     // Add Delete Icon
@@ -225,7 +240,10 @@ function addTaskToCategory(categoryContainer, name, description, date) {
     deleteIcon.classList.add("fas", "fa-trash", "text-danger", "cursor-pointer");
     deleteIcon.style.cursor = "pointer";
     deleteIcon.title = "Delete Task";
-    deleteIcon.addEventListener("click", () => deleteTask(taskDiv));
+    deleteIcon.addEventListener("click", (event) => {
+        event.stopPropagation(); // Prevent event from bubbling to parent
+        deleteTask(taskDiv);
+    });
     iconsContainer.appendChild(deleteIcon);
 
     // Append task info and icons
@@ -233,7 +251,21 @@ function addTaskToCategory(categoryContainer, name, description, date) {
     taskDiv.appendChild(iconsContainer);
 
     taskList.appendChild(taskDiv);
+
+    // Add click event to show task details
+    taskDiv.addEventListener("click", () => showTaskDetails(taskDiv));
 }
+
+
+// Set the minimum date for the task date input to today's date
+document.getElementById("taskDateInput").addEventListener("focus", function () {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const day = String(today.getDate()).padStart(2, "0");
+    const minDate = `${year}-${month}-${day}`;
+    this.setAttribute("min", minDate);
+});
 
 // Function to Delete a Task
 function deleteTask(taskDiv) {
@@ -245,22 +277,28 @@ function deleteTask(taskDiv) {
 // Function to Edit a Task
 function editTask(taskDiv) {
     // Set task to edit
-    taskBeingEdited = taskDiv;
+    selectedTaskDiv = taskDiv; // Store the task being edited
 
     // Get existing task details
-    const taskTitle = taskDiv.querySelector("h5");
-    const taskDesc = taskDiv.querySelector("p");
-    const taskDate = taskDiv.querySelector(".task-date");
+    const taskTitle = taskDiv.querySelector("h5").textContent;
+    const taskDesc = taskDiv.querySelector("p").textContent;
+    const taskDate = taskDiv.querySelector(".task-date")?.textContent.replace("TDD: ", "") || "";
 
-    // Populate the modal with existing task details
-    document.getElementById("taskNameInput").value = taskTitle.textContent;
-    document.getElementById("taskDescriptionInput").value = taskDesc.textContent;
-    document.getElementById("taskDateInput").value = taskDate ? taskDate.textContent.replace("TDD: ", "") : "";
+    // Populate the modal fields
+    document.getElementById("taskNameInput").value = taskTitle;
+    document.getElementById("taskDescriptionInput").value = taskDesc;
+    document.getElementById("taskDateInput").value = taskDate;
 
-    // Open the modal
+    // Update the modal title and button text
+    document.getElementById("addTaskModalLabel").textContent = "Edit Task";
+    document.querySelector("#addTaskForm button[type='submit']").textContent = "Save Changes";
+
+    // Show the modal
     const taskModal = new bootstrap.Modal(document.getElementById("addTaskModal"));
     taskModal.show();
 }
+
+
 // Function to Show Task Details
 function showTaskDetails(taskDiv) {
     const taskTitle = taskDiv.querySelector("h5").textContent;
@@ -268,8 +306,12 @@ function showTaskDetails(taskDiv) {
     const taskDateSpan = taskDiv.querySelector(".task-date");
     const taskDate = taskDateSpan ? taskDateSpan.textContent.replace("TDD: ", "") : "No due date provided.";
 
+    // Get the category name
+    const categoryCard = taskDiv.closest(".category-card"); // Find the closest category card
+    const categoryName = categoryCard.querySelector("h4").textContent; // Get the category name
+
     // Update the modal content
-    document.getElementById("taskDetailsModalLabel").textContent = taskTitle; // Change modal title
+    document.getElementById("taskDetailsModalLabel").textContent = `Category: ${categoryName}`; // Change modal title
     document.getElementById("taskDetailTitle").textContent = taskTitle;
     document.getElementById("taskDetailDescription").textContent = taskDescription;
     document.getElementById("taskDetailDate").textContent = `Due Date: ${taskDate}`;
@@ -278,55 +320,3 @@ function showTaskDetails(taskDiv) {
     const taskDetailsModal = new bootstrap.Modal(document.getElementById("taskDetailsModal"));
     taskDetailsModal.show();
 }
-function addTaskToCategory(categoryContainer, name, description, date) {
-    let taskList = categoryContainer.querySelector(".task-list");
-    if (!taskList) {
-        taskList = document.createElement("div");
-        taskList.classList.add("task-list");
-        categoryContainer.appendChild(taskList);
-    }
-
-    const taskDiv = document.createElement("div");
-    taskDiv.classList.add("task", "position-relative");
-
-    const taskTitle = document.createElement("h5");
-    taskTitle.textContent = name;
-    taskDiv.appendChild(taskTitle);
-
-    const taskDesc = document.createElement("p");
-    taskDesc.textContent = description || "No description provided.";
-    taskDiv.appendChild(taskDesc);
-
-    if (date) {
-        const taskDate = document.createElement("span");
-        taskDate.textContent = "TDD: " + date;
-        taskDate.classList.add("task-date", "position-absolute", "top-0", "end-0", "me-2", "mt-2");
-        taskDiv.appendChild(taskDate);
-    }
-
-    // Add click event to show task details
-    taskDiv.addEventListener("click", () => showTaskDetails(taskDiv));
-
-    // Add Edit Button
-    const editButton = document.createElement("button");
-    editButton.textContent = "Edit";
-    editButton.classList.add("btn", "btn-secondary", "me-2");
-    editButton.addEventListener("click", (e) => {
-        e.stopPropagation(); // Prevent opening details modal
-        editTask(taskDiv);
-    });
-    taskDiv.appendChild(editButton);
-
-    // Add Delete Button
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete";
-    deleteButton.classList.add("btn", "btn-danger");
-    deleteButton.addEventListener("click", (e) => {
-        e.stopPropagation(); // Prevent opening details modal
-        deleteTask(taskDiv);
-    });
-    taskDiv.appendChild(deleteButton);
-
-    taskList.appendChild(taskDiv);
-}
-
