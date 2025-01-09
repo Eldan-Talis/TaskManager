@@ -173,6 +173,7 @@ document.getElementById("addTaskForm").addEventListener("submit", function (e) {
 });
 
 // Function to Add a Task to a Category
+// Function to Add a Task to a Category
 function addTaskToCategory(categoryContainer, name, description, date) {
     let taskList = categoryContainer.querySelector(".task-list");
     if (!taskList) {
@@ -182,36 +183,54 @@ function addTaskToCategory(categoryContainer, name, description, date) {
     }
 
     const taskDiv = document.createElement("div");
-    taskDiv.classList.add("task", "position-relative");
+    taskDiv.classList.add("task", "position-relative", "p-2", "mb-2", "border", "rounded");
+    taskDiv.style.display = "flex";
+    taskDiv.style.justifyContent = "space-between";
+    taskDiv.style.alignItems = "center";
+
+    const taskInfo = document.createElement("div");
+    taskInfo.style.flex = "1";
+    taskInfo.style.paddingRight = "10px";
 
     const taskTitle = document.createElement("h5");
     taskTitle.textContent = name;
-    taskDiv.appendChild(taskTitle);
+    taskInfo.appendChild(taskTitle);
 
     const taskDesc = document.createElement("p");
     taskDesc.textContent = description || "No description provided.";
-    taskDiv.appendChild(taskDesc);
+    taskInfo.appendChild(taskDesc);
 
     if (date) {
         const taskDate = document.createElement("span");
         taskDate.textContent = "TDD: " + date;
-        taskDate.classList.add("task-date", "position-absolute", "top-0", "end-0", "me-2", "mt-2");
-        taskDiv.appendChild(taskDate);
+        taskDate.classList.add("task-date", "text-muted", "small");
+        taskInfo.appendChild(taskDate);
     }
 
-    // Add Edit Button
-    const editButton = document.createElement("button");
-    editButton.textContent = "Edit";
-    editButton.classList.add("btn", "btn-secondary", "me-2");
-    editButton.addEventListener("click", () => editTask(taskDiv));
-    taskDiv.appendChild(editButton);
+    // Icons Container
+    const iconsContainer = document.createElement("div");
+    iconsContainer.style.display = "flex";
+    iconsContainer.style.gap = "10px";
 
-    // Add Delete Button
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete";
-    deleteButton.classList.add("btn", "btn-danger");
-    deleteButton.addEventListener("click", () => deleteTask(taskDiv));
-    taskDiv.appendChild(deleteButton);
+    // Add Edit Icon
+    const editIcon = document.createElement("i");
+    editIcon.classList.add("fas", "fa-edit", "text-secondary", "cursor-pointer");
+    editIcon.style.cursor = "pointer";
+    editIcon.title = "Edit Task";
+    editIcon.addEventListener("click", () => editTask(taskDiv));
+    iconsContainer.appendChild(editIcon);
+
+    // Add Delete Icon
+    const deleteIcon = document.createElement("i");
+    deleteIcon.classList.add("fas", "fa-trash", "text-danger", "cursor-pointer");
+    deleteIcon.style.cursor = "pointer";
+    deleteIcon.title = "Delete Task";
+    deleteIcon.addEventListener("click", () => deleteTask(taskDiv));
+    iconsContainer.appendChild(deleteIcon);
+
+    // Append task info and icons
+    taskDiv.appendChild(taskInfo);
+    taskDiv.appendChild(iconsContainer);
 
     taskList.appendChild(taskDiv);
 }
@@ -222,22 +241,23 @@ function deleteTask(taskDiv) {
         taskDiv.remove();
     }
 }
+
 // Function to Edit a Task
 function editTask(taskDiv) {
-    // שמירה של המשימה לעריכה
+    // Set task to edit
     taskBeingEdited = taskDiv;
 
-    // קבלת הערכים של המשימה הקיימת
+    // Get existing task details
     const taskTitle = taskDiv.querySelector("h5");
     const taskDesc = taskDiv.querySelector("p");
     const taskDate = taskDiv.querySelector(".task-date");
 
-    // מילוי המודל עם הפרטים הקיימים
+    // Populate the modal with existing task details
     document.getElementById("taskNameInput").value = taskTitle.textContent;
     document.getElementById("taskDescriptionInput").value = taskDesc.textContent;
     document.getElementById("taskDateInput").value = taskDate ? taskDate.textContent.replace("TDD: ", "") : "";
 
-    // פתיחת המודל
+    // Open the modal
     const taskModal = new bootstrap.Modal(document.getElementById("addTaskModal"));
     taskModal.show();
 }
