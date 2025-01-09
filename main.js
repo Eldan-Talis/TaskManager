@@ -1,4 +1,5 @@
 let selectedCategoryContainer = null; // Tracks the category container for task creation
+let taskBeingEdited = null; // Tracks the task currently being edited
 
 // Function to handle Add Category Form Submission
 document.getElementById("addCategoryForm").addEventListener("submit", function (e) {
@@ -38,17 +39,18 @@ function addCategory(categoryName) {
 
     // Add Task Button (Plus Icon)
     const addTaskIcon = document.createElement("button");
-    addTaskIcon.innerHTML = "+"; // Plus icon
+    addTaskIcon.innerHTML = "+";
     addTaskIcon.classList.add("btn", "btn-primary", "p-1");
 
     // Event Listener to Open Task Modal
     addTaskIcon.addEventListener("click", function () {
-        openTaskModal(categoryCard); // Pass the category card to the task modal
+        taskBeingEdited = null; // Ensure we're not editing
+        openTaskModal(categoryCard);
     });
 
     // Delete Category Button (Red X Icon)
     const deleteCategoryIcon = document.createElement("button");
-    deleteCategoryIcon.innerHTML = "×"; // X icon
+    deleteCategoryIcon.innerHTML = "×";
     deleteCategoryIcon.classList.add("btn", "text-danger", "p-1");
 
     // Event Listener to Delete the Category
@@ -107,26 +109,9 @@ function addCategoryToSidebar(categoryName) {
         }
     });
 
-    // Add to Sidebar (Categories are added to the list, below the button)
+    // Add to Sidebar
     sidebarList.appendChild(sidebarCategory);
 }
-
-
-
-// Function to Remove Category from Sidebar
-function removeCategoryFromSidebar(categoryName) {
-    const sidebarList = document.getElementById("category-list");
-    const sidebarCategories = sidebarList.getElementsByClassName("category-link");
-
-    for (let i = 0; i < sidebarCategories.length; i++) {
-        if (sidebarCategories[i].textContent === categoryName) {
-            sidebarList.removeChild(sidebarCategories[i]);
-            break;
-        }
-    }
-}
-
-
 
 // Function to Open the Task Modal
 function openTaskModal(categoryContainer) {
@@ -135,7 +120,7 @@ function openTaskModal(categoryContainer) {
     taskModal.show();
 }
 
-// Function to Handle Task Form Submission
+// Handle Task Form Submission
 document.getElementById("addTaskForm").addEventListener("submit", function (e) {
     e.preventDefault(); // Prevent form refresh
 
@@ -147,20 +132,44 @@ document.getElementById("addTaskForm").addEventListener("submit", function (e) {
     const taskDescription = taskDescriptionInput.value.trim();
     const taskDate = taskDateInput.value;
 
-    if (taskName) {
-        addTaskToCategory(selectedCategoryContainer, taskName, taskDescription, taskDate);
-
-        // Clear input fields
-        taskNameInput.value = "";
-        taskDescriptionInput.value = "";
-        taskDateInput.value = "";
-
-        // Close the modal programmatically
-        const taskModal = bootstrap.Modal.getInstance(document.getElementById("addTaskModal"));
-        taskModal.hide();
-    } else {
+    if (!taskName) {
         alert("Task Name is required!");
+        return;
     }
+
+    if (taskBeingEdited) {
+        // Update existing task
+        const taskTitle = taskBeingEdited.querySelector("h5");
+        const taskDesc = taskBeingEdited.querySelector("p");
+        const taskDateSpan = taskBeingEdited.querySelector(".task-date");
+
+        taskTitle.textContent = taskName;
+        taskDesc.textContent = taskDescription || "No description provided.";
+        if (taskDate) {
+            if (!taskDateSpan) {
+                const newTaskDate = document.createElement("span");
+                newTaskDate.classList.add("task-date", "position-absolute", "top-0", "end-0", "me-2", "mt-2");
+                taskBeingEdited.appendChild(newTaskDate);
+            }
+            taskBeingEdited.querySelector(".task-date").textContent = "TDD: " + taskDate;
+        } else if (taskDateSpan) {
+            taskBeingEdited.removeChild(taskDateSpan);
+        }
+
+        taskBeingEdited = null; // Clear the editing reference
+    } else {
+        // Create new task
+        addTaskToCategory(selectedCategoryContainer, taskName, taskDescription, taskDate);
+    }
+
+    // Clear input fields
+    taskNameInput.value = "";
+    taskDescriptionInput.value = "";
+    taskDateInput.value = "";
+
+    // Close the modal
+    const taskModal = bootstrap.Modal.getInstance(document.getElementById("addTaskModal"));
+    taskModal.hide();
 });
 
 // Function to Add a Task to a Category
@@ -190,15 +199,45 @@ function addTaskToCategory(categoryContainer, name, description, date) {
         taskDiv.appendChild(taskDate);
     }
 
+    // Add Edit Button
+    const editButton = document.createElement("button");
+    editButton.textContent = "Edit";
+    editButton.classList.add("btn", "btn-secondary", "me-2");
+    editButton.addEventListener("click", () => editTask(taskDiv));
+    taskDiv.appendChild(editButton);
+
+    // Add Delete Button
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.classList.add("btn", "btn-danger");
+    deleteButton.addEventListener("click", () => deleteTask(taskDiv));
+    taskDiv.appendChild(deleteButton);
+
     taskList.appendChild(taskDiv);
 }
 
-// Set the minimum date for the task date input to today's date
-document.getElementById("taskDateInput").addEventListener("focus", function () {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-based
-    const day = String(today.getDate()).padStart(2, "0");
-    const minDate = `${year}-${month}-${day}`;
-    this.setAttribute("min", minDate);
-});
+// Function to Delete a Task
+function deleteTask(taskDiv) {
+    if (confirm("Are you sure you want to delete this task?")) {
+        taskDiv.remove();
+    }
+}
+// Function to Edit a Task
+function editTask(taskDiv) {
+    // שמירה של המשימה לעריכה
+    taskBeingEdited = taskDiv;
+
+    // קבלת הערכים של המשימה הקיימת
+    const taskTitle = taskDiv.querySelector("h5");
+    const taskDesc = taskDiv.querySelector("p");
+    const taskDate = taskDiv.querySelector(".task-date");
+
+    // מילוי המודל עם הפרטים הקיימים
+    document.getElementById("taskNameInput").value = taskTitle.textContent;
+    document.getElementById("taskDescriptionInput").value = taskDesc.textContent;
+    document.getElementById("taskDateInput").value = taskDate ? taskDate.textContent.replace("TDD: ", "") : "";
+
+    // פתיחת המודל
+    const taskModal = new bootstrap.Modal(document.getElementById("addTaskModal"));
+    taskModal.show();
+}
