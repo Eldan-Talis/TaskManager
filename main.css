@@ -220,3 +220,21 @@ body {
     margin-top: 10px;
     font-style: italic;
 }
+#categories-grid {
+    display: flex; /* במקום Grid, שימוש ב-Flexbox */
+    flex-wrap: wrap; /* מאפשר לשורות חדשות להיווצר במידת הצורך */
+    gap: 20px; /* רווח בין הקטגוריות */
+    padding: 10px;
+}
+
+.category-card {
+    flex: 0 1 calc(33.333% - 20px); /* כל קטגוריה תופסת כשליש רוחב (למשל 3 בעמודה) */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.task-list {
+    margin-top: 10px;
+    flex-grow: 1; /* תופסת את כל גובה הכרטיס */
+}
