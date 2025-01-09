@@ -378,3 +378,26 @@ function showTaskDetails(taskDiv) {
   );
   taskDetailsModal.show();
 }
+
+//color picker for background ----------------------------------------
+
+// Select all color picker buttons
+const colorButtons = document.querySelectorAll(".color-picker button");
+
+// Add click event listener to each button
+colorButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        const selectedColor = button.getAttribute("data-color");
+        const navbar = document.querySelector(".navbar");
+        const sidebar = document.querySelector(".sidebar");
+
+        // Remove the bg-dark class to prevent Bootstrap styles from overriding
+        navbar.classList.remove("bg-dark");
+        sidebar.classList.remove("bg-dark");
+
+        // Set the background color directly
+        navbar.style.setProperty("background-color", selectedColor, "important");
+        sidebar.style.setProperty("background-color", selectedColor, "important");
+    });
+});
+

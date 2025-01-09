@@ -228,6 +228,19 @@ body {
     background-color: #63c86698;
 }
 
+.color-picker button {
+    width: 30px;
+    height: 30px;
+    margin: 0 5px;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Make the buttons circular */
+    transition: transform 0.2s ease;
+}
+
+.color-picker button:hover {
+    transform: scale(1.2); /* Slightly enlarge the button on hover */
+}
 
 
 
