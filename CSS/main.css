@@ -223,3 +223,11 @@ body {
 .task i:hover {
     background-color: rgba(0, 0, 0, 0.1); /* Optional: Add hover effect */
 }
+
+.task.task-done {
+    background-color: #63c86698;
+}
+
+
+
+
