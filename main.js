@@ -130,32 +130,49 @@ function removeCategoryFromSidebar(categoryName) {
 
 // Function to Open the Task Modal
 function openTaskModal(categoryContainer) {
+    selectedTaskDiv = null; // Clear editing state for a new task
     selectedCategoryContainer = categoryContainer; // Set the selected category container
+    document.getElementById("addTaskModalLabel").textContent = "Add Task"; // Reset title
+    document.querySelector("#addTaskForm button[type='submit']").textContent = "Add Task"; // Reset button text
+    document.getElementById("addTaskForm").reset(); // Clear input fields
     const taskModal = new bootstrap.Modal(document.getElementById("addTaskModal"));
     taskModal.show();
 }
 
-// Function to Handle Task Form Submission
+
 document.getElementById("addTaskForm").addEventListener("submit", function (e) {
-    e.preventDefault(); // Prevent form refresh
+    e.preventDefault();
 
-    const taskNameInput = document.getElementById("taskNameInput");
-    const taskDescriptionInput = document.getElementById("taskDescriptionInput");
-    const taskDateInput = document.getElementById("taskDateInput");
-
-    const taskName = taskNameInput.value.trim();
-    const taskDescription = taskDescriptionInput.value.trim();
-    const taskDate = taskDateInput.value;
+    const taskName = document.getElementById("taskNameInput").value.trim();
+    const taskDescription = document.getElementById("taskDescriptionInput").value.trim();
+    const taskDate = document.getElementById("taskDateInput").value;
 
     if (taskName) {
-        addTaskToCategory(selectedCategoryContainer, taskName, taskDescription, taskDate);
+        if (selectedTaskDiv) {
+            // Edit existing task
+            selectedTaskDiv.querySelector("h5").textContent = taskName;
+            selectedTaskDiv.querySelector("p").textContent = taskDescription || "No description provided.";
+            if (taskDate) {
+                const taskDateElement = selectedTaskDiv.querySelector(".task-date");
+                if (taskDateElement) {
+                    taskDateElement.textContent = `TDD: ${taskDate}`;
+                } else {
+                    const newDateElement = document.createElement("span");
+                    newDateElement.textContent = `TDD: ${taskDate}`;
+                    newDateElement.classList.add("task-date", "text-muted", "small");
+                    selectedTaskDiv.appendChild(newDateElement);
+                }
+            }
+        } else {
+            // Add new task
+            addTaskToCategory(selectedCategoryContainer, taskName, taskDescription, taskDate);
+        }
 
-        // Clear input fields
-        taskNameInput.value = "";
-        taskDescriptionInput.value = "";
-        taskDateInput.value = "";
+        // Reset form and variables
+        selectedTaskDiv = null;
+        document.getElementById("addTaskForm").reset();
 
-        // Close the modal programmatically
+        // Close the modal
         const taskModal = bootstrap.Modal.getInstance(document.getElementById("addTaskModal"));
         taskModal.hide();
     } else {
@@ -163,7 +180,14 @@ document.getElementById("addTaskForm").addEventListener("submit", function (e) {
     }
 });
 
-// Function to Add a Task to a Category
+document.getElementById("add-category-btn").addEventListener("click", () => {
+    selectedTaskDiv = null; // Clear editing state
+    document.getElementById("addTaskModalLabel").textContent = "Add Task"; // Reset modal title
+    document.querySelector("#addTaskForm button[type='submit']").textContent = "Add Task"; // Reset button text
+    document.getElementById("addTaskForm").reset(); // Clear the form fields
+});
+
+
 function addTaskToCategory(categoryContainer, name, description, date) {
     let taskList = categoryContainer.querySelector(".task-list");
     if (!taskList) {
@@ -173,25 +197,65 @@ function addTaskToCategory(categoryContainer, name, description, date) {
     }
 
     const taskDiv = document.createElement("div");
-    taskDiv.classList.add("task", "position-relative");
+    taskDiv.classList.add("task", "position-relative", "p-2", "mb-2", "border", "rounded");
+
+    const taskInfo = document.createElement("div");
 
     const taskTitle = document.createElement("h5");
     taskTitle.textContent = name;
-    taskDiv.appendChild(taskTitle);
+    taskInfo.appendChild(taskTitle);
 
     const taskDesc = document.createElement("p");
     taskDesc.textContent = description || "No description provided.";
-    taskDiv.appendChild(taskDesc);
+    taskInfo.appendChild(taskDesc);
 
     if (date) {
         const taskDate = document.createElement("span");
         taskDate.textContent = "TDD: " + date;
-        taskDate.classList.add("task-date", "position-absolute", "top-0", "end-0", "me-2", "mt-2");
-        taskDiv.appendChild(taskDate);
+        taskDate.classList.add("task-date", "text-muted", "small");
+        taskInfo.appendChild(taskDate);
     }
 
+    // Icons Container
+    const iconsContainer = document.createElement("div");
+    iconsContainer.style.position = "absolute";
+    iconsContainer.style.top = "10px";
+    iconsContainer.style.right = "10px";
+    iconsContainer.style.display = "flex";
+    iconsContainer.style.gap = "5px";
+
+    // Add Edit Icon
+    const editIcon = document.createElement("i");
+    editIcon.classList.add("fas", "fa-edit", "text-secondary", "cursor-pointer");
+    editIcon.style.cursor = "pointer";
+    editIcon.title = "Edit Task";
+    editIcon.addEventListener("click", (event) => {
+        event.stopPropagation(); // Prevent event from bubbling to parent
+        editTask(taskDiv);
+    });
+    iconsContainer.appendChild(editIcon);
+
+    // Add Delete Icon
+    const deleteIcon = document.createElement("i");
+    deleteIcon.classList.add("fas", "fa-trash", "text-danger", "cursor-pointer");
+    deleteIcon.style.cursor = "pointer";
+    deleteIcon.title = "Delete Task";
+    deleteIcon.addEventListener("click", (event) => {
+        event.stopPropagation(); // Prevent event from bubbling to parent
+        deleteTask(taskDiv);
+    });
+    iconsContainer.appendChild(deleteIcon);
+
+    // Append task info and icons
+    taskDiv.appendChild(taskInfo);
+    taskDiv.appendChild(iconsContainer);
+
     taskList.appendChild(taskDiv);
+
+    // Add click event to show task details
+    taskDiv.addEventListener("click", () => showTaskDetails(taskDiv));
 }
+
 
 // Set the minimum date for the task date input to today's date
 document.getElementById("taskDateInput").addEventListener("focus", function () {
@@ -202,3 +266,57 @@ document.getElementById("taskDateInput").addEventListener("focus", function () {
     const minDate = `${year}-${month}-${day}`;
     this.setAttribute("min", minDate);
 });
+
+// Function to Delete a Task
+function deleteTask(taskDiv) {
+    if (confirm("Are you sure you want to delete this task?")) {
+        taskDiv.remove();
+    }
+}
+
+// Function to Edit a Task
+function editTask(taskDiv) {
+    // Set task to edit
+    selectedTaskDiv = taskDiv; // Store the task being edited
+
+    // Get existing task details
+    const taskTitle = taskDiv.querySelector("h5").textContent;
+    const taskDesc = taskDiv.querySelector("p").textContent;
+    const taskDate = taskDiv.querySelector(".task-date")?.textContent.replace("TDD: ", "") || "";
+
+    // Populate the modal fields
+    document.getElementById("taskNameInput").value = taskTitle;
+    document.getElementById("taskDescriptionInput").value = taskDesc;
+    document.getElementById("taskDateInput").value = taskDate;
+
+    // Update the modal title and button text
+    document.getElementById("addTaskModalLabel").textContent = "Edit Task";
+    document.querySelector("#addTaskForm button[type='submit']").textContent = "Save Changes";
+
+    // Show the modal
+    const taskModal = new bootstrap.Modal(document.getElementById("addTaskModal"));
+    taskModal.show();
+}
+
+
+// Function to Show Task Details
+function showTaskDetails(taskDiv) {
+    const taskTitle = taskDiv.querySelector("h5").textContent;
+    const taskDescription = taskDiv.querySelector("p").textContent;
+    const taskDateSpan = taskDiv.querySelector(".task-date");
+    const taskDate = taskDateSpan ? taskDateSpan.textContent.replace("TDD: ", "") : "No due date provided.";
+
+    // Get the category name
+    const categoryCard = taskDiv.closest(".category-card"); // Find the closest category card
+    const categoryName = categoryCard.querySelector("h4").textContent; // Get the category name
+
+    // Update the modal content
+    document.getElementById("taskDetailsModalLabel").textContent = `Category: ${categoryName}`; // Change modal title
+    document.getElementById("taskDetailTitle").textContent = taskTitle;
+    document.getElementById("taskDetailDescription").textContent = taskDescription;
+    document.getElementById("taskDetailDate").textContent = `Due Date: ${taskDate}`;
+
+    // Show the modal
+    const taskDetailsModal = new bootstrap.Modal(document.getElementById("taskDetailsModal"));
+    taskDetailsModal.show();
+}
