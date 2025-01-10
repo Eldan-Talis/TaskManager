@@ -13,7 +13,7 @@ body {
     left: 0;
     width: 100%;
     height: 60px;
-    background-color: #454343; /* Background color */
+    background-color: #181C14; /* Background color */
     color: white;
     display: flex;
     align-items: center;
@@ -31,7 +31,7 @@ body {
 }
 
 .navbar .nav-link:hover {
-    color: #4CAF50; /* Hover effect */
+    color: rgb(255, 255, 255); /* Hover effect */
     background-color: rgba(255, 255, 255, 0.1); /* Subtle hover background */
     border-radius: 5px;
 }
@@ -43,12 +43,17 @@ body {
     left: 0;
     width: 240px; /* Fixed width for the sidebar */
     height: calc(100vh - 60px); /* Full viewport height minus navbar height */
-    background-color: #343a40; /* Dark background */
+    background-color: #3C3D37; /* Dark background */
     color: white;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     overflow-y: auto; /* Enable scrolling for sidebar content */
     z-index: 1000; /* Ensure the sidebar is above other content */
+    display: flex; /* Use Flexbox */
+    flex-direction: column; /* Ensure content is arranged in a column */
+    align-items: center; /* Horizontally center content */
+    text-align: center; /* Center text within elements */
+    overflow-y: auto; /* Enable scrolling for sidebar content */
 }
 
 /* Main Content Styling */
@@ -57,6 +62,12 @@ body {
     padding: 20px;
     margin-top: 60px; /* Space below the fixed navbar */
 }
+
+#category-list {
+    width: 100%; /* Make it span the full width of the sidebar */
+    align-items: center;
+}
+
 
 /* Categories Grid */
 #categories-grid {
@@ -68,20 +79,28 @@ body {
 
 #add-category-btn{
     margin-bottom: 10px;
+    width: 90%;
+    background-color: #0d6efd;
+    color: white;
 }
 
 .category-link {
     cursor: pointer;
-    text-align: center;
+    text-align: center; /* Centers text within the button */
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 5px;
     background-color: #e4e4e4 !important;
     transition: background-color 0.3s ease;
+    width: 90%; /* Ensures the category takes full width of the sidebar */
+    box-sizing: border-box; /* Includes padding and borders in width */
+    display: block; /* Makes the category behave as a block-level element */
 }
 
+
+
 .category-link:hover {
-    background-color: #4CAF50 !important;
+    background-color: #1168ebd0 !important;
     color: white;
 }
 
@@ -100,12 +119,11 @@ body {
 
 /* Highlighted Category Card */
 .category-card.highlight {
-    border: 2px solid #4CAF50; /* Green border */
-    background-color: #e8f5e9; /* Light green background */
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5); /* Glow effect */
+    border: 2px solid #0d6efd; /* Blue border */
+    background-color: #e7f1ff; /* Light blue background */
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.5); /* Blue glow effect */
     transition: background-color 0.5s ease, box-shadow 0.5s ease; /* Smooth transition */
 }
-
 
 /* Category Title */
 .category-card h4 {
@@ -212,16 +230,17 @@ body {
 }
 
 .task i{
-    padding: 5px; /* Add 5px padding around icons */
+    padding: 4px; /* Add 5px padding around icons */
     border-radius: 4px; /* Optional: Add rounded corners */
-}
-
-.task i:nth-child(1){
-    padding-right: 0px;
 }
 
 .task i:hover {
     background-color: rgba(0, 0, 0, 0.1); /* Optional: Add hover effect */
+}
+
+.task i.disabled {
+    opacity: 0.5; /* Reduce opacity */
+    cursor: not-allowed; /* Change cursor to indicate non-clickable */
 }
 
 .task.task-done {
@@ -242,5 +261,29 @@ body {
     transform: scale(1.2); /* Slightly enlarge the button on hover */
 }
 
+.btn-sm{
+    border: solid 2px white !important;
+}
+
+#cateCharCount {
+    font-size: 0.9em;
+    color: gray;
+    margin-top: 5px;
+}
+
+  
+#taskCharCount {
+    font-size: 0.9em;
+    color: gray;
+    margin-top: 5px;
+}
+
+#descriptionCharCount {
+    font-size: 0.9em;
+    color: gray;
+    margin-top: 5px;
+  }
+  
+  
 
 

@@ -17,19 +17,19 @@
   </head>
   <body>
     <!-- Navbar -->
-    <div class="navbar bg-dark d-flex align-items-center">
+    <div class="navbar d-flex align-items-center">
       <div class="container-fluid">
         <div class="d-flex">
           <a href="#" class="nav-link">My Tasks</a>
           <a href="#" class="nav-link">Settings</a>
           <a href="#" class="nav-link">Log out</a>
         </div>
-        <div class="color-picker d-flex justify-content-center mt-3">
+        <div class="color-picker d-flex justify-content-center">
           <button
             class="btn btn-sm"
-            style="background-color: rgb(33 37 41)"
-            data-navbar-color="rgb(33 37 41)"
-            data-sidebar-color="rgb(33 37 41)"
+            style="background-color: #181C14"
+            data-navbar-color="#181C14"
+            data-sidebar-color="#3C3D37"
           ></button>
           <button
             class="btn btn-sm"
@@ -39,9 +39,9 @@
           ></button>
           <button
             class="btn btn-sm"
-            style="background-color: #800f2f"
-            data-navbar-color="#800f2f"
-            data-sidebar-color="#c9184a"
+            style="background-color: #A35C7A"
+            data-navbar-color="#A35C7A"
+            data-sidebar-color="#C890A7"
           ></button>
           <button
             class="btn btn-sm"
@@ -51,9 +51,9 @@
           ></button>
           <button
             class="btn btn-sm"
-            style="background-color: #6a994e"
-            data-navbar-color="#6a994e"
-            data-sidebar-color="#a7c957"
+            style="background-color: #7695FF"
+            data-navbar-color="#7695FF"
+            data-sidebar-color="#9DBDFF"
           ></button>
         </div>
       </div>
@@ -63,11 +63,11 @@
     <div class="container-fluid">
       <div class="row">
         <!-- Sidebar Panel -->
-        <div class="col-md-3 bg-dark text-white p-4 sidebar">
+        <div class="col-md-3 text-white p-4 sidebar">
           <h3 class="text-center">My Categories</h3>
           <button
             id="add-category-btn"
-            class="btn btn-success w-100 mt-3"
+            class="btn btn-black mt-3"
             data-bs-toggle="modal"
             data-bs-target="#addCategoryModal"
           >
@@ -111,17 +111,19 @@
           <div class="modal-body">
             <form id="addCategoryForm">
               <div class="mb-3">
-                <label for="categoryNameInput" class="form-label"
-                  >Category Name</label
-                >
+                <label for="categoryNameInput" class="form-label">Category Name</label>
                 <input
                   type="text"
                   class="form-control"
                   id="categoryNameInput"
                   placeholder="Enter category name"
                   required
+                  maxlength="20"
                 />
-              </div>
+                <small id="cateCharCount" class="form-text text-muted">
+                  20 characters remaining
+                </small>
+              </div>              
               <button type="submit" class="btn btn-primary">
                 Create Category
               </button>
@@ -160,20 +162,26 @@
                   id="taskNameInput"
                   placeholder="Enter task name"
                   required
+                  maxlength="20"
                 />
-              </div>
+                <small id="taskCharCount" class="form-text text-muted">
+                  20 characters remaining
+                </small>
+              </div>              
               <div class="mb-3">
-                <label for="taskDescriptionInput" class="form-label"
-                  >Task Description</label
-                >
+                <label for="taskDescriptionInput" class="form-label">Task Description</label>
                 <textarea
                   class="form-control"
                   id="taskDescriptionInput"
                   rows="3"
                   placeholder="Enter task description"
                   required
+                  maxlength="200"
                 ></textarea>
-              </div>
+                <small id="descriptionCharCount" class="form-text text-muted">
+                  200 characters remaining
+                </small>
+              </div>              
               <div class="mb-3">
                 <label for="taskDateInput" class="form-label"
                   >Due Date (Optional)</label
@@ -195,7 +203,7 @@
       aria-labelledby="taskDetailsModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-lg">
+      <div class="modal-dialog">
         <!-- Added modal-lg -->
         <div class="modal-content">
           <div class="modal-header">

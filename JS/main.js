@@ -6,18 +6,27 @@ document
   .addEventListener("submit", function (e) {
     e.preventDefault(); // Prevent form refresh
 
+    // Set the character limit
+    const maxLength = 20;
+
     const categoryNameInput = document.getElementById("categoryNameInput");
     const categoryName = categoryNameInput.value.trim();
 
     if (categoryName) {
-      addCategory(categoryName); // Add category to the grid
-      categoryNameInput.value = ""; // Clear input field
-
       // Close the modal programmatically
       const addCategoryModal = bootstrap.Modal.getInstance(
         document.getElementById("addCategoryModal")
       );
       addCategoryModal.hide();
+
+      addCategory(categoryName); // Add category to the grid
+      categoryNameInput.value = ""; // Clear input field
+
+      // Reset the character counter
+      const cateCharCount = document.getElementById("cateCharCount");
+      cateCharCount.textContent = `${maxLength} characters remaining`;
+      cateCharCount.style.color = "gray"; // Reset color
+    
     } else {
       alert("Category Name is required!");
     }
@@ -160,6 +169,9 @@ document.getElementById("addTaskForm").addEventListener("submit", function (e) {
     .value.trim();
   const taskDate = document.getElementById("taskDateInput").value;
 
+  const taskNameMaxLength = 20;
+  const taskDescriptionMaxLength = 200;
+
   if (taskName) {
     if (selectedTaskDiv) {
       // Edit existing task
@@ -187,15 +199,22 @@ document.getElementById("addTaskForm").addEventListener("submit", function (e) {
       );
     }
 
-    // Reset form and variables
-    selectedTaskDiv = null;
-    document.getElementById("addTaskForm").reset();
-
     // Close the modal
     const taskModal = bootstrap.Modal.getInstance(
       document.getElementById("addTaskModal")
     );
     taskModal.hide();
+
+    // Reset form and variables
+    selectedTaskDiv = null;
+    document.getElementById("addTaskForm").reset();
+
+    // Reset form and character counters
+    document.getElementById("addTaskForm").reset();
+    document.getElementById("taskCharCount").textContent = `${taskNameMaxLength} characters remaining`;
+    document.getElementById("taskCharCount").style.color = "gray";
+    document.getElementById("descriptionCharCount").textContent = `${taskDescriptionMaxLength} characters remaining`;
+    document.getElementById("descriptionCharCount").style.color = "gray";
   } else {
     alert("Task Name is required!");
   }
@@ -260,12 +279,18 @@ function addTaskToCategory(categoryContainer, name, description, date) {
       checkIcon.classList.replace("fa-undo", "fa-check");
       checkIcon.classList.replace("text-secondary", "text-success");
       checkIcon.title = "Mark as Done";
+
+      editIcon.classList.remove("disabled");
+      editIcon.title = "Edit Task";
     } else {
       // Mark Task as Done
+      editIcon.classList.add("disabled");
       taskDiv.classList.add("task-done");
       checkIcon.classList.replace("fa-check", "fa-undo");
       checkIcon.classList.replace("text-success", "text-secondary");
+      
       checkIcon.title = "Mark as Not Done";
+      editIcon.title = "Cannot Edit a Done Task";
     }
   });
 
@@ -322,6 +347,13 @@ function deleteTask(taskDiv) {
 
 // Function to Edit a Task
 function editTask(taskDiv) {
+
+  // Check if the task is marked as done
+  if (taskDiv.classList.contains("task-done")) {
+    alert("You cannot edit a task that is marked as done!");
+    return; // Exit the function
+  }
+
   // Set task to edit
   selectedTaskDiv = taskDiv; // Store the task being edited
 
@@ -392,13 +424,72 @@ colorButtons.forEach((button) => {
         const navbar = document.querySelector(".navbar");
         const sidebar = document.querySelector(".sidebar");
 
-        // Remove the bg-dark class to prevent Bootstrap styles from overriding
-        navbar.classList.remove("bg-dark");
-        sidebar.classList.remove("bg-dark");
-
         // Set the background color directly
         navbar.style.setProperty("background-color", selectedNavbarColor, "important");
         sidebar.style.setProperty("background-color", selectedSidebarColor, "important");
     });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Check if the user prefers dark mode
+  const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  // Select the black and blue buttons
+  const blackButton = document.querySelector("[data-navbar-color='#181C14']");
+  const blueButton = document.querySelector("[data-navbar-color='#7695FF']");
+
+  if (prefersDarkMode && blackButton) {
+      blackButton.click(); // Simulate a click on the black button
+  } else if (blueButton) {
+      blueButton.click(); // Simulate a click on the blue button
+  }
+});
+
+// Updates the character counter for the Category Name input field in real-time.
+document.getElementById("categoryNameInput").addEventListener("input", function () {
+  const maxLength = 20;
+  const remaining = maxLength - this.value.length;
+
+  const cateCharCount = document.getElementById("cateCharCount");
+  cateCharCount.textContent = `${remaining} characters remaining`;
+
+  if (remaining < 1) {
+    cateCharCount.style.setProperty("color", "red", "important");
+ // Highlight if exceeding limit (shouldn't happen due to `maxlength`)
+  } else {
+    cateCharCount.style.color = "gray"; // Reset color
+  }
+});
+
+// Updates the character counter for the Task Name input field in real-time.
+document.getElementById("taskNameInput").addEventListener("input", function () {
+  const maxLength = 20; // Character limit for Task Name
+  const remaining = maxLength - this.value.length; // Calculate remaining characters
+
+  const taskCharCount = document.getElementById("taskCharCount");
+  taskCharCount.textContent = `${remaining} characters remaining`;
+
+  // Change text color if nearing or exceeding the limit
+  if (remaining < 5) {
+    taskCharCount.style.setProperty("color", "red", "important");
+  } else {
+    taskCharCount.style.color = "gray"; // Default color
+  }
+});
+
+// Updates the character counter for the Task Description input field in real-time.
+document.getElementById("taskDescriptionInput").addEventListener("input", function () {
+  const maxLength = 200; // Character limit for Task Description
+  const remaining = maxLength - this.value.length; // Calculate remaining characters
+
+  const descriptionCharCount = document.getElementById("descriptionCharCount");
+  descriptionCharCount.textContent = `${remaining} characters remaining`;
+
+  // Change text color if nearing or exceeding the limit
+  if (remaining < 20) {
+    descriptionCharCount.style.setProperty("color", "red", "important"); // Highlight in red
+  } else {
+    descriptionCharCount.style.setProperty("color", "gray", "important"); // Default color
+  }
 });
 
