@@ -387,7 +387,8 @@ const colorButtons = document.querySelectorAll(".color-picker button");
 // Add click event listener to each button
 colorButtons.forEach((button) => {
     button.addEventListener("click", () => {
-        const selectedColor = button.getAttribute("data-color");
+        const selectedNavbarColor = button.getAttribute("data-navbar-color");
+        const selectedSidebarColor = button.getAttribute("data-sidebar-color");
         const navbar = document.querySelector(".navbar");
         const sidebar = document.querySelector(".sidebar");
 
@@ -396,8 +397,8 @@ colorButtons.forEach((button) => {
         sidebar.classList.remove("bg-dark");
 
         // Set the background color directly
-        navbar.style.setProperty("background-color", selectedColor, "important");
-        sidebar.style.setProperty("background-color", selectedColor, "important");
+        navbar.style.setProperty("background-color", selectedNavbarColor, "important");
+        sidebar.style.setProperty("background-color", selectedSidebarColor, "important");
     });
 });
 
