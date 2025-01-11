@@ -101,8 +101,17 @@ function addCategoryToSidebar(categoryName) {
 
   // Create Sidebar Item
   const sidebarCategory = document.createElement("li");
-  sidebarCategory.textContent = categoryName;
-  sidebarCategory.classList.add("list-group-item", "category-link");
+  sidebarCategory.classList.add("list-group-item", "category-link", "d-flex", "align-items-center");
+
+  // Add a dot icon using Unicode
+  const dotIcon = document.createElement("span");
+  dotIcon.textContent = "•"; // Unicode for a dot
+  dotIcon.classList.add("dot-icon", "me-2"); // Add styling class
+  sidebarCategory.appendChild(dotIcon);
+
+  // Add category name
+  const text = document.createTextNode(categoryName);
+  sidebarCategory.appendChild(text);
 
   // Add Click Event to Navigate to Category
   sidebarCategory.addEventListener("click", function () {
@@ -110,28 +119,20 @@ function addCategoryToSidebar(categoryName) {
     for (let category of categories) {
       const header = category.querySelector("h4");
       if (header.textContent === categoryName) {
-        // Remove highlight from all cards
         categories.forEach((card) => card.classList.remove("highlight"));
-
-        // Scroll to the category card
         category.scrollIntoView({ behavior: "smooth", block: "start" });
-
-        // Add highlight class to the clicked category card
         category.classList.add("highlight");
-
-        // Remove highlight after a delay
-        setTimeout(() => {
-          category.classList.remove("highlight");
-        }, 1000);
-
+        setTimeout(() => category.classList.remove("highlight"), 1000);
         break;
       }
     }
   });
 
-  // Add to Sidebar (Categories are added to the list, below the button)
+  // Add to Sidebar
   sidebarList.appendChild(sidebarCategory);
 }
+
+
 
 // Function to Remove Category from Sidebar
 function removeCategoryFromSidebar(categoryName) {
@@ -492,4 +493,29 @@ document.getElementById("taskDescriptionInput").addEventListener("input", functi
     descriptionCharCount.style.setProperty("color", "gray", "important"); // Default color
   }
 });
+
+// Dynamic Search for Category
+document.getElementById("categorySearch").addEventListener("input", function () {
+  const searchValue = this.value.trim().toLowerCase();
+  const categoryItems = document.querySelectorAll("#category-list .list-group-item");
+
+  categoryItems.forEach((item) => {
+      const categoryText = item.textContent.replace("•", "").trim().toLowerCase();
+      console.log("Raw Text:", item.textContent, "| Processed Text:", categoryText, "| Search Value:", searchValue);
+
+      if (searchValue === "" || categoryText.includes(searchValue)) {
+          item.classList.remove("hidden");
+          item.style.display = "flex"; // Ensure it uses flex display for visible items
+          console.log(`Showing item: ${categoryText}`);
+      } else {
+          item.classList.add("hidden");
+          item.style.display = "none"; // Force hiding
+          console.log(`Hiding item: ${categoryText}`);
+      }
+  });
+});
+
+
+
+
 

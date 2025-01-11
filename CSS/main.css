@@ -41,7 +41,6 @@ body {
     position: fixed; /* Keeps the sidebar locked in place */
     top: 60px; /* Start below the navbar */
     left: 0;
-    width: 240px; /* Fixed width for the sidebar */
     height: calc(100vh - 60px); /* Full viewport height minus navbar height */
     background-color: #3C3D37; /* Dark background */
     color: white;
@@ -58,7 +57,7 @@ body {
 
 /* Main Content Styling */
 .main-container {
-    margin-left: 25%; /* Offset for the fixed sidebar width */
+    margin-left: 16.666667%; /* Offset for the fixed sidebar width */
     padding: 20px;
     margin-top: 60px; /* Space below the fixed navbar */
 }
@@ -80,29 +79,105 @@ body {
 #add-category-btn{
     margin-bottom: 10px;
     width: 90%;
-    background-color: #0d6efd;
     color: white;
+    font-size: 18px;
+    text-align: left;
+}
+
+.icon-spacing {
+    margin-right: 8px; /* Adjust spacing as needed */
+  }
+
+#add-category-btn:hover{
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+    border-bottom: 1px solid #ccc; /* Add bottom border */
+}
+
+.search-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 90%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    outline: none;
+    background: none; /* Remove background */
+    padding: 10px 10px 10px 40px; /* Adjust padding to make space for icon */
+    color: white !important;
+}
+
+.search-input::placeholder {
+    color: white; /* Set placeholder text color to white */
+    opacity: 0.8; /* Ensure full opacity for the placeholder */
+  }
+  
+
+.search-input:hover {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+    border-bottom: 1px solid #ccc; /* Add bottom border */
+}
+
+.search-input:focus {
+    border-bottom: 1px solid #ccc; /* Add bottom border */
+}
+
+.search-container .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 10%; /* Position the icon inside the input field */
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: white;
+    pointer-events: none; /* Ensure the icon does not interfere with input */
+}
+
+.search-separator {
+    width: 100%;
+    height: 2px;
+    background-color: white; /* White separation line */
+    margin: 0 0 10px 0; /* Add spacing around the line */
 }
 
 .category-link {
     cursor: pointer;
-    text-align: center; /* Centers text within the button */
-    padding: 10px;
+    text-align: left; /* Centers text within the button */
+    font-size: 18px;
+    padding: 0 5px !important;
     border-radius: 5px;
     margin-bottom: 5px;
-    background-color: #e4e4e4 !important;
+    border: none !important;
+    color:white !important;
+    background-color: transparent !important;
     transition: background-color 0.3s ease;
     width: 90%; /* Ensures the category takes full width of the sidebar */
     box-sizing: border-box; /* Includes padding and borders in width */
     display: block; /* Makes the category behave as a block-level element */
+
+    /* Truncate text with ellipsis */
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide overflowing text */
+    text-overflow: ellipsis; /* Add ellipsis for overflow */
 }
-
-
 
 .category-link:hover {
-    background-color: #1168ebd0 !important;
-    color: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+    border-bottom: 1px solid #ccc !important; /* Add bottom border */
 }
+
+.list-group-item.hidden {
+    display: none !important;
+}
+  
+.dot-icon {
+    font-size: 30px; /* Adjust dot size */
+    color: white; /* Dot color */
+    margin-right: 8px; /* Space between dot and text */
+  }
+   
 
 /* Category Card */
 .category-card {

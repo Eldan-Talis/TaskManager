@@ -63,7 +63,7 @@
     <div class="container-fluid">
       <div class="row">
         <!-- Sidebar Panel -->
-        <div class="col-md-3 text-white p-4 sidebar">
+        <div class="col-md-2 text-white p-4 sidebar">
           <h3 class="text-center">My Categories</h3>
           <button
             id="add-category-btn"
@@ -71,15 +71,21 @@
             data-bs-toggle="modal"
             data-bs-target="#addCategoryModal"
           >
-            Create Category
+          <i class="fas fa-plus icon-spacing">  </i> <!-- Font Awesome plus icon -->
+            Add
           </button>
+          <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="categorySearch" placeholder="Search" class="search-input" />
+        </div>
+        <div class="search-separator"></div>
           <ul id="category-list" class="list-group">
             <!-- Categories will be added here dynamically -->
           </ul>
         </div>
 
         <!-- Main Content -->
-        <div class="col-md-9 main-container">
+        <div class="col-md-10 main-container">
           <div id="categories-grid" class="row g-4">
             <!-- Categories and tasks will be displayed here -->
           </div>
