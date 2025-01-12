@@ -153,13 +153,21 @@ function openTaskModal(categoryContainer) {
   selectedCategoryContainer = categoryContainer; // Set the selected category container
   document.getElementById("addTaskModalLabel").textContent = "Add Task"; // Reset title
   document.querySelector("#addTaskForm button[type='submit']").textContent =
-    "Add Task"; // Reset button text
+      "Add Task"; // Reset button text
   document.getElementById("addTaskForm").reset(); // Clear input fields
+
+  // Reset counters
+  document.getElementById("taskCharCount").textContent = "20 characters remaining";
+  document.getElementById("taskCharCount").style.color = "gray";
+  document.getElementById("descriptionCharCount").textContent = "200 characters remaining";
+  document.getElementById("descriptionCharCount").style.color = "gray";
+
   const taskModal = new bootstrap.Modal(
-    document.getElementById("addTaskModal")
+      document.getElementById("addTaskModal")
   );
   taskModal.show();
 }
+
 
 document.getElementById("addTaskForm").addEventListener("submit", function (e) {
   e.preventDefault();
@@ -200,6 +208,8 @@ document.getElementById("addTaskForm").addEventListener("submit", function (e) {
       );
     }
 
+    
+
     // Close the modal
     const taskModal = bootstrap.Modal.getInstance(
       document.getElementById("addTaskModal")
@@ -220,6 +230,7 @@ document.getElementById("addTaskForm").addEventListener("submit", function (e) {
     alert("Task Name is required!");
   }
 });
+
 
 document.getElementById("add-category-btn").addEventListener("click", () => {
   selectedTaskDiv = null; // Clear editing state
@@ -348,11 +359,10 @@ function deleteTask(taskDiv) {
 
 // Function to Edit a Task
 function editTask(taskDiv) {
-
   // Check if the task is marked as done
   if (taskDiv.classList.contains("task-done")) {
-    alert("You cannot edit a task that is marked as done!");
-    return; // Exit the function
+      alert("You cannot edit a task that is marked as done!");
+      return; // Exit the function
   }
 
   // Set task to edit
@@ -362,24 +372,38 @@ function editTask(taskDiv) {
   const taskTitle = taskDiv.querySelector("h5").textContent;
   const taskDesc = taskDiv.querySelector("p").textContent;
   const taskDate =
-    taskDiv.querySelector(".task-date")?.textContent.replace("TDD: ", "") || "";
+      taskDiv.querySelector(".task-date")?.textContent.replace("TDD: ", "") || "";
 
   // Populate the modal fields
-  document.getElementById("taskNameInput").value = taskTitle;
-  document.getElementById("taskDescriptionInput").value = taskDesc;
+  const taskNameInput = document.getElementById("taskNameInput");
+  const taskDescriptionInput = document.getElementById("taskDescriptionInput");
+
+  taskNameInput.value = taskTitle;
+  taskDescriptionInput.value = taskDesc;
   document.getElementById("taskDateInput").value = taskDate;
+
+  // Update counters based on existing values
+  const taskCharCount = document.getElementById("taskCharCount");
+  const descriptionCharCount = document.getElementById("descriptionCharCount");
+
+  taskCharCount.textContent = `${20 - taskTitle.length} characters remaining`;
+  taskCharCount.style.color = taskTitle.length > 15 ? "red" : "gray";
+
+  descriptionCharCount.textContent = `${200 - taskDesc.length} characters remaining`;
+  descriptionCharCount.style.color = taskDesc.length > 180 ? "red" : "gray";
 
   // Update the modal title and button text
   document.getElementById("addTaskModalLabel").textContent = "Edit Task";
   document.querySelector("#addTaskForm button[type='submit']").textContent =
-    "Save Changes";
+      "Save Changes";
 
   // Show the modal
   const taskModal = new bootstrap.Modal(
-    document.getElementById("addTaskModal")
+      document.getElementById("addTaskModal")
   );
   taskModal.show();
 }
+
 
 // Function to Show Task Details
 function showTaskDetails(taskDiv) {
