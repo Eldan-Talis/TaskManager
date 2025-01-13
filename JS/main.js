@@ -1,5 +1,9 @@
 let selectedCategoryContainer = null; // Tracks the category container for task creation
 
+const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod"
+
+const user = "user123"
+
 // Function to handle Add Category Form Submission
 document
   .getElementById("addCategoryForm")
@@ -538,6 +542,153 @@ document.getElementById("categorySearch").addEventListener("input", function () 
       }
   });
 });
+
+function displayCategories(categories) {
+  const categoriesGrid = document.getElementById("categories-grid");
+  const sidebarList = document.getElementById("category-list");
+
+  // Clear any existing categories
+  categoriesGrid.innerHTML = "";
+  sidebarList.innerHTML = "";
+
+  // Loop through the categories and add them
+  categories.forEach((categoryName) => {
+    // Add to categories grid
+    addCategory(categoryName);
+
+  });
+}
+
+
+//get all categories ---------------------
+async function fetchAllCategories() {
+  try {
+    const url = `${apiBaseUrl}/GetAllCategories?userId=${user}`;
+    console.log("Fetching categories with tasks from URL:", url);
+
+    const response = await fetch(url, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch categories: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Fetched Categories with Tasks:", data);
+
+    const categories = data.categories || {};
+
+    // Display categories and their tasks
+    displayCategoriesWithTasks(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    alert("Unable to fetch categories. Please try again later.");
+  }
+}
+
+function displayCategoriesWithTasks(categories) {
+  const categoriesGrid = document.getElementById("categories-grid");
+  const sidebarList = document.getElementById("category-list");
+
+  // Clear any existing categories
+  categoriesGrid.innerHTML = "";
+  sidebarList.innerHTML = "";
+
+  // Loop through the categories and display them
+  Object.entries(categories).forEach(([categoryName, tasks]) => {
+    // Add category to the grid and sidebar
+    addCategory(categoryName);
+
+    // Add tasks for the category
+    const categoryCard = Array.from(document.querySelectorAll(".category-card"))
+      .find((card) => card.querySelector("h4").textContent === categoryName);
+
+    if (categoryCard && tasks) {
+      Object.entries(tasks).forEach(([taskName, taskDetails]) => {
+        addTaskToCategory(
+          categoryCard,
+          taskName,
+          taskDetails.description,
+          taskDetails.dueDate
+        );
+      });
+    }
+  });
+}
+
+// Function to handle Add Category Form Submission
+document
+  .getElementById("addCategoryForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault(); // Prevent form refresh
+
+    const maxLength = 20; // Character limit
+    const categoryNameInput = document.getElementById("categoryNameInput");
+    const categoryName = categoryNameInput.value.trim();
+
+    if (categoryName) {
+      try {
+        // Call the backend to add the category
+        const response = await fetch(`${apiBaseUrl}/AddCategory`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user, // Send the user ID
+            categoryName: categoryName, // Send the new category name
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Add category to the UI only if the backend operation was successful
+          addCategory(categoryName);
+
+          // Close the modal programmatically
+          const addCategoryModal = bootstrap.Modal.getInstance(
+            document.getElementById("addCategoryModal")
+          );
+          addCategoryModal.hide();
+
+          // Clear input field
+          categoryNameInput.value = "";
+
+          // Reset the character counter
+          const cateCharCount = document.getElementById("cateCharCount");
+          cateCharCount.textContent = `${maxLength} characters remaining`;
+          cateCharCount.style.color = "gray";
+
+          console.log("Category added successfully:", data.message);
+        } else {
+          // Show an error if the backend fails
+          alert(data.error || "Failed to add category.");
+          console.error("Error adding category:", data.error);
+        }
+      } catch (error) {
+        // Handle any unexpected errors
+        alert("An error occurred while adding the category. Please try again.");
+        console.error("Error:", error);
+      }
+    } else {
+      alert("Category Name is required!");
+    }
+  });
+
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchAllCategories();
+});
+
+
 
 
 
