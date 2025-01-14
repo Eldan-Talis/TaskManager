@@ -197,7 +197,6 @@ document.getElementById("addTaskForm").addEventListener("submit", async function
         taskName, // New task name
         taskDescription || "No description provided.",
         taskDate || null,
-        selectedTaskDiv.classList.contains("task-done") // Maintain task's done state
       );
 
       if (success) {
@@ -250,7 +249,7 @@ document.getElementById("add-category-btn").addEventListener("click", () => {
   document.getElementById("addTaskForm").reset(); // Clear the form fields
 });
 
-function addTaskToCategory(categoryContainer, name, description = "No description provided.", date = null) {
+function addTaskToCategory(categoryContainer, name, description = "No description provided.", date = null, status = "In Progress") {
   // Check if the task already exists in the category
   const existingTasks = Array.from(categoryContainer.querySelectorAll(".task h5")).map(
     (taskTitle) => taskTitle.textContent
@@ -303,9 +302,19 @@ function addTaskToCategory(categoryContainer, name, description = "No descriptio
   // Add Task to the List
   taskList.appendChild(taskDiv);
 
+  // Check if task is completed, apply done state
+  if (status === "Completed") {
+    taskDiv.classList.add("task-done");
+    const checkIcon = iconsContainer.querySelector(".fa-check");
+    checkIcon.classList.replace("fa-check", "fa-undo");
+    checkIcon.classList.replace("text-success", "text-secondary");
+    checkIcon.title = "Mark as Not Done";
+  }
+
   // Add Click Event to Show Task Details
   taskDiv.addEventListener("click", () => showTaskDetails(taskDiv));
 }
+
 
 /**
  * Creates and returns the icons container with event listeners.
@@ -325,7 +334,16 @@ function createTaskIcons(taskDiv, name, description, date) {
 
   checkIcon.addEventListener("click", (event) => {
     event.stopPropagation();
-    toggleTaskDoneState(taskDiv, checkIcon);
+
+    // Get current task status from UI
+    const newStatus = taskDiv.classList.contains("task-done") ? "In Progress" : "Completed";
+
+    // Update task status in the backend
+    const categoryName = taskDiv.closest(".category-card").querySelector("h4").textContent;
+    updateTaskStatus(categoryName, name, newStatus);  // Send request to update status
+
+    // Toggle task done state in UI
+    toggleTaskDoneState(taskDiv, checkIcon, newStatus);
   });
   iconsContainer.appendChild(checkIcon);
 
@@ -354,20 +372,21 @@ function createTaskIcons(taskDiv, name, description, date) {
   return iconsContainer;
 }
 
+
 /**
  * Toggles the task's "done" state.
  */
-function toggleTaskDoneState(taskDiv, checkIcon) {
-  if (taskDiv.classList.contains("task-done")) {
-    taskDiv.classList.remove("task-done");
-    checkIcon.classList.replace("fa-undo", "fa-check");
-    checkIcon.classList.replace("text-secondary", "text-success");
-    checkIcon.title = "Mark as Done";
-  } else {
+function toggleTaskDoneState(taskDiv, checkIcon, newStatus) {
+  if (newStatus === "Completed") {
     taskDiv.classList.add("task-done");
     checkIcon.classList.replace("fa-check", "fa-undo");
     checkIcon.classList.replace("text-success", "text-secondary");
     checkIcon.title = "Mark as Not Done";
+  } else {
+    taskDiv.classList.remove("task-done");
+    checkIcon.classList.replace("fa-undo", "fa-check");
+    checkIcon.classList.replace("text-secondary", "text-success");
+    checkIcon.title = "Mark as Done";
   }
 }
 
@@ -581,35 +600,16 @@ document.getElementById("categorySearch").addEventListener("input", function () 
 
   categoryItems.forEach((item) => {
       const categoryText = item.textContent.replace("•", "").trim().toLowerCase();
-      console.log("Raw Text:", item.textContent, "| Processed Text:", categoryText, "| Search Value:", searchValue);
 
       if (searchValue === "" || categoryText.includes(searchValue)) {
           item.classList.remove("hidden");
           item.style.display = "flex"; // Ensure it uses flex display for visible items
-          console.log(`Showing item: ${categoryText}`);
       } else {
           item.classList.add("hidden");
           item.style.display = "none"; // Force hiding
-          console.log(`Hiding item: ${categoryText}`);
       }
   });
 });
-
-function displayCategories(categories) {
-  const categoriesGrid = document.getElementById("categories-grid");
-  const sidebarList = document.getElementById("category-list");
-
-  // Clear any existing categories
-  categoriesGrid.innerHTML = "";
-  sidebarList.innerHTML = "";
-
-  // Loop through the categories and add them
-  categories.forEach((categoryName) => {
-    // Add to categories grid
-    addCateaddCategory(categoryName);
-
-  });
-}
 
 
 //get all categories ---------------------
@@ -659,12 +659,14 @@ function displayCategoriesWithTasks(categories) {
           categoryCard,
           taskName,
           taskDetails.description,
-          taskDetails.dueDate
+          taskDetails.dueDate,
+          taskDetails.status // Pass status here
         );
       });
     }
   });
 }
+
 
 // Function to handle Add Category Form Submission
 document
@@ -901,7 +903,7 @@ async function deleteTaskFromBackend(categoryName, taskName) {
   }
 }
 
-async function updateTaskInBackend(categoryName, currentTaskName, newTaskName, description, dueDate, isChecked) {
+async function updateTaskInBackend(categoryName, currentTaskName, newTaskName, description, dueDate) {
   try {
     const payload = {
       UserId: user,
@@ -910,7 +912,6 @@ async function updateTaskInBackend(categoryName, currentTaskName, newTaskName, d
       newTaskName: newTaskName, // Ensure this is included to update the task name
       description: description,
       dueDate: dueDate || null,
-      isChecked: isChecked, // Ensure this is included
     };
 
     console.log("Updating task with payload:", payload);
@@ -939,6 +940,53 @@ async function updateTaskInBackend(categoryName, currentTaskName, newTaskName, d
     return false;
   }
 }
+
+// Function to update task status when the checkIcon is clicked
+async function updateTaskStatus(categoryName, taskName, newStatus) {
+  try {
+    // Ensure all required parameters are sent in the payload
+    const payload = {
+      userId: user,  // Assuming `user` is your logged-in user ID
+      category: categoryName,  // Ensure category is being passed
+      taskName: taskName,  // Ensure taskName is being passed
+      status: newStatus  // Ensure status is being passed
+    };
+
+    console.log("Payload being sent:", payload);  // Debug the payload
+
+    // Send the PUT request to update the task status
+    const response = await fetch(`${apiBaseUrl}/updateTaskStatus`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error updating task status:", errorData.error);
+      alert(errorData.error || "Failed to update task status.");
+      return;
+    }
+
+    const data = await response.json();
+    console.log("Task status updated successfully:", data.message);
+
+    // Update the task status in the UI after success
+    const taskElement = document.querySelector(`#task-${taskName}`);
+    if (taskElement) {
+      taskElement.querySelector('.status').textContent = newStatus;
+    }
+  } catch (error) {
+    console.error("Error during API call to update task status:", error);
+    alert("An error occurred while updating the task status.");
+  }
+}
+
+
+
+
 
 
 
