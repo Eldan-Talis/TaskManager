@@ -121,23 +121,31 @@ function removeCategoryFromSidebar(categoryName) {
   const sidebarList = document.getElementById("category-list");
   const sidebarCategories = Array.from(sidebarList.getElementsByClassName("category-link"));
 
+  // Normalize category names for comparison
   const categoryItem = sidebarCategories.find(item =>
-    item.textContent.trim() === categoryName
+    item.textContent.replace("•", "").trim().toLowerCase() === categoryName.toLowerCase()
   );
 
   if (categoryItem) {
     sidebarList.removeChild(categoryItem);
+    console.log(`Removed category "${categoryName}" from the sidebar.`);
+  } else {
+    console.warn(`Category "${categoryName}" not found in the sidebar.`);
   }
 }
+
 
 // Function to Open the Task Modal
 function openTaskModal(categoryContainer) {
   selectedTaskDiv = null; // Clear editing state for a new task
   selectedCategoryContainer = categoryContainer; // Set the selected category container
-  document.getElementById("addTaskModalLabel").textContent = "Add Task"; // Reset title
-  document.querySelector("#addTaskForm button[type='submit']").textContent =
-      "Add Task"; // Reset button text
-  document.getElementById("addTaskForm").reset(); // Clear input fields
+
+  // Reset modal title and button text
+  document.getElementById("addTaskModalLabel").textContent = "Add Task";
+  document.querySelector("#addTaskForm button[type='submit']").textContent = "Add Task";
+
+  // Clear the input fields
+  document.getElementById("addTaskForm").reset();
 
   // Reset counters
   document.getElementById("taskCharCount").textContent = "20 characters remaining";
@@ -145,11 +153,11 @@ function openTaskModal(categoryContainer) {
   document.getElementById("descriptionCharCount").textContent = "200 characters remaining";
   document.getElementById("descriptionCharCount").style.color = "gray";
 
-  const taskModal = new bootstrap.Modal(
-      document.getElementById("addTaskModal")
-  );
+  // Show the modal
+  const taskModal = new bootstrap.Modal(document.getElementById("addTaskModal"));
   taskModal.show();
 }
+
 
 
 document.getElementById("addTaskForm").addEventListener("submit", async function (e) {
@@ -169,37 +177,47 @@ document.getElementById("addTaskForm").addEventListener("submit", async function
     return;
   }
 
+  // Ensure selectedCategoryContainer is set
+  if (!selectedCategoryContainer) {
+    alert("No category selected. Please open the task modal from a valid category.");
+    console.error("No category container selected.");
+    return;
+  }
+
   try {
+    const categoryName = selectedCategoryContainer.querySelector("h4").textContent;
+
     if (selectedTaskDiv) {
-      // Edit existing task
-      selectedTaskDiv.querySelector("h5").textContent = taskName;
-      selectedTaskDiv.querySelector("p").textContent =
-        taskDescription || "No description provided.";
-      if (taskDate) {
-        const taskDateElement = selectedTaskDiv.querySelector(".task-date");
-        if (taskDateElement) {
-          taskDateElement.textContent = `Due: ${taskDate}`;
-        } else {
-          const newDateElement = document.createElement("span");
-          newDateElement.textContent = `Due: ${taskDate}`;
-          newDateElement.classList.add("task-date", "text-muted", "small");
-          selectedTaskDiv.appendChild(newDateElement);
-        }
+      // Editing an existing task
+      const currentTaskName = selectedTaskDiv.querySelector("h5").textContent;
+
+      const success = await updateTaskInBackend(
+        categoryName,
+        currentTaskName,
+        taskName, // New task name
+        taskDescription || "No description provided.",
+        taskDate || null,
+        selectedTaskDiv.classList.contains("task-done") // Maintain task's done state
+      );
+
+      if (success) {
+        await refreshCategoryTasks(selectedCategoryContainer, categoryName);
+      } else {
+        console.warn("Failed to update the task in the backend.");
       }
     } else {
-      // Add new task using backend API
+      // Adding a new task
       const addedTask = await addTaskToBackend(
-        selectedCategoryContainer.querySelector("h4").textContent, // Category name
+        categoryName,
         taskName,
         taskDescription || "No description provided.",
         taskDate || null
       );
 
       if (addedTask) {
-        const categoryName = selectedCategoryContainer.querySelector("h4").textContent;
         await refreshCategoryTasks(selectedCategoryContainer, categoryName);
       } else {
-        console.warn("addTaskToBackend did not return a valid task.");
+        console.warn("Failed to add the task to the backend.");
       }
     }
 
@@ -209,7 +227,7 @@ document.getElementById("addTaskForm").addEventListener("submit", async function
     );
     taskModal.hide();
 
-    selectedTaskDiv = null;
+    selectedTaskDiv = null; // Clear the editing state
     document.getElementById("addTaskForm").reset();
     document.getElementById("taskCharCount").textContent = `${taskNameMaxLength} characters remaining`;
     document.getElementById("taskCharCount").style.color = "gray";
@@ -220,6 +238,7 @@ document.getElementById("addTaskForm").addEventListener("submit", async function
     alert("An error occurred while processing the task.");
   }
 });
+
 
 
 
@@ -365,27 +384,41 @@ document.getElementById("taskDateInput").addEventListener("focus", function () {
 
 // Function to Delete a Task
 function deleteTask(taskDiv) {
-  if (confirm("Are you sure you want to delete this task?")) {
-    taskDiv.remove();
+  const categoryCard = taskDiv.closest(".category-card"); // Get the category container
+  const categoryName = categoryCard.querySelector("h4").textContent; // Get category name
+  const taskName = taskDiv.querySelector("h5").textContent; // Get task name
+
+  if (confirm(`Are you sure you want to delete the task "${taskName}"?`)) {
+    deleteTaskFromBackend(categoryName, taskName).then((success) => {
+      if (success) {
+        // Remove task from the UI
+        taskDiv.remove();
+        console.log(`Task "${taskName}" removed from category "${categoryName}".`);
+      }
+    });
   }
 }
+
 
 // Function to Edit a Task
 function editTask(taskDiv) {
   // Check if the task is marked as done
   if (taskDiv.classList.contains("task-done")) {
-      alert("You cannot edit a task that is marked as done!");
-      return; // Exit the function
+    alert("You cannot edit a task that is marked as done!");
+    return; // Exit the function
   }
 
   // Set task to edit
   selectedTaskDiv = taskDiv; // Store the task being edited
 
+  // Get the category container
+  selectedCategoryContainer = taskDiv.closest(".category-card"); // Set the category container
+
   // Get existing task details
   const taskTitle = taskDiv.querySelector("h5").textContent;
   const taskDesc = taskDiv.querySelector("p").textContent;
   const taskDate =
-      taskDiv.querySelector(".task-date")?.textContent.replace("TDD: ", "") || "";
+    taskDiv.querySelector(".task-date")?.textContent.replace("Due: ", "") || "";
 
   // Populate the modal fields
   const taskNameInput = document.getElementById("taskNameInput");
@@ -408,14 +441,15 @@ function editTask(taskDiv) {
   // Update the modal title and button text
   document.getElementById("addTaskModalLabel").textContent = "Edit Task";
   document.querySelector("#addTaskForm button[type='submit']").textContent =
-      "Save Changes";
+    "Save Changes";
 
   // Show the modal
   const taskModal = new bootstrap.Modal(
-      document.getElementById("addTaskModal")
+    document.getElementById("addTaskModal")
   );
   taskModal.show();
 }
+
 
 
 // Function to Show Task Details
@@ -572,7 +606,7 @@ function displayCategories(categories) {
   // Loop through the categories and add them
   categories.forEach((categoryName) => {
     // Add to categories grid
-    addCategory(categoryName);
+    addCateaddCategory(categoryName);
 
   });
 }
@@ -673,6 +707,21 @@ document
 
       // Add category to the UI
       addCategory(categoryName);
+
+      // Synchronize with the backend for sorting
+      await fetchAllCategories();
+
+      // Scroll to the newly added category
+      const newCategoryCard = Array.from(document.querySelectorAll(".category-card")).find(
+        (card) => card.querySelector("h4").textContent === categoryName
+      );
+
+      if (newCategoryCard) {
+        newCategoryCard.scrollIntoView({ behavior: "smooth", block: "center" });
+        newCategoryCard.classList.add("highlight"); // Optionally add a highlight effect
+        setTimeout(() => newCategoryCard.classList.remove("highlight"), 2000); // Remove highlight after 2 seconds
+      }
+
 
       // Clear input field
       categoryNameInput.value = "";
@@ -794,7 +843,7 @@ async function refreshCategoryTasks(categoryContainer, categoryName) {
 async function deleteCategoryFromBackend(categoryName) {
   try {
     const response = await fetch(`${apiBaseUrl}/DeleteCategory`, {
-      method: "POST",
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
@@ -820,6 +869,79 @@ async function deleteCategoryFromBackend(categoryName) {
     return false;
   }
 }
+
+async function deleteTaskFromBackend(categoryName, taskName) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/DeleteTask`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user,
+        categoryName: categoryName,
+        taskName: taskName,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error deleting task:", errorData.error);
+      alert(errorData.error || "Failed to delete task.");
+      return false;
+    }
+
+    const data = await response.json();
+    console.log("Task deleted successfully:", data.message);
+    return true;
+  } catch (error) {
+    console.error("Error during API call to delete task:", error);
+    alert("An error occurred while deleting the task. Please try again.");
+    return false;
+  }
+}
+
+async function updateTaskInBackend(categoryName, currentTaskName, newTaskName, description, dueDate, isChecked) {
+  try {
+    const payload = {
+      UserId: user,
+      categoryName: categoryName, // Backend expects "categoryName"
+      currentTaskName: currentTaskName,
+      newTaskName: newTaskName, // Ensure this is included to update the task name
+      description: description,
+      dueDate: dueDate || null,
+      isChecked: isChecked, // Ensure this is included
+    };
+
+    console.log("Updating task with payload:", payload);
+
+    const response = await fetch(`${apiBaseUrl}/UpdateTask`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error updating task:", errorData.error);
+      alert(errorData.error || "Failed to update task.");
+      return false;
+    }
+
+    const data = await response.json();
+    console.log("Task updated successfully:", data.message);
+    return true;
+  } catch (error) {
+    console.error("Error during API call to update task:", error);
+    alert("An error occurred while updating the task. Please try again.");
+    return false;
+  }
+}
+
+
+
 
 
 
