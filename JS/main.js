@@ -4,42 +4,19 @@ const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod"
 
 const user = "user123"
 
-// Function to handle Add Category Form Submission
-document
-  .getElementById("addCategoryForm")
-  .addEventListener("submit", function (e) {
-    e.preventDefault(); // Prevent form refresh
-
-    // Set the character limit
-    const maxLength = 20;
-
-    const categoryNameInput = document.getElementById("categoryNameInput");
-    const categoryName = categoryNameInput.value.trim();
-
-    if (categoryName) {
-      // Close the modal programmatically
-      const addCategoryModal = bootstrap.Modal.getInstance(
-        document.getElementById("addCategoryModal")
-      );
-      addCategoryModal.hide();
-
-      addCategory(categoryName); // Add category to the grid
-      categoryNameInput.value = ""; // Clear input field
-
-      // Reset the character counter
-      const cateCharCount = document.getElementById("cateCharCount");
-      cateCharCount.textContent = `${maxLength} characters remaining`;
-      cateCharCount.style.color = "gray"; // Reset color
-    
-    } else {
-      alert("Category Name is required!");
-    }
-  });
-
 // Function to Add a Category Dynamically
 function addCategory(categoryName) {
   const categoriesGrid = document.getElementById("categories-grid");
-  const sidebarList = document.getElementById("category-list");
+
+  // Avoid duplicate categories
+  const existingCategory = Array.from(document.querySelectorAll(".category-card h4"))
+    .some((header) => header.textContent === categoryName);
+
+  if (existingCategory) {
+    console.warn("Category already exists in UI:", categoryName);
+    alert("This category already exists!");
+    return;
+  }
 
   // Create Category Card
   const categoryCard = document.createElement("div");
@@ -60,44 +37,38 @@ function addCategory(categoryName) {
     "gap-1"
   );
 
-  // Add Task Button (Plus Icon)
+  // Add Task Button
   const addTaskIcon = document.createElement("button");
-  addTaskIcon.innerHTML = "+"; // Plus icon
+  addTaskIcon.innerHTML = "+";
   addTaskIcon.classList.add("btn", "btn-primary", "p-1");
-
-  // Event Listener to Open Task Modal
   addTaskIcon.addEventListener("click", function () {
-    openTaskModal(categoryCard); // Pass the category card to the task modal
+    openTaskModal(categoryCard);
   });
 
-  // Delete Category Button (Red X Icon)
+  // Delete Category Button
   const deleteCategoryIcon = document.createElement("button");
-  deleteCategoryIcon.innerHTML = "×"; // X icon
+  deleteCategoryIcon.innerHTML = "×";
   deleteCategoryIcon.classList.add("btn", "text-danger", "p-1");
-
-  // Event Listener to Delete the Category
   deleteCategoryIcon.addEventListener("click", function () {
-    if (
-      confirm(`Are you sure you want to delete the category "${categoryName}"?`)
-    ) {
+    if (confirm(`Are you sure you want to delete the category "${categoryName}"?`)) {
       categoriesGrid.removeChild(categoryCard);
-      removeCategoryFromSidebar(categoryName); // Remove from sidebar
     }
   });
 
-  // Append buttons to the container
+  // Append Buttons to Container
   buttonContainer.appendChild(addTaskIcon);
   buttonContainer.appendChild(deleteCategoryIcon);
 
-  // Append elements to the card
+  // Append Elements to Card
   categoryCard.appendChild(buttonContainer);
   categoryCard.appendChild(categoryHeader);
 
   categoriesGrid.appendChild(categoryCard);
 
-  // Add the category to the sidebar
+  // Update Sidebar
   addCategoryToSidebar(categoryName);
 }
+
 
 // Function to Add Category to Sidebar
 function addCategoryToSidebar(categoryName) {
@@ -173,7 +144,7 @@ function openTaskModal(categoryContainer) {
 }
 
 
-document.getElementById("addTaskForm").addEventListener("submit", function (e) {
+document.getElementById("addTaskForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const taskName = document.getElementById("taskNameInput").value.trim();
@@ -185,7 +156,12 @@ document.getElementById("addTaskForm").addEventListener("submit", function (e) {
   const taskNameMaxLength = 20;
   const taskDescriptionMaxLength = 200;
 
-  if (taskName) {
+  if (!taskName) {
+    alert("Task Name is required!");
+    return;
+  }
+
+  try {
     if (selectedTaskDiv) {
       // Edit existing task
       selectedTaskDiv.querySelector("h5").textContent = taskName;
@@ -194,46 +170,49 @@ document.getElementById("addTaskForm").addEventListener("submit", function (e) {
       if (taskDate) {
         const taskDateElement = selectedTaskDiv.querySelector(".task-date");
         if (taskDateElement) {
-          taskDateElement.textContent = `TDD: ${taskDate}`;
+          taskDateElement.textContent = `Due: ${taskDate}`;
         } else {
           const newDateElement = document.createElement("span");
-          newDateElement.textContent = `TDD: ${taskDate}`;
+          newDateElement.textContent = `Due: ${taskDate}`;
           newDateElement.classList.add("task-date", "text-muted", "small");
           selectedTaskDiv.appendChild(newDateElement);
         }
       }
     } else {
-      // Add new task
-      addTaskToCategory(
-        selectedCategoryContainer,
+      // Add new task using backend API
+      const addedTask = await addTaskToBackend(
+        selectedCategoryContainer.querySelector("h4").textContent, // Category name
         taskName,
-        taskDescription,
-        taskDate
+        taskDescription || "No description provided.",
+        taskDate || null
       );
+
+      if (addedTask) {
+        const categoryName = selectedCategoryContainer.querySelector("h4").textContent;
+        await refreshCategoryTasks(selectedCategoryContainer, categoryName);
+      } else {
+        console.warn("addTaskToBackend did not return a valid task.");
+      }
     }
 
-    
-
-    // Close the modal
+    // Close the modal and reset the form
     const taskModal = bootstrap.Modal.getInstance(
       document.getElementById("addTaskModal")
     );
     taskModal.hide();
 
-    // Reset form and variables
     selectedTaskDiv = null;
-    document.getElementById("addTaskForm").reset();
-
-    // Reset form and character counters
     document.getElementById("addTaskForm").reset();
     document.getElementById("taskCharCount").textContent = `${taskNameMaxLength} characters remaining`;
     document.getElementById("taskCharCount").style.color = "gray";
     document.getElementById("descriptionCharCount").textContent = `${taskDescriptionMaxLength} characters remaining`;
     document.getElementById("descriptionCharCount").style.color = "gray";
-  } else {
-    alert("Task Name is required!");
+  } catch (error) {
+    console.error("Error during task submission:", error);
+    alert("An error occurred while processing the task.");
   }
 });
+
 
 
 document.getElementById("add-category-btn").addEventListener("click", () => {
@@ -244,7 +223,17 @@ document.getElementById("add-category-btn").addEventListener("click", () => {
   document.getElementById("addTaskForm").reset(); // Clear the form fields
 });
 
-function addTaskToCategory(categoryContainer, name, description, date) {
+function addTaskToCategory(categoryContainer, name, description = "No description provided.", date = null) {
+  // Check if the task already exists in the category
+  const existingTasks = Array.from(categoryContainer.querySelectorAll(".task h5")).map(
+    (taskTitle) => taskTitle.textContent
+  );
+
+  if (existingTasks.includes(name)) {
+    alert(`A task named "${name}" already exists in this category.`);
+    return;
+  }
+
   let taskList = categoryContainer.querySelector(".task-list");
   if (!taskList) {
     taskList = document.createElement("div");
@@ -252,27 +241,49 @@ function addTaskToCategory(categoryContainer, name, description, date) {
     categoryContainer.appendChild(taskList);
   }
 
+  // Create Task Container
   const taskDiv = document.createElement("div");
   taskDiv.classList.add("task", "position-relative", "p-2", "mb-2", "rounded");
 
+  // Task Info Section
   const taskInfo = document.createElement("div");
 
+  // Task Title
   const taskTitle = document.createElement("h5");
   taskTitle.textContent = name;
   taskInfo.appendChild(taskTitle);
 
+  // Task Description
   const taskDesc = document.createElement("p");
-  taskDesc.textContent = description || "No description provided.";
+  taskDesc.textContent = description;
   taskInfo.appendChild(taskDesc);
 
+  // Task Date
   if (date) {
     const taskDate = document.createElement("span");
-    taskDate.textContent = "TDD: " + date;
+    taskDate.textContent = "Due: " + date;
     taskDate.classList.add("task-date", "text-muted", "small");
     taskInfo.appendChild(taskDate);
   }
 
-  // Icons Container
+  // Task Actions (Icons)
+  const iconsContainer = createTaskIcons(taskDiv, name, description, date);
+
+  // Append Info and Actions to Task Div
+  taskDiv.appendChild(taskInfo);
+  taskDiv.appendChild(iconsContainer);
+
+  // Add Task to the List
+  taskList.appendChild(taskDiv);
+
+  // Add Click Event to Show Task Details
+  taskDiv.addEventListener("click", () => showTaskDetails(taskDiv));
+}
+
+/**
+ * Creates and returns the icons container with event listeners.
+ */
+function createTaskIcons(taskDiv, name, description, date) {
   const iconsContainer = document.createElement("div");
   iconsContainer.style.position = "absolute";
   iconsContainer.style.top = "10px";
@@ -280,69 +291,59 @@ function addTaskToCategory(categoryContainer, name, description, date) {
   iconsContainer.style.display = "flex";
   iconsContainer.style.gap = "5px";
 
-  // Add Check Icon
+  // Check Icon
   const checkIcon = document.createElement("i");
   checkIcon.classList.add("fas", "fa-check", "text-success", "cursor-pointer");
-  checkIcon.style.cursor = "pointer";
   checkIcon.title = "Mark as Done";
 
-  // Event Listener for Check Icon
   checkIcon.addEventListener("click", (event) => {
-    event.stopPropagation(); // Prevent event from bubbling to parent
-    if (taskDiv.classList.contains("task-done")) {
-      // Unmark Task as Done
-      taskDiv.classList.remove("task-done");
-      checkIcon.classList.replace("fa-undo", "fa-check");
-      checkIcon.classList.replace("text-secondary", "text-success");
-      checkIcon.title = "Mark as Done";
-
-      editIcon.classList.remove("disabled");
-      editIcon.title = "Edit Task";
-    } else {
-      // Mark Task as Done
-      editIcon.classList.add("disabled");
-      taskDiv.classList.add("task-done");
-      checkIcon.classList.replace("fa-check", "fa-undo");
-      checkIcon.classList.replace("text-success", "text-secondary");
-      
-      checkIcon.title = "Mark as Not Done";
-      editIcon.title = "Cannot Edit a Done Task";
-    }
+    event.stopPropagation();
+    toggleTaskDoneState(taskDiv, checkIcon);
   });
-
   iconsContainer.appendChild(checkIcon);
 
-  // Add Edit Icon
+  // Edit Icon
   const editIcon = document.createElement("i");
   editIcon.classList.add("fas", "fa-edit", "text-secondary", "cursor-pointer");
-  editIcon.style.cursor = "pointer";
   editIcon.title = "Edit Task";
+
   editIcon.addEventListener("click", (event) => {
-    event.stopPropagation(); // Prevent event from bubbling to parent
-    editTask(taskDiv);
+    event.stopPropagation();
+    editTask(taskDiv, name, description, date);
   });
   iconsContainer.appendChild(editIcon);
 
-  // Add Delete Icon
+  // Delete Icon
   const deleteIcon = document.createElement("i");
   deleteIcon.classList.add("fas", "fa-trash", "text-danger", "cursor-pointer");
-  deleteIcon.style.cursor = "pointer";
   deleteIcon.title = "Delete Task";
+
   deleteIcon.addEventListener("click", (event) => {
-    event.stopPropagation(); // Prevent event from bubbling to parent
+    event.stopPropagation();
     deleteTask(taskDiv);
   });
   iconsContainer.appendChild(deleteIcon);
 
-  // Append task info and icons
-  taskDiv.appendChild(taskInfo);
-  taskDiv.appendChild(iconsContainer);
-
-  taskList.appendChild(taskDiv);
-
-  // Add click event to show task details
-  taskDiv.addEventListener("click", () => showTaskDetails(taskDiv));
+  return iconsContainer;
 }
+
+/**
+ * Toggles the task's "done" state.
+ */
+function toggleTaskDoneState(taskDiv, checkIcon) {
+  if (taskDiv.classList.contains("task-done")) {
+    taskDiv.classList.remove("task-done");
+    checkIcon.classList.replace("fa-undo", "fa-check");
+    checkIcon.classList.replace("text-secondary", "text-success");
+    checkIcon.title = "Mark as Done";
+  } else {
+    taskDiv.classList.add("task-done");
+    checkIcon.classList.replace("fa-check", "fa-undo");
+    checkIcon.classList.replace("text-success", "text-secondary");
+    checkIcon.title = "Mark as Not Done";
+  }
+}
+
 
 // Set the minimum date for the task date input to today's date
 document.getElementById("taskDateInput").addEventListener("focus", function () {
@@ -564,7 +565,6 @@ function displayCategories(categories) {
 async function fetchAllCategories() {
   try {
     const url = `${apiBaseUrl}/GetAllCategories?userId=${user}`;
-    console.log("Fetching categories with tasks from URL:", url);
 
     const response = await fetch(url, {
       method: "GET",
@@ -575,8 +575,6 @@ async function fetchAllCategories() {
     }
 
     const data = await response.json();
-    console.log("Fetched Categories with Tasks:", data);
-
     const categories = data.categories || {};
 
     // Display categories and their tasks
@@ -619,64 +617,68 @@ function displayCategoriesWithTasks(categories) {
 
 // Function to handle Add Category Form Submission
 document
-  .getElementById("addCategoryForm")
-  .addEventListener("submit", async function (e) {
-    e.preventDefault(); // Prevent form refresh
+.getElementById("addCategoryForm")
+.addEventListener("submit", async function (e) {
+  e.preventDefault(); // Prevent form refresh
 
-    const maxLength = 20; // Character limit
-    const categoryNameInput = document.getElementById("categoryNameInput");
-    const categoryName = categoryNameInput.value.trim();
+  // Set the character limit
+  const maxLength = 20;
 
-    if (categoryName) {
-      try {
-        // Call the backend to add the category
-        const response = await fetch(`${apiBaseUrl}/AddCategory`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: user, // Send the user ID
-            categoryName: categoryName, // Send the new category name
-          }),
-        });
+  const categoryNameInput = document.getElementById("categoryNameInput");
+  const categoryName = categoryNameInput.value.trim();
 
-        const data = await response.json();
+  if (!categoryName) {
+    alert("Category Name is required!");
+    return;
+  }
 
-        if (response.ok) {
-          // Add category to the UI only if the backend operation was successful
-          addCategory(categoryName);
+  try {
+    // Make API call to add the category
+    const response = await fetch(`${apiBaseUrl}/AddCategory`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user,
+        categoryName: categoryName,
+      }),
+    });
 
-          // Close the modal programmatically
-          const addCategoryModal = bootstrap.Modal.getInstance(
-            document.getElementById("addCategoryModal")
-          );
-          addCategoryModal.hide();
+    const data = await response.json();
 
-          // Clear input field
-          categoryNameInput.value = "";
+    if (response.ok) {
+      // Close the modal programmatically
+      const addCategoryModal = bootstrap.Modal.getInstance(
+        document.getElementById("addCategoryModal")
+      );
+      addCategoryModal.hide();
 
-          // Reset the character counter
-          const cateCharCount = document.getElementById("cateCharCount");
-          cateCharCount.textContent = `${maxLength} characters remaining`;
-          cateCharCount.style.color = "gray";
+      // Add category to the UI
+      addCategory(categoryName);
 
-          console.log("Category added successfully:", data.message);
-        } else {
-          // Show an error if the backend fails
-          alert(data.error || "Failed to add category.");
-          console.error("Error adding category:", data.error);
-        }
-      } catch (error) {
-        // Handle any unexpected errors
-        alert("An error occurred while adding the category. Please try again.");
-        console.error("Error:", error);
-      }
+      // Clear input field
+      categoryNameInput.value = "";
+
+      // Reset the character counter
+      const cateCharCount = document.getElementById("cateCharCount");
+      cateCharCount.textContent = `${maxLength} characters remaining`;
+      cateCharCount.style.color = "gray";
+
     } else {
-      alert("Category Name is required!");
+      alert(data.error || "Failed to add category.");
+      console.error("Backend Error:", data.error);
     }
-  });
+  } catch (error) {
+    alert("An error occurred while adding the category. Please try again.");
+    console.error("Error:", error);
+  }
+});
 
+  
+  
+
+  
 
 
 
@@ -688,8 +690,89 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchAllCategories();
 });
 
+async function addTaskToBackend(categoryName, taskName, description, dueDate) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/AddTask`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user,
+        categoryName,
+        taskName,
+        description,
+        dueDate,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error from backend:", errorData.error);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.task; // Ensure this matches the backend's response structure
+  } catch (error) {
+    console.error("Error during API call to add task:", error);
+    return null;
+  }
+}
 
 
+
+async function fetchTasksForCategory(userId, categoryName) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/GetAllTasks?userId=${userId}&categoryName=${categoryName}`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch tasks: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // Transform tasks from object to array if necessary
+    if (data.tasks && typeof data.tasks === "object" && !Array.isArray(data.tasks)) {
+      return Object.entries(data.tasks).map(([taskName, taskDetails]) => ({
+        taskName, // Add taskName to each task object
+        ...taskDetails,
+      }));
+    }
+
+    return data.tasks || [];
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    alert("Unable to fetch tasks. Please try again later.");
+    return [];
+  }
+}
+
+
+async function refreshCategoryTasks(categoryContainer, categoryName) {
+  try {
+    const tasks = await fetchTasksForCategory(user, categoryName);
+
+    let taskList = categoryContainer.querySelector(".task-list");
+    if (!taskList) {
+      taskList = document.createElement("div");
+      taskList.classList.add("task-list");
+      categoryContainer.appendChild(taskList);
+    }
+
+    taskList.innerHTML = ""; // Clear existing tasks
+
+    tasks.forEach((task) => {
+      addTaskToCategory(categoryContainer, task.taskName, task.description, task.dueDate);
+    });
+
+  } catch (error) {
+    console.error(`Failed to refresh tasks for category "${categoryName}":`, error);
+    alert("Unable to refresh tasks. Please try again later.");
+  }
+}
 
 
 
