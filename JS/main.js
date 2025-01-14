@@ -482,7 +482,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   // Select the black and blue buttons
-  const blackButton = document.querySelector("[data-navbar-color='#181C14']");
+  const blackButton = document.querySelector("[data-navbar-color='#1a1b18']");
   const blueButton = document.querySelector("[data-navbar-color='#7695FF']");
 
   if (prefersDarkMode && blackButton) {
