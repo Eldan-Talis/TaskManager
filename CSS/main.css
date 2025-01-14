@@ -8,7 +8,7 @@ body {
 
 /* Navbar Styling */
 .navbar {
-    position: fixed;
+    position: fixed !important;
     top: 0;
     left: 0;
     width: 100%;
@@ -59,7 +59,7 @@ body {
 .main-container {
     margin-left: 16.666667%; /* Offset for the fixed sidebar width */
     padding: 20px;
-    margin-top: 60px; /* Space below the fixed navbar */
+    margin-top: 50px !important; /* Space below the fixed navbar */
 }
 
 #category-list {
