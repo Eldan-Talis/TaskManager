@@ -49,11 +49,19 @@ function addCategory(categoryName) {
   const deleteCategoryIcon = document.createElement("button");
   deleteCategoryIcon.innerHTML = "×";
   deleteCategoryIcon.classList.add("btn", "text-danger", "p-1");
-  deleteCategoryIcon.addEventListener("click", function () {
+  deleteCategoryIcon.addEventListener("click", async function () {
     if (confirm(`Are you sure you want to delete the category "${categoryName}"?`)) {
-      categoriesGrid.removeChild(categoryCard);
+      const success = await deleteCategoryFromBackend(categoryName);
+  
+      if (success) {
+        // Remove category from the UI
+        categoriesGrid.removeChild(categoryCard);
+        removeCategoryFromSidebar(categoryName);
+        console.log(`Category "${categoryName}" removed from UI.`);
+      }
     }
   });
+  
 
   // Append Buttons to Container
   buttonContainer.appendChild(addTaskIcon);
@@ -108,17 +116,17 @@ function addCategoryToSidebar(categoryName) {
 }
 
 
-
 // Function to Remove Category from Sidebar
 function removeCategoryFromSidebar(categoryName) {
   const sidebarList = document.getElementById("category-list");
-  const sidebarCategories = sidebarList.getElementsByClassName("category-link");
+  const sidebarCategories = Array.from(sidebarList.getElementsByClassName("category-link"));
 
-  for (let i = 0; i < sidebarCategories.length; i++) {
-    if (sidebarCategories[i].textContent === categoryName) {
-      sidebarList.removeChild(sidebarCategories[i]);
-      break;
-    }
+  const categoryItem = sidebarCategories.find(item =>
+    item.textContent.trim() === categoryName
+  );
+
+  if (categoryItem) {
+    sidebarList.removeChild(categoryItem);
   }
 }
 
@@ -783,6 +791,35 @@ async function refreshCategoryTasks(categoryContainer, categoryName) {
   }
 }
 
+async function deleteCategoryFromBackend(categoryName) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/DeleteCategory`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user,
+        categoryName: categoryName,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error deleting category:", errorData.error);
+      alert(errorData.error || "Failed to delete category.");
+      return false;
+    }
+
+    const data = await response.json();
+    console.log("Category deleted successfully:", data.message);
+    return true;
+  } catch (error) {
+    console.error("Error during API call to delete category:", error);
+    alert("An error occurred while deleting the category. Please try again.");
+    return false;
+  }
+}
 
 
 
