@@ -448,17 +448,26 @@ const colorButtons = document.querySelectorAll(".color-picker button");
 
 // Add click event listener to each button
 colorButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-        const selectedNavbarColor = button.getAttribute("data-navbar-color");
-        const selectedSidebarColor = button.getAttribute("data-sidebar-color");
-        const navbar = document.querySelector(".navbar");
-        const sidebar = document.querySelector(".sidebar");
+  button.addEventListener("click", () => {
+      const selectedNavbarColor = button.getAttribute("data-navbar-color");
+      const selectedSidebarColor = button.getAttribute("data-sidebar-color");
+      const selectedCategoryContainerColor = button.getAttribute("data-category-color");
+      
+      const navbar = document.querySelector(".navbar");
+      const sidebar = document.querySelector(".sidebar");
+      const categoryCards = document.querySelectorAll(".category-card");
 
-        // Set the background color directly
-        navbar.style.setProperty("background-color", selectedNavbarColor, "important");
-        sidebar.style.setProperty("background-color", selectedSidebarColor, "important");
-    });
+      // Set the background color directly for navbar and sidebar
+      navbar.style.setProperty("background-color", selectedNavbarColor, "important");
+      sidebar.style.setProperty("background-color", selectedSidebarColor, "important");
+
+      // Set the background color for all category cards
+      categoryCards.forEach((categoryCard) => {
+          categoryCard.style.setProperty("background-color", selectedCategoryContainerColor, "important");
+      });
+  });
 });
+
 
 document.addEventListener("DOMContentLoaded", () => {
   // Check if the user prefers dark mode

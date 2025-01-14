@@ -27,33 +27,38 @@
         <div class="color-picker d-flex justify-content-center">
           <button
             class="btn btn-sm"
-            style="background-color: #181C14"
-            data-navbar-color="#181C14"
+            style="background-color: #1a1b18"
+            data-navbar-color="#1a1b18"
             data-sidebar-color="#3C3D37"
+            data-category-color="#e6e7e4"
           ></button>
           <button
             class="btn btn-sm"
-            style="background-color: #8D89A6"
+            style="background-color: #8d89a6"
             data-navbar-color="#8D89A6"
             data-sidebar-color="#A69AB9"
+            data-category-color="#e3e2e9"
           ></button>
           <button
             class="btn btn-sm"
-            style="background-color: #A35C7A"
+            style="background-color: #a35c7a"
             data-navbar-color="#A35C7A"
             data-sidebar-color="#C890A7"
+            data-category-color="#eddee4"
           ></button>
           <button
             class="btn btn-sm"
-            style="background-color: #C57B57"
+            style="background-color: #c57b57"
             data-navbar-color="#C57B57"
             data-sidebar-color="#F4C0A4"
+            data-category-color="#f1e2da"
           ></button>
           <button
             class="btn btn-sm"
-            style="background-color: #7695FF"
+            style="background-color: #7695ff"
             data-navbar-color="#7695FF"
             data-sidebar-color="#9DBDFF"
+            data-category-color="#e6ebff"
           ></button>
         </div>
       </div>
@@ -71,14 +76,20 @@
             data-bs-toggle="modal"
             data-bs-target="#addCategoryModal"
           >
-          <i class="fas fa-plus icon-spacing">  </i> <!-- Font Awesome plus icon -->
+            <i class="fas fa-plus icon-spacing"> </i>
+            <!-- Font Awesome plus icon -->
             Add
           </button>
           <div class="search-container">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" id="categorySearch" placeholder="Search" class="search-input" />
-        </div>
-        <div class="search-separator"></div>
+            <input
+              type="text"
+              id="categorySearch"
+              placeholder="Search"
+              class="search-input"
+            />
+          </div>
+          <div class="search-separator"></div>
           <ul id="category-list" class="list-group">
             <!-- Categories will be added here dynamically -->
           </ul>
@@ -117,7 +128,9 @@
           <div class="modal-body">
             <form id="addCategoryForm">
               <div class="mb-3">
-                <label for="categoryNameInput" class="form-label">Category Name</label>
+                <label for="categoryNameInput" class="form-label"
+                  >Category Name</label
+                >
                 <input
                   type="text"
                   class="form-control"
@@ -129,7 +142,7 @@
                 <small id="cateCharCount" class="form-text text-muted">
                   20 characters remaining
                 </small>
-              </div>              
+              </div>
               <button type="submit" class="btn btn-primary">
                 Create Category
               </button>
@@ -173,9 +186,11 @@
                 <small id="taskCharCount" class="form-text text-muted">
                   20 characters remaining
                 </small>
-              </div>              
+              </div>
               <div class="mb-3">
-                <label for="taskDescriptionInput" class="form-label">Task Description</label>
+                <label for="taskDescriptionInput" class="form-label"
+                  >Task Description</label
+                >
                 <textarea
                   class="form-control"
                   id="taskDescriptionInput"
@@ -187,7 +202,7 @@
                 <small id="descriptionCharCount" class="form-text text-muted">
                   200 characters remaining
                 </small>
-              </div>              
+              </div>
               <div class="mb-3">
                 <label for="taskDateInput" class="form-label"
                   >Due Date (Optional)</label
