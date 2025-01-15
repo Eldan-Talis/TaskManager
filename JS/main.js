@@ -2,7 +2,43 @@ let selectedCategoryContainer = null; // Tracks the category container for task 
 
 const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod"
 
-const user = "user123"
+const sub = sessionStorage.getItem('sub');
+const user = sub
+console.log('Sub:', sub);
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const authUrl = `${config.domain}/login?` +
+      // response_type=code +
+      "response_type=token" +
+      `&client_id=${config.clientId}` +
+      `&redirect_uri=${encodeURIComponent(config.redirectUri)}` +
+      "&scope=openid+aws.cognito.signin.user.admin";
+  const sub = sessionStorage.getItem('sub');
+  if (!sub) {
+      console.error("User ID (sub) is missing. Redirecting to login.");
+      // Redirect to login if the sub is not available
+      window.location.href = authUrl;
+      return;
+  }
+
+  try {
+      await fetchAllCategories(); // Fetch all categories for the user
+  } catch (error) {
+      console.error("Failed to load user data:", error);
+  }
+});
+
+
+function login() {
+  const authUrl = `${config.domain}/login?` +
+      // response_type=code +
+      "response_type=token" +
+      `&client_id=${config.clientId}` +
+      `&redirect_uri=${encodeURIComponent(config.redirectUri)}` +
+      "&scope=openid+aws.cognito.signin.user.admin";
+  window.location.href = authUrl;
+}
 
 // Function to Add a Category Dynamically
 function addCategory(categoryName) {
@@ -743,21 +779,6 @@ document
   }
 });
 
-  
-  
-
-  
-
-
-
-
-
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  fetchAllCategories();
-});
-
 async function addTaskToBackend(categoryName, taskName, description, dueDate) {
   try {
     const response = await fetch(`${apiBaseUrl}/AddTask`, {
@@ -787,8 +808,6 @@ async function addTaskToBackend(categoryName, taskName, description, dueDate) {
     return null;
   }
 }
-
-
 
 async function fetchTasksForCategory(userId, categoryName) {
   try {
