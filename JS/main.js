@@ -3,6 +3,7 @@ let selectedCategoryContainer = null; // Tracks the category container for task 
 const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod"
 
 const sub = sessionStorage.getItem('sub');
+const firstName = sessionStorage.getItem('firstName');
 const user = sub
 console.log('Sub:', sub);
 
@@ -14,7 +15,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       `&client_id=${config.clientId}` +
       `&redirect_uri=${encodeURIComponent(config.redirectUri)}` +
       "&scope=openid+aws.cognito.signin.user.admin";
-  const sub = sessionStorage.getItem('sub');
   if (!sub) {
       console.error("User ID (sub) is missing. Redirecting to login.");
       // Redirect to login if the sub is not available
@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
       await fetchAllCategories(); // Fetch all categories for the user
+      greetUser;
   } catch (error) {
       console.error("Failed to load user data:", error);
   }
@@ -351,6 +352,33 @@ function addTaskToCategory(categoryContainer, name, description = "No descriptio
   taskDiv.addEventListener("click", () => showTaskDetails(taskDiv));
 }
 
+function toggleColorPicker() {
+  const colorPicker = document.getElementById("colorPicker");
+  
+  // Check the current display style
+  const currentDisplay = window.getComputedStyle(colorPicker).getPropertyValue("display");
+
+  if (currentDisplay === "none") {
+    // Show the color picker with !important
+    colorPicker.style.setProperty("display", "flex", "important");
+  } else {
+    // Hide the color picker with !important
+    colorPicker.style.setProperty("display", "none", "important");
+  }
+}
+
+// Function to set the user's name and display a greeting
+function greetUser() {
+  const userName = firstName // Replace this with logic to fetch the actual user's name
+  const greetingText = document.getElementById("greetingText");
+
+  if (userName) {
+    greetingText.textContent = `Hello, ${userName}!`;
+  } else {
+    greetingText.textContent = "Hello, Guest!";
+  }
+}
+
 
 /**
  * Creates and returns the icons container with event listeners.
@@ -572,7 +600,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Select the black and blue buttons
   const blackButton = document.querySelector("[data-navbar-color='#1a1b18']");
-  const blueButton = document.querySelector("[data-navbar-color='#7695FF']");
+  const blueButton = document.querySelector("[data-navbar-color='#7695ff']");
 
   if (prefersDarkMode && blackButton) {
       blackButton.click(); // Simulate a click on the black button

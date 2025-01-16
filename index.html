@@ -20,46 +20,60 @@
     <div class="navbar d-flex align-items-center">
       <div class="container-fluid">
         <div class="d-flex">
-          <a href="#" class="nav-link">My Tasks</a>
-          <a href="#" class="nav-link">Settings</a>
-          <a href="#" onclick="login()" class="nav-link">Log in</a>
+          <a href="#" class="nav-link">
+            <i class="fas fa-tasks"></i> <!-- Font Awesome tasks icon -->
+          </a>
+          <a href="#" class="nav-link">
+            <i class="fas fa-cog"></i> <!-- Font Awesome settings icon -->
+          </a>
+          <a href="#" onclick="login()" class="nav-link">
+            <i class="fas fa-sign-in-alt"></i> <!-- Font Awesome login icon -->
+          </a>
+          <a href="#" onclick="toggleColorPicker()" class="nav-link">
+            <i class="fas fa-palette"></i> <!-- Font Awesome color palette icon -->
+          </a>
+          <!-- Color Picker Buttons -->
+          <div id="colorPicker" class="color-picker align-items-center justify-content-center" style="display: none !important">
+            <button
+              class="btn btn-sm"
+              style="background-color: #1a1b18"
+              data-navbar-color="#1a1b18"
+              data-sidebar-color="#3C3D37"
+              data-category-color="#e6e7e4"
+            ></button>
+            <button
+              class="btn btn-sm"
+              style="background-color: #8d89a6"
+              data-navbar-color="#8D89A6"
+              data-sidebar-color="#A69AB9"
+              data-category-color="#e3e2e9"
+            ></button>
+            <button
+              class="btn btn-sm"
+              style="background-color: #a35c7a"
+              data-navbar-color="#A35C7A"
+              data-sidebar-color="#C890A7"
+              data-category-color="#eddee4"
+            ></button>
+            <button
+              class="btn btn-sm"
+              style="background-color: #c57b57"
+              data-navbar-color="#C57B57"
+              data-sidebar-color="#F4C0A4"
+              data-category-color="#f1e2da"
+            ></button>
+            <button
+              class="btn btn-sm"
+              style="background-color: #7695ff"
+              data-navbar-color="#7695ff"
+              data-sidebar-color="#9DBDFF"
+              data-category-color="#e6ebff"
+            ></button>
+          </div>
         </div>
-        <div class="color-picker d-flex justify-content-center">
-          <button
-            class="btn btn-sm"
-            style="background-color: #1a1b18"
-            data-navbar-color="#1a1b18"
-            data-sidebar-color="#3C3D37"
-            data-category-color="#e6e7e4"
-          ></button>
-          <button
-            class="btn btn-sm"
-            style="background-color: #8d89a6"
-            data-navbar-color="#8D89A6"
-            data-sidebar-color="#A69AB9"
-            data-category-color="#e3e2e9"
-          ></button>
-          <button
-            class="btn btn-sm"
-            style="background-color: #a35c7a"
-            data-navbar-color="#A35C7A"
-            data-sidebar-color="#C890A7"
-            data-category-color="#eddee4"
-          ></button>
-          <button
-            class="btn btn-sm"
-            style="background-color: #c57b57"
-            data-navbar-color="#C57B57"
-            data-sidebar-color="#F4C0A4"
-            data-category-color="#f1e2da"
-          ></button>
-          <button
-            class="btn btn-sm"
-            style="background-color: #7695ff"
-            data-navbar-color="#7695FF"
-            data-sidebar-color="#9DBDFF"
-            data-category-color="#e6ebff"
-          ></button>
+        <!-- User Greeting -->
+        <div id="userGreeting" class="greeting">
+          <h3 id="greetingText"></h3>
         </div>
       </div>
     </div>
