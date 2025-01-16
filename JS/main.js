@@ -6,6 +6,7 @@ const sub = sessionStorage.getItem('sub');
 const firstName = sessionStorage.getItem('first_name');
 const user = sub
 console.log('Sub:', sub);
+console.log("hello world");
 
 
 document.addEventListener("DOMContentLoaded", async () => {
