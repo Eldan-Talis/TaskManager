@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!sub) {
       console.error("User ID (sub) is missing. Redirecting to login.");
       // Redirect to login if the sub is not available
-      //window.location.href = authUrl;
+      window.location.href = authUrl;
       return;
   }
 
