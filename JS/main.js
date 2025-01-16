@@ -346,6 +346,26 @@ function addTaskToCategory(categoryContainer, name, description = "No descriptio
 
   // Task Actions (Icons)
   const iconsContainer = createTaskIcons(taskDiv, name, description, date);
+  // Disable actions for "Late" tasks
+  if (status === "Late") {
+    taskDiv.classList.add("task-late");
+
+    // Disable the check button
+    const checkIcon = iconsContainer.querySelector(".fa-check");
+    if (checkIcon) {
+      checkIcon.style.pointerEvents = "none"; // Disable click events
+      checkIcon.style.opacity = "0.5"; // Dim the icon
+      checkIcon.title = "Cannot mark as done for a late task";
+    }
+
+    // Disable the edit button
+    const editIcon = iconsContainer.querySelector(".fa-edit");
+    if (editIcon) {
+      editIcon.style.pointerEvents = "none"; // Disable click events
+      editIcon.style.opacity = "0.5"; // Dim the icon
+      editIcon.title = "Cannot edit a late task";
+    }
+  }
 
   // Append Info and Actions to Task Div
   taskDiv.appendChild(taskInfo);
@@ -366,43 +386,6 @@ function addTaskToCategory(categoryContainer, name, description = "No descriptio
   // Add Click Event to Show Task Details
   taskDiv.addEventListener("click", () => showTaskDetails(taskDiv));
 }
-
-function toggleColorPicker() {
-  const colorPicker = document.getElementById("colorPicker");
-  
-  // Check the current display style
-  const currentDisplay = window.getComputedStyle(colorPicker).getPropertyValue("display");
-
-  if (currentDisplay === "none") {
-    // Show the color picker with !important
-    colorPicker.style.setProperty("display", "flex", "important");
-  } else {
-    // Hide the color picker with !important
-    colorPicker.style.setProperty("display", "none", "important");
-  }
-}
-
-// Function to set the user's name and display a greeting
-document.addEventListener("DOMContentLoaded", function () {
-  // Function to set the user's name and display a greeting
-  function greetUser() {
-    const userName = firstName; // Replace this with logic to fetch the actual user's name
-    const greetingText = document.getElementById("greetingText");
-
-    if (greetingText) {
-      if (userName) {
-        greetingText.textContent = `Hello ${userName}`;
-      } else {
-        greetingText.textContent = "Hello Guest";
-      }
-    } else {
-      console.error("Greeting text element not found!");
-    }
-  }
-
-  // Call the greetUser function
-  greetUser();
-});
 
 
 /**
