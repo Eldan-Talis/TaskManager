@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
       await fetchAllCategories(); // Fetch all categories for the user
+      await applyUserTheme();
   } catch (error) {
       console.error("Failed to load user data:", error);
   }
@@ -603,7 +604,8 @@ colorButtons.forEach((button) => {
 });
 
 
-document.addEventListener("DOMContentLoaded", () => {
+// Function to set the theme based on user preferences
+function applyUserTheme() {
   // Check if the user prefers dark mode
   const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
@@ -616,7 +618,10 @@ document.addEventListener("DOMContentLoaded", () => {
   } else if (blueButton) {
       blueButton.click(); // Simulate a click on the blue button
   }
-});
+}
+
+// Call the function when the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", applyUserTheme);
 
 // Updates the character counter for the Category Name input field in real-time.
 document.getElementById("categoryNameInput").addEventListener("input", function () {
