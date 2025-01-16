@@ -3,7 +3,7 @@ let selectedCategoryContainer = null; // Tracks the category container for task 
 const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod"
 
 const sub = sessionStorage.getItem('sub');
-const firstName = sessionStorage.getItem('firstName');
+const firstName = sessionStorage.getItem('first_name');
 const user = sub
 console.log('Sub:', sub);
 
