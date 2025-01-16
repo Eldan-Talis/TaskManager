@@ -18,13 +18,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!sub) {
       console.error("User ID (sub) is missing. Redirecting to login.");
       // Redirect to login if the sub is not available
-      window.location.href = authUrl;
+      //window.location.href = authUrl;
       return;
   }
 
   try {
       await fetchAllCategories(); // Fetch all categories for the user
-      greetUser;
   } catch (error) {
       console.error("Failed to load user data:", error);
   }
@@ -368,16 +367,26 @@ function toggleColorPicker() {
 }
 
 // Function to set the user's name and display a greeting
-function greetUser() {
-  const userName = firstName // Replace this with logic to fetch the actual user's name
-  const greetingText = document.getElementById("greetingText");
+document.addEventListener("DOMContentLoaded", function () {
+  // Function to set the user's name and display a greeting
+  function greetUser() {
+    const userName = firstName; // Replace this with logic to fetch the actual user's name
+    const greetingText = document.getElementById("greetingText");
 
-  if (userName) {
-    greetingText.textContent = `Hello, ${userName}!`;
-  } else {
-    greetingText.textContent = "Hello, Guest!";
+    if (greetingText) {
+      if (userName) {
+        greetingText.textContent = `Hello ${userName}`;
+      } else {
+        greetingText.textContent = "Hello Guest";
+      }
+    } else {
+      console.error("Greeting text element not found!");
+    }
   }
-}
+
+  // Call the greetUser function
+  greetUser();
+});
 
 
 /**
