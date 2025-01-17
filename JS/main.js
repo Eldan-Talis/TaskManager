@@ -2,11 +2,12 @@ let selectedCategoryContainer = null; // Tracks the category container for task 
 
 const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod"
 
-const sub = sessionStorage.getItem('sub');
+const sub = sessionStorage.getItem('sub');;
 const firstName = sessionStorage.getItem('first_name');
 const user = sub
 console.log('Sub:', sub);
-console.log("hello world");
+let isCategoryClicked = false;
+
 
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -136,36 +137,120 @@ function addCategoryToSidebar(categoryName) {
 
   // Create Sidebar Item
   const sidebarCategory = document.createElement("li");
-  sidebarCategory.classList.add("list-group-item", "category-link", "d-flex", "align-items-center");
+  sidebarCategory.classList.add("list-group-item", "category-link");
+
+  // Create a container for the dot and category name
+  const categoryContainer = document.createElement("div");
+  categoryContainer.classList.add("d-flex", "align-items-center", "gap-2");
 
   // Add a dot icon using Unicode
   const dotIcon = document.createElement("span");
   dotIcon.textContent = "•"; // Unicode for a dot
-  dotIcon.classList.add("dot-icon", "me-2"); // Add styling class
-  sidebarCategory.appendChild(dotIcon);
+  dotIcon.classList.add("dot-icon");
+  categoryContainer.appendChild(dotIcon);
 
   // Add category name
-  const text = document.createTextNode(categoryName);
-  sidebarCategory.appendChild(text);
+  const categoryNameElement = document.createElement("span");
+  categoryNameElement.textContent = categoryName;
+  categoryNameElement.classList.add("category-name", "flex-grow-1");
+  categoryContainer.appendChild(categoryNameElement);
 
-  // Add Click Event to Navigate to Category
-  sidebarCategory.addEventListener("click", function () {
-    const categories = document.querySelectorAll(".category-card");
-    for (let category of categories) {
-      const header = category.querySelector("h4");
-      if (header.textContent === categoryName) {
-        categories.forEach((card) => card.classList.remove("highlight"));
-        category.scrollIntoView({ behavior: "smooth", block: "start" });
-        category.classList.add("highlight");
-        setTimeout(() => category.classList.remove("highlight"), 1000);
-        break;
+  // Append the container to the sidebar category
+  sidebarCategory.appendChild(categoryContainer);
+
+  // Add dropdown container for tasks
+  const taskList = document.createElement("ul");
+  taskList.classList.add("task-list", "list-group", "d-none"); // Hidden by default
+  sidebarCategory.appendChild(taskList);
+
+  // Fetch tasks for the category when it is clicked
+  categoryContainer.addEventListener("click", async function () {
+    // Toggle dropdown visibility
+    taskList.classList.toggle("d-none");
+
+    // Only fetch tasks if the list is empty
+    if (taskList.childElementCount === 0) {
+
+      isCategoryClicked = true;
+      // Fetch tasks
+      const tasks = await fetchTasksForCategory(user, categoryName);
+
+      // Add tasks to the dropdown
+      tasks.forEach((task) => {
+        const taskItem = document.createElement("li");
+        taskItem.classList.add("list-group-item", "task-item");
+        // Add a dash mark before the task name
+        const smallDotIcon = document.createElement("span");
+        smallDotIcon.textContent = "• "; // Unicode dash mark
+        smallDotIcon.classList.add("small-dot-icon");
+        taskItem.appendChild(smallDotIcon);
+
+        // Add the task name
+        const taskNameText = document.createTextNode(task.taskName); // Use taskName for display
+        taskItem.appendChild(taskNameText);
+
+        // Add click event to open task modal
+        taskItem.addEventListener("click", function () {
+          showTaskDetailsSidebar({
+            taskName: task.taskName,
+            description: task.description,
+            dueDate: task.dueDate,
+            categoryName: categoryName, // Pass the category name for context
+          });
+        });
+
+        taskList.appendChild(taskItem);
+      });
+
+      // Show a message if there are no tasks
+      if (tasks.length === 0) {
+        const noTasksItem = document.createElement("li");
+        noTasksItem.classList.add("list-group-item", "non-task");
+        noTasksItem.textContent = "No tasks available.";
+        taskList.appendChild(noTasksItem);
       }
     }
   });
 
-  // Add to Sidebar
   sidebarList.appendChild(sidebarCategory);
 }
+
+function toggleColorPicker() {
+  const colorPicker = document.getElementById("colorPicker");
+  
+  // Check the current display style
+  const currentDisplay = window.getComputedStyle(colorPicker).getPropertyValue("display");
+
+  if (currentDisplay === "none") {
+    // Show the color picker with !important
+    colorPicker.style.setProperty("display", "flex", "important");
+  } else {
+    // Hide the color picker with !important
+    colorPicker.style.setProperty("display", "none", "important");
+  }
+}
+
+// Function to set the user's name and display a greeting
+document.addEventListener("DOMContentLoaded", function () {
+  // Function to set the user's name and display a greeting
+  function greetUser() {
+    const userName = firstName; // Replace this with logic to fetch the actual user's name
+    const greetingText = document.getElementById("greetingText");
+
+    if (greetingText) {
+      if (userName) {
+        greetingText.textContent = `Hello ${userName}`;
+      } else {
+        greetingText.textContent = "Hello Guest";
+      }
+    } else {
+      console.error("Greeting text element not found!");
+    }
+  }
+
+  // Call the greetUser function
+  greetUser();
+});
 
 
 // Function to Remove Category from Sidebar
@@ -855,7 +940,7 @@ async function fetchTasksForCategory(userId, categoryName) {
       method: "GET",
     });
 
-    if (!response.ok) {
+    if (!response.ok & !isCategoryClicked) {
       throw new Error(`Failed to fetch tasks: ${response.statusText}`);
     }
 
@@ -1043,6 +1128,26 @@ async function updateTaskStatus(categoryName, taskName, newStatus) {
   }
 }
 
+function showTaskDetailsSidebar(task) {
+  const { taskName, description, dueDate, categoryName } = task;
+
+  // Update the modal content
+  document.getElementById(
+    "taskDetailsModalLabel"
+  ).textContent = `Category: ${categoryName}`; // Change modal title
+  document.getElementById("taskDetailTitle").textContent = taskName;
+  document.getElementById("taskDetailDescription").textContent =
+    description || "No description available.";
+  document.getElementById(
+    "taskDetailDate"
+  ).textContent = `Due Date: ${dueDate || "No due date provided."}`;
+
+  // Show the modal
+  const taskDetailsModal = new bootstrap.Modal(
+    document.getElementById("taskDetailsModal")
+  );
+  taskDetailsModal.show();
+}
 
 
 
