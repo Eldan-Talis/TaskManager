@@ -977,7 +977,13 @@ async function refreshCategoryTasks(categoryContainer, categoryName) {
     taskList.innerHTML = ""; // Clear existing tasks
 
     tasks.forEach((task) => {
-      addTaskToCategory(categoryContainer, task.taskName, task.description, task.dueDate);
+      addTaskToCategory(
+        categoryContainer,
+        task.taskName,
+        task.description,
+        task.dueDate,
+        task.status // Pass status here
+      );
     });
 
   } catch (error) {
