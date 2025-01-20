@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task Manager</title>
-    <link rel="stylesheet" href="/CSS/main.css" />
+    <link rel="stylesheet" href="/CSS/teams.css" />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
@@ -14,7 +14,6 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body>
     <!-- Navbar -->
@@ -24,8 +23,8 @@
           <a href="#" class="nav-link" title="My Categories">
             <i class="fas fa-tasks"></i> <!-- Font Awesome tasks icon -->
           </a>
-          <a href="/HTML/teams.html" class="nav-link" title="Teams">
-            <i class="fas fa-users"></i> <!-- Font Awesome settings icon -->
+          <a href="/index.html" class="nav-link" title="Personal">
+            <i class="fas fa-user"></i> <!-- Font Awesome settings icon -->
           </a>
           <a href="#" onclick="logout()" class="nav-link" title="Log Out">
             <i class="fas fa-sign-out-alt"></i>
@@ -83,7 +82,7 @@
     <div class="container-fluid">
       <div class="row">
         <!-- Sidebar Panel -->
-        <div class="col-md-2 p-4 sidebar">
+        <div class="col-md-2 text-white p-4 sidebar">
           <h3 class="text-center">My Categories</h3>
           <button
             id="add-category-btn"
@@ -93,8 +92,29 @@
           >
             <i class="fas fa-plus icon-spacing"> </i>
             <!-- Font Awesome plus icon -->
-            Add
+            Add Category
           </button>
+          <div class="search-separator"></div>
+          <button
+              id="new-team-btn"
+              class="btn team-btn"
+              data-bs-toggle="modal"
+              data-bs-target="#newTeamModal"
+            >
+              <i class="fas fa-plus icon-spacing"></i>
+              New Team
+            </button>
+
+            <button
+            id="join-team-btn"
+            class="btn team-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#joinTeamModal"
+          >
+            <i class="fas fa-plus icon-spacing"></i>
+            Join Team
+          </button>
+          
           <div class="search-container">
             <i class="fas fa-search search-icon"></i>
             <input
@@ -270,7 +290,93 @@
       </div>
     </div>
 
-    <script src="/JS/main.js"></script>
-    <script src="/JS/config.js"></script>
+    <!-- New Team Modal -->
+<div
+class="modal fade"
+id="newTeamModal"
+tabindex="-1"
+aria-labelledby="newTeamModalLabel"
+aria-hidden="true"
+>
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="newTeamModalLabel">Create New Team</h5>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="modal"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <form id="newTeamForm">
+        <div class="mb-3">
+          <label for="teamNameInput" class="form-label">Team Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="teamNameInput"
+            placeholder="Enter team name"
+            required
+            maxlength="50"
+          />
+          <small id="teamCharCount" class="form-text text-muted">
+            20 characters remaining
+          </small>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Team</button>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Join Team Modal -->
+<div
+  class="modal fade"
+  id="joinTeamModal"
+  tabindex="-1"
+  aria-labelledby="joinTeamModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="joinTeamModalLabel">Join a Team</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="joinTeamForm">
+          <div class="mb-3">
+            <label for="teamCodeInput" class="form-label">Team Code</label>
+            <input
+              type="text"
+              class="form-control"
+              id="teamCodeInput"
+              placeholder="Enter 8-character team code"
+              required
+              maxlength="8"
+              minlength="8"
+              pattern=".{8,8}"
+            />
+            <small id="teamCodeError" class="form-text text-danger" style="display: none;">
+              Team code must be exactly 8 characters long.
+            </small>
+          </div>
+          <button type="submit" class="btn btn-primary">Join Team</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <script src="/JS/teams.js"></script>
   </body>
 </html>

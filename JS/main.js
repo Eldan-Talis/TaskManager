@@ -7,6 +7,7 @@ const firstName = sessionStorage.getItem('first_name');
 const user = sub
 console.log('Sub:', sub);
 let isCategoryClicked = false;
+let selectedCategoryContainerColor = null;
 
 
 
@@ -181,30 +182,28 @@ function addCategoryToSidebar(categoryName) {
 
   // Fetch tasks for the category when it is clicked
   categoryContainer.addEventListener("click", async function () {
-    // Toggle dropdown visibility
-    taskList.classList.toggle("d-none");
-
-    // Only fetch tasks if the list is empty
-    if (taskList.childElementCount === 0) {
-
-      isCategoryClicked = true;
-      // Fetch tasks
+    // Clear existing tasks
+    taskList.innerHTML = "";
+  
+    // Fetch tasks for the category
+    try {
       const tasks = await fetchTasksForCategory(user, categoryName);
-
+  
       // Add tasks to the dropdown
       tasks.forEach((task) => {
         const taskItem = document.createElement("li");
         taskItem.classList.add("list-group-item", "task-item");
+  
         // Add a dash mark before the task name
         const smallDotIcon = document.createElement("span");
         smallDotIcon.textContent = "• "; // Unicode dash mark
         smallDotIcon.classList.add("small-dot-icon");
         taskItem.appendChild(smallDotIcon);
-
+  
         // Add the task name
         const taskNameText = document.createTextNode(task.taskName); // Use taskName for display
         taskItem.appendChild(taskNameText);
-
+  
         // Add click event to open task modal
         taskItem.addEventListener("click", function () {
           showTaskDetailsSidebar({
@@ -214,10 +213,10 @@ function addCategoryToSidebar(categoryName) {
             categoryName: categoryName, // Pass the category name for context
           });
         });
-
+  
         taskList.appendChild(taskItem);
       });
-
+  
       // Show a message if there are no tasks
       if (tasks.length === 0) {
         const noTasksItem = document.createElement("li");
@@ -225,8 +224,14 @@ function addCategoryToSidebar(categoryName) {
         noTasksItem.textContent = "No tasks available.";
         taskList.appendChild(noTasksItem);
       }
+    } catch (error) {
+      console.error(`Failed to fetch tasks for category "${categoryName}":`, error);
+      alert("Unable to fetch tasks. Please try again later.");
     }
-  });
+  
+    // Toggle dropdown visibility
+    taskList.classList.toggle("d-none");
+  });  
 
   sidebarList.appendChild(sidebarCategory);
 }
@@ -701,7 +706,7 @@ colorButtons.forEach((button) => {
   button.addEventListener("click", () => {
       const selectedNavbarColor = button.getAttribute("data-navbar-color");
       const selectedSidebarColor = button.getAttribute("data-sidebar-color");
-      const selectedCategoryContainerColor = button.getAttribute("data-category-color");
+      selectedCategoryContainerColor = button.getAttribute("data-category-color");
       
       const navbar = document.querySelector(".navbar");
       const sidebar = document.querySelector(".sidebar");
@@ -789,18 +794,18 @@ document.getElementById("taskDescriptionInput").addEventListener("input", functi
 // Dynamic Search for Category
 document.getElementById("categorySearch").addEventListener("input", function () {
   const searchValue = this.value.trim().toLowerCase();
-  const categoryItems = document.querySelectorAll("#category-list .list-group-item");
 
-  categoryItems.forEach((item) => {
-      const categoryText = item.textContent.replace("•", "").trim().toLowerCase();
+  // Select only category items (e.g., those with the class `.category-link`)
+  const categoryItems = document.querySelectorAll("#category-list .category-link");
 
-      if (searchValue === "" || categoryText.includes(searchValue)) {
-          item.classList.remove("hidden");
-          item.style.display = "flex"; // Ensure it uses flex display for visible items
-      } else {
-          item.classList.add("hidden");
-          item.style.display = "none"; // Force hiding
-      }
+  categoryItems.forEach((categoryItem) => {
+    const categoryText = categoryItem.querySelector(".category-name").textContent.trim().toLowerCase();
+
+    if (searchValue === "" || categoryText.includes(searchValue)) {
+      categoryItem.style.display = "flex"; // Show matching categories
+    } else {
+      categoryItem.style.display = "none"; // Hide non-matching categories
+    }
   });
 });
 
@@ -857,6 +862,11 @@ function displayCategoriesWithTasks(categories) {
         );
       });
     }
+    // Set the background color for all category cards
+    const categoryCards = document.querySelectorAll(".category-card");
+    categoryCards.forEach((categoryCard) => {
+      categoryCard.style.setProperty("background-color", selectedCategoryContainerColor, "important");
+    });
   });
 }
 
@@ -900,23 +910,8 @@ document
       );
       addCategoryModal.hide();
 
-      // Add category to the UI
-      addCategory(categoryName);
-
       // Synchronize with the backend for sorting
       await fetchAllCategories();
-
-      // Scroll to the newly added category
-      const newCategoryCard = Array.from(document.querySelectorAll(".category-card")).find(
-        (card) => card.querySelector("h4").textContent === categoryName
-      );
-
-      if (newCategoryCard) {
-        newCategoryCard.scrollIntoView({ behavior: "smooth", block: "center" });
-        newCategoryCard.classList.add("highlight"); // Optionally add a highlight effect
-        setTimeout(() => newCategoryCard.classList.remove("highlight"), 2000); // Remove highlight after 2 seconds
-      }
-
 
       // Clear input field
       categoryNameInput.value = "";
@@ -959,6 +954,13 @@ async function addTaskToBackend(categoryName, taskName, description, dueDate) {
     }
 
     const data = await response.json();
+
+      // Close all dropdowns when a task is added
+      const taskLists = document.querySelectorAll(".task-item");
+      taskLists.forEach((taskList) => {
+        taskList.classList.add("d-none"); // Hide each task list
+      });
+
     return data.task; // Ensure this matches the backend's response structure
   } catch (error) {
     console.error("Error during API call to add task:", error);
@@ -1076,6 +1078,13 @@ async function deleteTaskFromBackend(categoryName, taskName) {
     }
 
     const data = await response.json();
+
+    // Close all dropdowns when a task is deleted
+    const taskLists = document.querySelectorAll(".task-item");
+    taskLists.forEach((taskList) => {
+      taskList.classList.add("d-none"); // Hide each task list
+    });
+
     console.log("Task deleted successfully:", data.message);
     return true;
   } catch (error) {
