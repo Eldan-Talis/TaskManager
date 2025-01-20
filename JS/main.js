@@ -184,6 +184,8 @@ function addCategoryToSidebar(categoryName) {
   categoryContainer.addEventListener("click", async function () {
     // Clear existing tasks
     taskList.innerHTML = "";
+
+    isCategoryClicked = true;
   
     // Fetch tasks for the category
     try {
@@ -956,10 +958,11 @@ async function addTaskToBackend(categoryName, taskName, description, dueDate) {
     const data = await response.json();
 
       // Close all dropdowns when a task is added
-      const taskLists = document.querySelectorAll(".task-item");
+      const taskLists = document.querySelectorAll(".task-item, .non-task");
       taskLists.forEach((taskList) => {
-        taskList.classList.add("d-none"); // Hide each task list
+        taskList.classList.add("d-none"); // Hide each task list or non-task element
       });
+
 
     return data.task; // Ensure this matches the backend's response structure
   } catch (error) {
@@ -1080,9 +1083,9 @@ async function deleteTaskFromBackend(categoryName, taskName) {
     const data = await response.json();
 
     // Close all dropdowns when a task is deleted
-    const taskLists = document.querySelectorAll(".task-item");
+    const taskLists = document.querySelectorAll(".task-item, .non-task");
     taskLists.forEach((taskList) => {
-      taskList.classList.add("d-none"); // Hide each task list
+      taskList.classList.add("d-none"); // Hide each task list or non-task element
     });
 
     console.log("Task deleted successfully:", data.message);
