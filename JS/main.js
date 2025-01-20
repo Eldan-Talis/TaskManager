@@ -98,22 +98,38 @@ function addCategory(categoryName) {
     openTaskModal(categoryCard);
   });
 
-  // Delete Category Button
-  const deleteCategoryIcon = document.createElement("button");
-  deleteCategoryIcon.innerHTML = "×";
-  deleteCategoryIcon.classList.add("btn", "text-danger", "p-1");
-  deleteCategoryIcon.addEventListener("click", async function () {
-    if (confirm(`Are you sure you want to delete the category "${categoryName}"?`)) {
+// Delete Category Button
+const deleteCategoryIcon = document.createElement("button");
+deleteCategoryIcon.innerHTML = "×";
+deleteCategoryIcon.classList.add("btn", "text-danger", "p-1");
+deleteCategoryIcon.addEventListener("click", async function () {
+  // SweetAlert2 confirmation dialog
+  Swal.fire({
+    title: `Are you sure?`,
+    text: `Do you really want to delete the category "${categoryName}"? This action cannot be undone.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
       const success = await deleteCategoryFromBackend(categoryName);
-  
+      
       if (success) {
         // Remove category from the UI
         categoriesGrid.removeChild(categoryCard);
         removeCategoryFromSidebar(categoryName);
         console.log(`Category "${categoryName}" removed from UI.`);
+        Swal.fire('Deleted!', `The category "${categoryName}" has been deleted.`, 'success');
+      } else {
+        Swal.fire('Error!', 'Something went wrong while deleting the category.', 'error');
       }
     }
   });
+});
+
   
 
   // Append Buttons to Container
@@ -564,16 +580,32 @@ function deleteTask(taskDiv) {
   const categoryName = categoryCard.querySelector("h4").textContent; // Get category name
   const taskName = taskDiv.querySelector("h5").textContent; // Get task name
 
-  if (confirm(`Are you sure you want to delete the task "${taskName}"?`)) {
-    deleteTaskFromBackend(categoryName, taskName).then((success) => {
-      if (success) {
-        // Remove task from the UI
-        taskDiv.remove();
-        console.log(`Task "${taskName}" removed from category "${categoryName}".`);
-      }
-    });
-  }
+  // SweetAlert2 confirmation dialog
+  Swal.fire({
+    title: `Are you sure?`,
+    text: `Do you really want to delete the task "${taskName}" from category "${categoryName}"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      deleteTaskFromBackend(categoryName, taskName).then((success) => {
+        if (success) {
+          // Remove task from the UI
+          taskDiv.remove();
+          console.log(`Task "${taskName}" removed from category "${categoryName}".`);
+          Swal.fire('Deleted!', `The task "${taskName}" has been deleted.`, 'success');
+        } else {
+          Swal.fire('Error!', 'Something went wrong while deleting the task.', 'error');
+        }
+      });
+    }
+  });
 }
+
 
 
 // Function to Edit a Task
