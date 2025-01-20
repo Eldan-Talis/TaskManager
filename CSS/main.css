@@ -52,10 +52,6 @@ body {
     height: calc(100vh - 60px); /* Full viewport height minus navbar height */
     background-color: #3C3D37; /* Dark background */
     color: white;
-    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.113), 
-    1px -1px 0 rgba(0, 0, 0, 0.113), 
-    -1px 1px 0 rgba(0, 0, 0, 0.113), 
-    1px 1px 0 rgba(0, 0, 0, 0.113); /* Creates an outline effect */
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     overflow-y: auto; /* Enable scrolling for sidebar content */
@@ -65,7 +61,6 @@ body {
     align-items: center; /* Horizontally center content */
     text-align: center; /* Center text within elements */
     overflow-y: auto; /* Enable scrolling for sidebar content */
-    font-weight: bolder;
 }
 
 /* Main Content Styling */

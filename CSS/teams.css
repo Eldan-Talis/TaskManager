@@ -70,7 +70,7 @@ body {
     margin-top: 50px !important; /* Space below the fixed navbar */
 }
 
-#category-list {
+#teams-list {
     width: 100%; /* Make it span the full width of the sidebar */
     align-items: center;
 }
@@ -151,7 +151,7 @@ body {
     margin: 0 0 10px 0; /* Add spacing around the line */
 }
 
-.category-link {
+.teams-link {
     cursor: pointer;
     text-align: left; /* Centers text within the button */
     font-size: 18px;
@@ -173,7 +173,7 @@ body {
     text-overflow: ellipsis; /* Add ellipsis for overflow */
 }
 
-.category-link:hover {
+.teams-link:hover {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
     border-bottom: 1px solid #ccc !important; /* Add bottom border */
 }
