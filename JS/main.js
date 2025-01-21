@@ -1,11 +1,9 @@
 let selectedCategoryContainer = null; // Tracks the category container for task creation
 
 const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod"
-const apiBaseUrl =
-  "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod";
 
-//const sub = sessionStorage.getItem('sub');;
-sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
+const sub = sessionStorage.getItem('sub');;
+//sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 const firstName = sessionStorage.getItem("first_name");
 const user = sub;
 console.log("Sub:", sub);
@@ -38,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 function logout() {
   // Construct the Cognito logout URL
   const logoutUrl =
-    "https://us-east-1doxbvaqzz.auth.us-east-1.amazoncognito.com/logout?client_id=646mieltk0s1nidal6scivrlc0&logout_uri=https://taskmanager-led.s3.us-east-1.amazonaws.com/index.html";
+    "https://us-east-1doxbvaqzz.auth.us-east-1.amazoncognito.com/logout?client_id=646mieltk0s1nidal6scivrlc0&logout_uri=https://taskeld.s3.us-east-1.amazonaws.com/index.html";
 
   // Clear the session
   clearStorage();
@@ -150,6 +148,11 @@ function addCategory(categoryName) {
   // Append Elements to Card
   categoryCard.appendChild(buttonContainer);
   categoryCard.appendChild(categoryHeader);
+
+  // **Add a Task List Container**
+  const taskList = document.createElement("div");
+  taskList.classList.add("task-list"); // You can style this as needed
+  categoryCard.appendChild(taskList);
 
   categoriesGrid.appendChild(categoryCard);
 
@@ -909,16 +912,39 @@ function displayCategoriesWithTasks(categories) {
   categoriesGrid.innerHTML = "";
   sidebarList.innerHTML = "";
 
-  // Loop through the categories and display them
+  // Loop through each category and its tasks
   Object.entries(categories).forEach(([categoryName, tasks]) => {
     // Add category to the grid and sidebar
     addCategory(categoryName);
 
-    // Add tasks for the category
+    // Find the corresponding category card in the grid
     const categoryCard = Array.from(
       document.querySelectorAll(".category-card")
     ).find((card) => card.querySelector("h4").textContent === categoryName);
 
+    if (!categoryCard) {
+      console.error(`Category card for "${categoryName}" not found.`);
+      return;
+    }
+
+    // Select the task list within the category card
+    const taskList = categoryCard.querySelector(".task-list");
+    if (!taskList) {
+      console.error(`Task list for category "${categoryName}" not found.`);
+      return;
+    }
+
+    // Check if there are no tasks
+    if (Object.keys(tasks).length === 0) {
+      // Create and append the "No tasks available" message
+      const noTasksMessage = document.createElement("p");
+      noTasksMessage.textContent = "No tasks available for this category.";
+      noTasksMessage.classList.add("text-muted");
+      taskList.appendChild(noTasksMessage);
+      return; // Exit the current iteration
+    }
+
+    // If tasks exist, iterate and add them to the category
     if (categoryCard && tasks) {
       Object.entries(tasks).forEach(([taskName, taskDetails]) => {
         addTaskToCategory(
@@ -930,17 +956,16 @@ function displayCategoriesWithTasks(categories) {
         );
       });
     }
-    // Set the background color for all category cards
-    const categoryCards = document.querySelectorAll(".category-card");
-    categoryCards.forEach((categoryCard) => {
-      categoryCard.style.setProperty(
-        "background-color",
-        selectedCategoryContainerColor,
-        "important"
-      );
-    });
+
+    // **Set the Background Color for the Current Category Card Only**
+    categoryCard.style.setProperty(
+      "background-color",
+      selectedCategoryContainerColor,
+      "important"
+    );
   });
 }
+
 
 // Function to handle Add Category Form Submission
 document
@@ -1047,7 +1072,7 @@ async function fetchTasksForCategory(userId, categoryName) {
       }
     );
 
-    if (!response.ok & !isCategoryClicked) {
+    if (!response.ok && !isCategoryClicked) {
       throw new Error(`Failed to fetch tasks: ${response.statusText}`);
     }
 
