@@ -34,7 +34,6 @@ body {
 .navbar .nav-link:nth-child(1) {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
-    margin-left: 0px;
     transform: scale(1.1);
 }
 

@@ -21,8 +21,8 @@
     <div class="navbar d-flex align-items-center">
       <div class="container-fluid">
         <div class="d-flex">
-          <a href="#" class="nav-link" title="My Categories">
-            <i class="fas fa-tasks"></i> <!-- Font Awesome tasks icon -->
+          <a href="#" class="nav-link" title="Personal">
+            <i class="fas fa-user"></i> <!-- Font Awesome tasks icon -->
           </a>
           <a href="/HTML/teams.html" class="nav-link" title="Teams">
             <i class="fas fa-users"></i> <!-- Font Awesome settings icon -->
@@ -121,31 +121,30 @@
 
     <!-- Add Category Modal -->
     <div
-      class="modal fade"
-      id="addCategoryModal"
-      tabindex="-1"
-      aria-labelledby="addCategoryModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addCategoryModalLabel">
-              Create New Category
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form id="addCategoryForm">
-              <div class="mb-3">
-                <label for="categoryNameInput" class="form-label"
-                  >Category Name</label
-                >
+    class="modal fade"
+    id="addCategoryModal"
+    tabindex="-1"
+    aria-labelledby="addCategoryModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel">
+            Create New Category
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form id="addCategoryForm">
+            <div class="mb-3">
+              <label for="categoryNameInput" class="form-label">Category Name</label>
+              <div style="display: flex; align-items: center;">
                 <input
                   type="text"
                   class="form-control"
@@ -154,82 +153,122 @@
                   required
                   maxlength="20"
                 />
-                <small id="cateCharCount" class="form-text text-muted">
-                  20 characters remaining
-                </small>
+                <button
+                  type="button"
+                  id="speechButton"
+                  class="btn btn-outline-secondary"
+                  style="margin-left: 10px;"
+                  title="Click to dictate"
+                >
+                  <i class="fa fa-microphone"></i>
+                </button>
               </div>
-              <button type="submit" class="btn btn-primary">
-                Create Category
-              </button>
-            </form>
-          </div>
+              <small id="cateCharCount" class="form-text text-muted">
+                20 characters remaining
+              </small>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              Create Category
+            </button>
+          </form>
         </div>
       </div>
     </div>
+  </div>
+  
+  
 
-    <!-- Add Task Modal -->
-    <div
-      class="modal fade"
-      id="addTaskModal"
-      tabindex="-1"
-      aria-labelledby="addTaskModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+<!-- Add Task Modal -->
+<div
+  class="modal fade"
+  id="addTaskModal"
+  tabindex="-1"
+  aria-labelledby="addTaskModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="addTaskForm">
+          <!-- Task Name Input -->
+          <div class="mb-3">
+            <label for="taskNameInput" class="form-label">Task Name</label>
+            <div style="display: flex; align-items: center;">
+              <input
+                type="text"
+                class="form-control"
+                id="taskNameInput"
+                placeholder="Enter task name"
+                required
+                maxlength="20"
+              />
+              <button
+                type="button"
+                id="speechTaskName"
+                class="btn btn-outline-secondary"
+                style="margin-left: 10px;"
+                title="Click to dictate task name"
+              >
+                <i class="fa fa-microphone"></i>
+              </button>
+            </div>
+            <small id="taskCharCount" class="form-text text-muted">
+              20 characters remaining
+            </small>
           </div>
-          <div class="modal-body">
-            <form id="addTaskForm">
-              <div class="mb-3">
-                <label for="taskNameInput" class="form-label">Task Name</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="taskNameInput"
-                  placeholder="Enter task name"
-                  required
-                  maxlength="20"
-                />
-                <small id="taskCharCount" class="form-text text-muted">
-                  20 characters remaining
-                </small>
-              </div>
-              <div class="mb-3">
-                <label for="taskDescriptionInput" class="form-label"
-                  >Task Description</label
-                >
-                <textarea
-                  class="form-control"
-                  id="taskDescriptionInput"
-                  rows="3"
-                  placeholder="Enter task description"
-                  required
-                  maxlength="200"
-                ></textarea>
-                <small id="descriptionCharCount" class="form-text text-muted">
-                  200 characters remaining
-                </small>
-              </div>
-              <div class="mb-3">
-                <label for="taskDateInput" class="form-label"
-                  >Due Date (Optional)</label
-                >
-                <input type="date" class="form-control" id="taskDateInput" />
-              </div>
-              <button type="submit" class="btn btn-primary">Add Task</button>
-            </form>
+
+          <!-- Task Description Input -->
+          <div class="mb-3">
+            <label for="taskDescriptionInput" class="form-label"
+              >Task Description</label
+            >
+            <div style="display: flex; align-items: center;">
+              <textarea
+                class="form-control"
+                id="taskDescriptionInput"
+                rows="3"
+                placeholder="Enter task description"
+                required
+                maxlength="200"
+              ></textarea>
+              <button
+                type="button"
+                id="speechTaskDescription"
+                class="btn btn-outline-secondary"
+                style="margin-left: 10px;"
+                title="Click to dictate task description"
+              >
+                <i class="fa fa-microphone"></i>
+              </button>
+            </div>
+            <small id="descriptionCharCount" class="form-text text-muted">
+              200 characters remaining
+            </small>
           </div>
-        </div>
+
+          <!-- Due Date Input -->
+          <div class="mb-3">
+            <label for="taskDateInput" class="form-label">Due Date (Optional)</label>
+            <input type="date" class="form-control" id="taskDateInput" />
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary">Add Task</button>
+        </form>
       </div>
     </div>
+  </div>
+</div>
+
 
     <!-- Task Details Modal -->
     <div

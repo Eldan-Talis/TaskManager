@@ -31,12 +31,12 @@ body {
     padding: 5px 10px;
 }
 
-.navbar .nav-link:nth-child(1) {
+.navbar .nav-link:nth-child(2) {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
-    margin-left: 0px;
     transform: scale(1.1);
 }
+
 
 .navbar .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.3); /* Subtle hover background */

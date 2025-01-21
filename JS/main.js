@@ -1,42 +1,45 @@
 let selectedCategoryContainer = null; // Tracks the category container for task creation
 
 const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod"
+const apiBaseUrl =
+  "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod";
 
-const sub = sessionStorage.getItem('sub');;
-const firstName = sessionStorage.getItem('first_name');
-const user = sub
-console.log('Sub:', sub);
+//const sub = sessionStorage.getItem('sub');;
+sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
+const firstName = sessionStorage.getItem("first_name");
+const user = sub;
+console.log("Sub:", sub);
 let isCategoryClicked = false;
 let selectedCategoryContainerColor = null;
 
-
-
 document.addEventListener("DOMContentLoaded", async () => {
-  const authUrl = `${config.domain}/login?` +
-      // response_type=code +
-      "response_type=token" +
-      `&client_id=${config.clientId}` +
-      `&redirect_uri=${encodeURIComponent(config.redirectUri)}` +
-      "&scope=openid+aws.cognito.signin.user.admin";
+  const authUrl =
+    `${config.domain}/login?` +
+    // response_type=code +
+    "response_type=token" +
+    `&client_id=${config.clientId}` +
+    `&redirect_uri=${encodeURIComponent(config.redirectUri)}` +
+    "&scope=openid+aws.cognito.signin.user.admin";
   if (!sub) {
-      console.error("User ID (sub) is missing. Redirecting to login.");
-      // Redirect to login if the sub is not available
-      window.location.href = authUrl;
-      return;
+    console.error("User ID (sub) is missing. Redirecting to login.");
+    // Redirect to login if the sub is not available
+    window.location.href = authUrl;
+    return;
   }
 
   try {
-      await fetchAllCategories(); // Fetch all categories for the user
-      await applyUserTheme();
+    await fetchAllCategories(); // Fetch all categories for the user
+    await applyUserTheme();
   } catch (error) {
-      console.error("Failed to load user data:", error);
+    console.error("Failed to load user data:", error);
   }
 });
 
 function logout() {
   // Construct the Cognito logout URL
-  const logoutUrl = "https://us-east-1doxbvaqzz.auth.us-east-1.amazoncognito.com/logout?client_id=646mieltk0s1nidal6scivrlc0&logout_uri=https://taskmanager-led.s3.us-east-1.amazonaws.com/index.html";
-  
+  const logoutUrl =
+    "https://us-east-1doxbvaqzz.auth.us-east-1.amazoncognito.com/logout?client_id=646mieltk0s1nidal6scivrlc0&logout_uri=https://taskmanager-led.s3.us-east-1.amazonaws.com/index.html";
+
   // Clear the session
   clearStorage();
   clearCookies();
@@ -63,8 +66,9 @@ function addCategory(categoryName) {
   const categoriesGrid = document.getElementById("categories-grid");
 
   // Avoid duplicate categories
-  const existingCategory = Array.from(document.querySelectorAll(".category-card h4"))
-    .some((header) => header.textContent === categoryName);
+  const existingCategory = Array.from(
+    document.querySelectorAll(".category-card h4")
+  ).some((header) => header.textContent === categoryName);
 
   if (existingCategory) {
     console.warn("Category already exists in UI:", categoryName);
@@ -99,39 +103,45 @@ function addCategory(categoryName) {
     openTaskModal(categoryCard);
   });
 
-// Delete Category Button
-const deleteCategoryIcon = document.createElement("button");
-deleteCategoryIcon.innerHTML = "×";
-deleteCategoryIcon.classList.add("btn", "text-danger", "p-1");
-deleteCategoryIcon.addEventListener("click", async function () {
-  // SweetAlert2 confirmation dialog
-  Swal.fire({
-    title: `Are you sure?`,
-    text: `Do you really want to delete the category "${categoryName}"? This action cannot be undone.`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      const success = await deleteCategoryFromBackend(categoryName);
-      
-      if (success) {
-        // Remove category from the UI
-        categoriesGrid.removeChild(categoryCard);
-        removeCategoryFromSidebar(categoryName);
-        console.log(`Category "${categoryName}" removed from UI.`);
-        Swal.fire('Deleted!', `The category "${categoryName}" has been deleted.`, 'success');
-      } else {
-        Swal.fire('Error!', 'Something went wrong while deleting the category.', 'error');
-      }
-    }
-  });
-});
+  // Delete Category Button
+  const deleteCategoryIcon = document.createElement("button");
+  deleteCategoryIcon.innerHTML = "×";
+  deleteCategoryIcon.classList.add("btn", "text-danger", "p-1");
+  deleteCategoryIcon.addEventListener("click", async function () {
+    // SweetAlert2 confirmation dialog
+    Swal.fire({
+      title: `Are you sure?`,
+      text: `Do you really want to delete the category "${categoryName}"? This action cannot be undone.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const success = await deleteCategoryFromBackend(categoryName);
 
-  
+        if (success) {
+          // Remove category from the UI
+          categoriesGrid.removeChild(categoryCard);
+          removeCategoryFromSidebar(categoryName);
+          console.log(`Category "${categoryName}" removed from UI.`);
+          Swal.fire(
+            "Deleted!",
+            `The category "${categoryName}" has been deleted.`,
+            "success"
+          );
+        } else {
+          Swal.fire(
+            "Error!",
+            "Something went wrong while deleting the category.",
+            "error"
+          );
+        }
+      }
+    });
+  });
 
   // Append Buttons to Container
   buttonContainer.appendChild(addTaskIcon);
@@ -146,7 +156,6 @@ deleteCategoryIcon.addEventListener("click", async function () {
   // Update Sidebar
   addCategoryToSidebar(categoryName);
 }
-
 
 // Function to Add Category to Sidebar
 function addCategoryToSidebar(categoryName) {
@@ -186,26 +195,26 @@ function addCategoryToSidebar(categoryName) {
     taskList.innerHTML = "";
 
     isCategoryClicked = true;
-  
+
     // Fetch tasks for the category
     try {
       const tasks = await fetchTasksForCategory(user, categoryName);
-  
+
       // Add tasks to the dropdown
       tasks.forEach((task) => {
         const taskItem = document.createElement("li");
         taskItem.classList.add("list-group-item", "task-item");
-  
+
         // Add a dash mark before the task name
         const smallDotIcon = document.createElement("span");
         smallDotIcon.textContent = "• "; // Unicode dash mark
         smallDotIcon.classList.add("small-dot-icon");
         taskItem.appendChild(smallDotIcon);
-  
+
         // Add the task name
         const taskNameText = document.createTextNode(task.taskName); // Use taskName for display
         taskItem.appendChild(taskNameText);
-  
+
         // Add click event to open task modal
         taskItem.addEventListener("click", function () {
           showTaskDetailsSidebar({
@@ -215,10 +224,10 @@ function addCategoryToSidebar(categoryName) {
             categoryName: categoryName, // Pass the category name for context
           });
         });
-  
+
         taskList.appendChild(taskItem);
       });
-  
+
       // Show a message if there are no tasks
       if (tasks.length === 0) {
         const noTasksItem = document.createElement("li");
@@ -227,22 +236,27 @@ function addCategoryToSidebar(categoryName) {
         taskList.appendChild(noTasksItem);
       }
     } catch (error) {
-      console.error(`Failed to fetch tasks for category "${categoryName}":`, error);
+      console.error(
+        `Failed to fetch tasks for category "${categoryName}":`,
+        error
+      );
       alert("Unable to fetch tasks. Please try again later.");
     }
-  
+
     // Toggle dropdown visibility
     taskList.classList.toggle("d-none");
-  });  
+  });
 
   sidebarList.appendChild(sidebarCategory);
 }
 
 function toggleColorPicker() {
   const colorPicker = document.getElementById("colorPicker");
-  
+
   // Check the current display style
-  const currentDisplay = window.getComputedStyle(colorPicker).getPropertyValue("display");
+  const currentDisplay = window
+    .getComputedStyle(colorPicker)
+    .getPropertyValue("display");
 
   if (currentDisplay === "none") {
     // Show the color picker with !important
@@ -275,15 +289,18 @@ document.addEventListener("DOMContentLoaded", function () {
   greetUser();
 });
 
-
 // Function to Remove Category from Sidebar
 function removeCategoryFromSidebar(categoryName) {
   const sidebarList = document.getElementById("category-list");
-  const sidebarCategories = Array.from(sidebarList.getElementsByClassName("category-link"));
+  const sidebarCategories = Array.from(
+    sidebarList.getElementsByClassName("category-link")
+  );
 
   // Normalize category names for comparison
-  const categoryItem = sidebarCategories.find(item =>
-    item.textContent.replace("•", "").trim().toLowerCase() === categoryName.toLowerCase()
+  const categoryItem = sidebarCategories.find(
+    (item) =>
+      item.textContent.replace("•", "").trim().toLowerCase() ===
+      categoryName.toLowerCase()
   );
 
   if (categoryItem) {
@@ -294,7 +311,6 @@ function removeCategoryFromSidebar(categoryName) {
   }
 }
 
-
 // Function to Open the Task Modal
 function openTaskModal(categoryContainer) {
   selectedTaskDiv = null; // Clear editing state for a new task
@@ -302,104 +318,113 @@ function openTaskModal(categoryContainer) {
 
   // Reset modal title and button text
   document.getElementById("addTaskModalLabel").textContent = "Add Task";
-  document.querySelector("#addTaskForm button[type='submit']").textContent = "Add Task";
+  document.querySelector("#addTaskForm button[type='submit']").textContent =
+    "Add Task";
 
   // Clear the input fields
   document.getElementById("addTaskForm").reset();
 
   // Reset counters
-  document.getElementById("taskCharCount").textContent = "20 characters remaining";
+  document.getElementById("taskCharCount").textContent =
+    "20 characters remaining";
   document.getElementById("taskCharCount").style.color = "gray";
-  document.getElementById("descriptionCharCount").textContent = "200 characters remaining";
+  document.getElementById("descriptionCharCount").textContent =
+    "200 characters remaining";
   document.getElementById("descriptionCharCount").style.color = "gray";
 
   // Show the modal
-  const taskModal = new bootstrap.Modal(document.getElementById("addTaskModal"));
+  const taskModal = new bootstrap.Modal(
+    document.getElementById("addTaskModal")
+  );
   taskModal.show();
 }
 
+document
+  .getElementById("addTaskForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
 
+    const taskName = document.getElementById("taskNameInput").value.trim();
+    const taskDescription = document
+      .getElementById("taskDescriptionInput")
+      .value.trim();
+    const taskDate = document.getElementById("taskDateInput").value;
 
-document.getElementById("addTaskForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+    const taskNameMaxLength = 20;
+    const taskDescriptionMaxLength = 200;
 
-  const taskName = document.getElementById("taskNameInput").value.trim();
-  const taskDescription = document
-    .getElementById("taskDescriptionInput")
-    .value.trim();
-  const taskDate = document.getElementById("taskDateInput").value;
-
-  const taskNameMaxLength = 20;
-  const taskDescriptionMaxLength = 200;
-
-  if (!taskName) {
-    alert("Task Name is required!");
-    return;
-  }
-
-  // Ensure selectedCategoryContainer is set
-  if (!selectedCategoryContainer) {
-    alert("No category selected. Please open the task modal from a valid category.");
-    console.error("No category container selected.");
-    return;
-  }
-
-  try {
-    const categoryName = selectedCategoryContainer.querySelector("h4").textContent;
-
-    if (selectedTaskDiv) {
-      // Editing an existing task
-      const currentTaskName = selectedTaskDiv.querySelector("h5").textContent;
-
-      const success = await updateTaskInBackend(
-        categoryName,
-        currentTaskName,
-        taskName, // New task name
-        taskDescription || "No description provided.",
-        taskDate || null,
-      );
-
-      if (success) {
-        await refreshCategoryTasks(selectedCategoryContainer, categoryName);
-      } else {
-        console.warn("Failed to update the task in the backend.");
-      }
-    } else {
-      // Adding a new task
-      const addedTask = await addTaskToBackend(
-        categoryName,
-        taskName,
-        taskDescription || "No description provided.",
-        taskDate || null
-      );
-
-      if (addedTask) {
-        await refreshCategoryTasks(selectedCategoryContainer, categoryName);
-      } else {
-        console.warn("Failed to add the task to the backend.");
-      }
+    if (!taskName) {
+      alert("Task Name is required!");
+      return;
     }
 
-    // Close the modal and reset the form
-    const taskModal = bootstrap.Modal.getInstance(
-      document.getElementById("addTaskModal")
-    );
-    taskModal.hide();
+    // Ensure selectedCategoryContainer is set
+    if (!selectedCategoryContainer) {
+      alert(
+        "No category selected. Please open the task modal from a valid category."
+      );
+      console.error("No category container selected.");
+      return;
+    }
 
-    selectedTaskDiv = null; // Clear the editing state
-    document.getElementById("addTaskForm").reset();
-    document.getElementById("taskCharCount").textContent = `${taskNameMaxLength} characters remaining`;
-    document.getElementById("taskCharCount").style.color = "gray";
-    document.getElementById("descriptionCharCount").textContent = `${taskDescriptionMaxLength} characters remaining`;
-    document.getElementById("descriptionCharCount").style.color = "gray";
-  } catch (error) {
-    console.error("Error during task submission:", error);
-    alert("An error occurred while processing the task.");
-  }
-});
+    try {
+      const categoryName =
+        selectedCategoryContainer.querySelector("h4").textContent;
 
+      if (selectedTaskDiv) {
+        // Editing an existing task
+        const currentTaskName = selectedTaskDiv.querySelector("h5").textContent;
 
+        const success = await updateTaskInBackend(
+          categoryName,
+          currentTaskName,
+          taskName, // New task name
+          taskDescription || "No description provided.",
+          taskDate || null
+        );
 
+        if (success) {
+          await refreshCategoryTasks(selectedCategoryContainer, categoryName);
+        } else {
+          console.warn("Failed to update the task in the backend.");
+        }
+      } else {
+        // Adding a new task
+        const addedTask = await addTaskToBackend(
+          categoryName,
+          taskName,
+          taskDescription || "No description provided.",
+          taskDate || null
+        );
+
+        if (addedTask) {
+          await refreshCategoryTasks(selectedCategoryContainer, categoryName);
+        } else {
+          console.warn("Failed to add the task to the backend.");
+        }
+      }
+
+      // Close the modal and reset the form
+      const taskModal = bootstrap.Modal.getInstance(
+        document.getElementById("addTaskModal")
+      );
+      taskModal.hide();
+
+      selectedTaskDiv = null; // Clear the editing state
+      document.getElementById("addTaskForm").reset();
+      document.getElementById(
+        "taskCharCount"
+      ).textContent = `${taskNameMaxLength} characters remaining`;
+      document.getElementById("taskCharCount").style.color = "gray";
+      document.getElementById(
+        "descriptionCharCount"
+      ).textContent = `${taskDescriptionMaxLength} characters remaining`;
+      document.getElementById("descriptionCharCount").style.color = "gray";
+    } catch (error) {
+      console.error("Error during task submission:", error);
+      alert("An error occurred while processing the task.");
+    }
+  });
 
 document.getElementById("add-category-btn").addEventListener("click", () => {
   selectedTaskDiv = null; // Clear editing state
@@ -409,11 +434,17 @@ document.getElementById("add-category-btn").addEventListener("click", () => {
   document.getElementById("addTaskForm").reset(); // Clear the form fields
 });
 
-function addTaskToCategory(categoryContainer, name, description = "No description provided.", date = null, status = "In Progress") {
+function addTaskToCategory(
+  categoryContainer,
+  name,
+  description = "No description provided.",
+  date = null,
+  status = "In Progress"
+) {
   // Check if the task already exists in the category
-  const existingTasks = Array.from(categoryContainer.querySelectorAll(".task h5")).map(
-    (taskTitle) => taskTitle.textContent
-  );
+  const existingTasks = Array.from(
+    categoryContainer.querySelectorAll(".task h5")
+  ).map((taskTitle) => taskTitle.textContent);
 
   if (existingTasks.includes(name)) {
     alert(`A task named "${name}" already exists in this category.`);
@@ -495,7 +526,6 @@ function addTaskToCategory(categoryContainer, name, description = "No descriptio
   taskDiv.addEventListener("click", () => showTaskDetails(taskDiv));
 }
 
-
 /**
  * Creates and returns the icons container with event listeners.
  */
@@ -516,11 +546,15 @@ function createTaskIcons(taskDiv, name, description, date) {
     event.stopPropagation();
 
     // Get current task status from UI
-    const newStatus = taskDiv.classList.contains("task-done") ? "In Progress" : "Completed";
+    const newStatus = taskDiv.classList.contains("task-done")
+      ? "In Progress"
+      : "Completed";
 
     // Update task status in the backend
-    const categoryName = taskDiv.closest(".category-card").querySelector("h4").textContent;
-    updateTaskStatus(categoryName, name, newStatus);  // Send request to update status
+    const categoryName = taskDiv
+      .closest(".category-card")
+      .querySelector("h4").textContent;
+    updateTaskStatus(categoryName, name, newStatus); // Send request to update status
 
     // Toggle task done state in UI
     toggleTaskDoneState(taskDiv, checkIcon, newStatus);
@@ -552,7 +586,6 @@ function createTaskIcons(taskDiv, name, description, date) {
   return iconsContainer;
 }
 
-
 /**
  * Toggles the task's "done" state.
  */
@@ -569,7 +602,6 @@ function toggleTaskDoneState(taskDiv, checkIcon, newStatus) {
     checkIcon.title = "Mark as Done";
   }
 }
-
 
 // Set the minimum date for the task date input to today's date
 document.getElementById("taskDateInput").addEventListener("focus", function () {
@@ -591,29 +623,37 @@ function deleteTask(taskDiv) {
   Swal.fire({
     title: `Are you sure?`,
     text: `Do you really want to delete the task "${taskName}" from category "${categoryName}"?`,
-    icon: 'warning',
+    icon: "warning",
     showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
   }).then((result) => {
     if (result.isConfirmed) {
       deleteTaskFromBackend(categoryName, taskName).then((success) => {
         if (success) {
           // Remove task from the UI
           taskDiv.remove();
-          console.log(`Task "${taskName}" removed from category "${categoryName}".`);
-          Swal.fire('Deleted!', `The task "${taskName}" has been deleted.`, 'success');
+          console.log(
+            `Task "${taskName}" removed from category "${categoryName}".`
+          );
+          Swal.fire(
+            "Deleted!",
+            `The task "${taskName}" has been deleted.`,
+            "success"
+          );
         } else {
-          Swal.fire('Error!', 'Something went wrong while deleting the task.', 'error');
+          Swal.fire(
+            "Error!",
+            "Something went wrong while deleting the task.",
+            "error"
+          );
         }
       });
     }
   });
 }
-
-
 
 // Function to Edit a Task
 function editTask(taskDiv) {
@@ -650,7 +690,9 @@ function editTask(taskDiv) {
   taskCharCount.textContent = `${20 - taskTitle.length} characters remaining`;
   taskCharCount.style.color = taskTitle.length > 15 ? "red" : "gray";
 
-  descriptionCharCount.textContent = `${200 - taskDesc.length} characters remaining`;
+  descriptionCharCount.textContent = `${
+    200 - taskDesc.length
+  } characters remaining`;
   descriptionCharCount.style.color = taskDesc.length > 180 ? "red" : "gray";
 
   // Update the modal title and button text
@@ -664,8 +706,6 @@ function editTask(taskDiv) {
   );
   taskModal.show();
 }
-
-
 
 // Function to Show Task Details
 function showTaskDetails(taskDiv) {
@@ -706,39 +746,52 @@ const colorButtons = document.querySelectorAll(".color-picker button");
 // Add click event listener to each button
 colorButtons.forEach((button) => {
   button.addEventListener("click", () => {
-      const selectedNavbarColor = button.getAttribute("data-navbar-color");
-      const selectedSidebarColor = button.getAttribute("data-sidebar-color");
-      selectedCategoryContainerColor = button.getAttribute("data-category-color");
-      
-      const navbar = document.querySelector(".navbar");
-      const sidebar = document.querySelector(".sidebar");
-      const categoryCards = document.querySelectorAll(".category-card");
+    const selectedNavbarColor = button.getAttribute("data-navbar-color");
+    const selectedSidebarColor = button.getAttribute("data-sidebar-color");
+    selectedCategoryContainerColor = button.getAttribute("data-category-color");
 
-      // Set the background color directly for navbar and sidebar
-      navbar.style.setProperty("background-color", selectedNavbarColor, "important");
-      sidebar.style.setProperty("background-color", selectedSidebarColor, "important");
+    const navbar = document.querySelector(".navbar");
+    const sidebar = document.querySelector(".sidebar");
+    const categoryCards = document.querySelectorAll(".category-card");
 
-      // Set the background color for all category cards
-      categoryCards.forEach((categoryCard) => {
-          categoryCard.style.setProperty("background-color", selectedCategoryContainerColor, "important");
-      });
+    // Set the background color directly for navbar and sidebar
+    navbar.style.setProperty(
+      "background-color",
+      selectedNavbarColor,
+      "important"
+    );
+    sidebar.style.setProperty(
+      "background-color",
+      selectedSidebarColor,
+      "important"
+    );
+
+    // Set the background color for all category cards
+    categoryCards.forEach((categoryCard) => {
+      categoryCard.style.setProperty(
+        "background-color",
+        selectedCategoryContainerColor,
+        "important"
+      );
+    });
   });
 });
-
 
 // Function to set the theme based on user preferences
 function applyUserTheme() {
   // Check if the user prefers dark mode
-  const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const prefersDarkMode = window.matchMedia(
+    "(prefers-color-scheme: dark)"
+  ).matches;
 
   // Select the black and blue buttons
   const blackButton = document.querySelector("[data-navbar-color='#1a1b18']");
   const blueButton = document.querySelector("[data-navbar-color='#7695ff']");
 
   if (prefersDarkMode && blackButton) {
-      blackButton.click(); // Simulate a click on the black button
+    blackButton.click(); // Simulate a click on the black button
   } else if (blueButton) {
-      blueButton.click(); // Simulate a click on the blue button
+    blueButton.click(); // Simulate a click on the blue button
   }
 }
 
@@ -746,20 +799,22 @@ function applyUserTheme() {
 document.addEventListener("DOMContentLoaded", applyUserTheme);
 
 // Updates the character counter for the Category Name input field in real-time.
-document.getElementById("categoryNameInput").addEventListener("input", function () {
-  const maxLength = 20;
-  const remaining = maxLength - this.value.length;
+document
+  .getElementById("categoryNameInput")
+  .addEventListener("input", function () {
+    const maxLength = 20;
+    const remaining = maxLength - this.value.length;
 
-  const cateCharCount = document.getElementById("cateCharCount");
-  cateCharCount.textContent = `${remaining} characters remaining`;
+    const cateCharCount = document.getElementById("cateCharCount");
+    cateCharCount.textContent = `${remaining} characters remaining`;
 
-  if (remaining < 1) {
-    cateCharCount.style.setProperty("color", "red", "important");
- // Highlight if exceeding limit (shouldn't happen due to `maxlength`)
-  } else {
-    cateCharCount.style.color = "gray"; // Reset color
-  }
-});
+    if (remaining < 1) {
+      cateCharCount.style.setProperty("color", "red", "important");
+      // Highlight if exceeding limit (shouldn't happen due to `maxlength`)
+    } else {
+      cateCharCount.style.color = "gray"; // Reset color
+    }
+  });
 
 // Updates the character counter for the Task Name input field in real-time.
 document.getElementById("taskNameInput").addEventListener("input", function () {
@@ -778,39 +833,49 @@ document.getElementById("taskNameInput").addEventListener("input", function () {
 });
 
 // Updates the character counter for the Task Description input field in real-time.
-document.getElementById("taskDescriptionInput").addEventListener("input", function () {
-  const maxLength = 200; // Character limit for Task Description
-  const remaining = maxLength - this.value.length; // Calculate remaining characters
+document
+  .getElementById("taskDescriptionInput")
+  .addEventListener("input", function () {
+    const maxLength = 200; // Character limit for Task Description
+    const remaining = maxLength - this.value.length; // Calculate remaining characters
 
-  const descriptionCharCount = document.getElementById("descriptionCharCount");
-  descriptionCharCount.textContent = `${remaining} characters remaining`;
+    const descriptionCharCount = document.getElementById(
+      "descriptionCharCount"
+    );
+    descriptionCharCount.textContent = `${remaining} characters remaining`;
 
-  // Change text color if nearing or exceeding the limit
-  if (remaining < 20) {
-    descriptionCharCount.style.setProperty("color", "red", "important"); // Highlight in red
-  } else {
-    descriptionCharCount.style.setProperty("color", "gray", "important"); // Default color
-  }
-});
-
-// Dynamic Search for Category
-document.getElementById("categorySearch").addEventListener("input", function () {
-  const searchValue = this.value.trim().toLowerCase();
-
-  // Select only category items (e.g., those with the class `.category-link`)
-  const categoryItems = document.querySelectorAll("#category-list .category-link");
-
-  categoryItems.forEach((categoryItem) => {
-    const categoryText = categoryItem.querySelector(".category-name").textContent.trim().toLowerCase();
-
-    if (searchValue === "" || categoryText.includes(searchValue)) {
-      categoryItem.style.display = "flex"; // Show matching categories
+    // Change text color if nearing or exceeding the limit
+    if (remaining < 20) {
+      descriptionCharCount.style.setProperty("color", "red", "important"); // Highlight in red
     } else {
-      categoryItem.style.display = "none"; // Hide non-matching categories
+      descriptionCharCount.style.setProperty("color", "gray", "important"); // Default color
     }
   });
-});
 
+// Dynamic Search for Category
+document
+  .getElementById("categorySearch")
+  .addEventListener("input", function () {
+    const searchValue = this.value.trim().toLowerCase();
+
+    // Select only category items (e.g., those with the class `.category-link`)
+    const categoryItems = document.querySelectorAll(
+      "#category-list .category-link"
+    );
+
+    categoryItems.forEach((categoryItem) => {
+      const categoryText = categoryItem
+        .querySelector(".category-name")
+        .textContent.trim()
+        .toLowerCase();
+
+      if (searchValue === "" || categoryText.includes(searchValue)) {
+        categoryItem.style.display = "flex"; // Show matching categories
+      } else {
+        categoryItem.style.display = "none"; // Hide non-matching categories
+      }
+    });
+  });
 
 //get all categories ---------------------
 async function fetchAllCategories() {
@@ -850,8 +915,9 @@ function displayCategoriesWithTasks(categories) {
     addCategory(categoryName);
 
     // Add tasks for the category
-    const categoryCard = Array.from(document.querySelectorAll(".category-card"))
-      .find((card) => card.querySelector("h4").textContent === categoryName);
+    const categoryCard = Array.from(
+      document.querySelectorAll(".category-card")
+    ).find((card) => card.querySelector("h4").textContent === categoryName);
 
     if (categoryCard && tasks) {
       Object.entries(tasks).forEach(([taskName, taskDetails]) => {
@@ -867,71 +933,73 @@ function displayCategoriesWithTasks(categories) {
     // Set the background color for all category cards
     const categoryCards = document.querySelectorAll(".category-card");
     categoryCards.forEach((categoryCard) => {
-      categoryCard.style.setProperty("background-color", selectedCategoryContainerColor, "important");
+      categoryCard.style.setProperty(
+        "background-color",
+        selectedCategoryContainerColor,
+        "important"
+      );
     });
   });
 }
 
-
 // Function to handle Add Category Form Submission
 document
-.getElementById("addCategoryForm")
-.addEventListener("submit", async function (e) {
-  e.preventDefault(); // Prevent form refresh
+  .getElementById("addCategoryForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault(); // Prevent form refresh
 
-  // Set the character limit
-  const maxLength = 20;
+    // Set the character limit
+    const maxLength = 20;
 
-  const categoryNameInput = document.getElementById("categoryNameInput");
-  const categoryName = categoryNameInput.value.trim();
+    const categoryNameInput = document.getElementById("categoryNameInput");
+    const categoryName = categoryNameInput.value.trim();
 
-  if (!categoryName) {
-    alert("Category Name is required!");
-    return;
-  }
-
-  try {
-    // Make API call to add the category
-    const response = await fetch(`${apiBaseUrl}/AddCategory`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: user,
-        categoryName: categoryName,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      // Close the modal programmatically
-      const addCategoryModal = bootstrap.Modal.getInstance(
-        document.getElementById("addCategoryModal")
-      );
-      addCategoryModal.hide();
-
-      // Synchronize with the backend for sorting
-      await fetchAllCategories();
-
-      // Clear input field
-      categoryNameInput.value = "";
-
-      // Reset the character counter
-      const cateCharCount = document.getElementById("cateCharCount");
-      cateCharCount.textContent = `${maxLength} characters remaining`;
-      cateCharCount.style.color = "gray";
-
-    } else {
-      alert(data.error || "Failed to add category.");
-      console.error("Backend Error:", data.error);
+    if (!categoryName) {
+      alert("Category Name is required!");
+      return;
     }
-  } catch (error) {
-    alert("An error occurred while adding the category. Please try again.");
-    console.error("Error:", error);
-  }
-});
+
+    try {
+      // Make API call to add the category
+      const response = await fetch(`${apiBaseUrl}/AddCategory`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user,
+          categoryName: categoryName,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Close the modal programmatically
+        const addCategoryModal = bootstrap.Modal.getInstance(
+          document.getElementById("addCategoryModal")
+        );
+        addCategoryModal.hide();
+
+        // Synchronize with the backend for sorting
+        await fetchAllCategories();
+
+        // Clear input field
+        categoryNameInput.value = "";
+
+        // Reset the character counter
+        const cateCharCount = document.getElementById("cateCharCount");
+        cateCharCount.textContent = `${maxLength} characters remaining`;
+        cateCharCount.style.color = "gray";
+      } else {
+        alert(data.error || "Failed to add category.");
+        console.error("Backend Error:", data.error);
+      }
+    } catch (error) {
+      alert("An error occurred while adding the category. Please try again.");
+      console.error("Error:", error);
+    }
+  });
 
 async function addTaskToBackend(categoryName, taskName, description, dueDate) {
   try {
@@ -957,12 +1025,11 @@ async function addTaskToBackend(categoryName, taskName, description, dueDate) {
 
     const data = await response.json();
 
-      // Close all dropdowns when a task is added
-      const taskLists = document.querySelectorAll(".task-item, .non-task");
-      taskLists.forEach((taskList) => {
-        taskList.classList.add("d-none"); // Hide each task list or non-task element
-      });
-
+    // Close all dropdowns when a task is added
+    const taskLists = document.querySelectorAll(".task-item, .non-task");
+    taskLists.forEach((taskList) => {
+      taskList.classList.add("d-none"); // Hide each task list or non-task element
+    });
 
     return data.task; // Ensure this matches the backend's response structure
   } catch (error) {
@@ -973,9 +1040,12 @@ async function addTaskToBackend(categoryName, taskName, description, dueDate) {
 
 async function fetchTasksForCategory(userId, categoryName) {
   try {
-    const response = await fetch(`${apiBaseUrl}/GetAllTasks?userId=${userId}&categoryName=${categoryName}`, {
-      method: "GET",
-    });
+    const response = await fetch(
+      `${apiBaseUrl}/GetAllTasks?userId=${userId}&categoryName=${categoryName}`,
+      {
+        method: "GET",
+      }
+    );
 
     if (!response.ok & !isCategoryClicked) {
       throw new Error(`Failed to fetch tasks: ${response.statusText}`);
@@ -984,7 +1054,11 @@ async function fetchTasksForCategory(userId, categoryName) {
     const data = await response.json();
 
     // Transform tasks from object to array if necessary
-    if (data.tasks && typeof data.tasks === "object" && !Array.isArray(data.tasks)) {
+    if (
+      data.tasks &&
+      typeof data.tasks === "object" &&
+      !Array.isArray(data.tasks)
+    ) {
       return Object.entries(data.tasks).map(([taskName, taskDetails]) => ({
         taskName, // Add taskName to each task object
         ...taskDetails,
@@ -998,7 +1072,6 @@ async function fetchTasksForCategory(userId, categoryName) {
     return [];
   }
 }
-
 
 async function refreshCategoryTasks(categoryContainer, categoryName) {
   try {
@@ -1022,9 +1095,11 @@ async function refreshCategoryTasks(categoryContainer, categoryName) {
         task.status // Pass status here
       );
     });
-
   } catch (error) {
-    console.error(`Failed to refresh tasks for category "${categoryName}":`, error);
+    console.error(
+      `Failed to refresh tasks for category "${categoryName}":`,
+      error
+    );
     alert("Unable to refresh tasks. Please try again later.");
   }
 }
@@ -1097,7 +1172,13 @@ async function deleteTaskFromBackend(categoryName, taskName) {
   }
 }
 
-async function updateTaskInBackend(categoryName, currentTaskName, newTaskName, description, dueDate) {
+async function updateTaskInBackend(
+  categoryName,
+  currentTaskName,
+  newTaskName,
+  description,
+  dueDate
+) {
   try {
     const payload = {
       UserId: user,
@@ -1140,19 +1221,19 @@ async function updateTaskStatus(categoryName, taskName, newStatus) {
   try {
     // Ensure all required parameters are sent in the payload
     const payload = {
-      userId: user,  // Assuming `user` is your logged-in user ID
-      category: categoryName,  // Ensure category is being passed
-      taskName: taskName,  // Ensure taskName is being passed
-      status: newStatus  // Ensure status is being passed
+      userId: user, // Assuming `user` is your logged-in user ID
+      category: categoryName, // Ensure category is being passed
+      taskName: taskName, // Ensure taskName is being passed
+      status: newStatus, // Ensure status is being passed
     };
 
-    console.log("Payload being sent:", payload);  // Debug the payload
+    console.log("Payload being sent:", payload); // Debug the payload
 
     // Send the PUT request to update the task status
     const response = await fetch(`${apiBaseUrl}/updateTaskStatus`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
     });
@@ -1170,7 +1251,7 @@ async function updateTaskStatus(categoryName, taskName, newStatus) {
     // Update the task status in the UI after success
     const taskElement = document.querySelector(`#task-${taskName}`);
     if (taskElement) {
-      taskElement.querySelector('.status').textContent = newStatus;
+      taskElement.querySelector(".status").textContent = newStatus;
     }
   } catch (error) {
     console.error("Error during API call to update task status:", error);
@@ -1188,9 +1269,9 @@ function showTaskDetailsSidebar(task) {
   document.getElementById("taskDetailTitle").textContent = taskName;
   document.getElementById("taskDetailDescription").textContent =
     description || "No description available.";
-  document.getElementById(
-    "taskDetailDate"
-  ).textContent = `Due Date: ${dueDate || "No due date provided."}`;
+  document.getElementById("taskDetailDate").textContent = `Due Date: ${
+    dueDate || "No due date provided."
+  }`;
 
   // Show the modal
   const taskDetailsModal = new bootstrap.Modal(
@@ -1199,11 +1280,117 @@ function showTaskDetailsSidebar(task) {
   taskDetailsModal.show();
 }
 
+//speechToText
 
+// Helper function for Speech-to-Text
+function addSpeechToText(buttonId, inputId, charCountId, maxLength) {
+  document.getElementById(buttonId).addEventListener("click", function () {
+    if (!("webkitSpeechRecognition" in window)) {
+      alert("Speech-to-Text is not supported in this browser.");
+      return;
+    }
 
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = "en-US"; // Set language
+    recognition.interimResults = false; // Only final results
 
+    recognition.start();
 
+    recognition.onstart = function () {
+      console.log("Speech recognition started...");
+    };
 
+    recognition.onresult = function (event) {
+      let transcript = event.results[0][0].transcript;
+
+      // Truncate the transcript if it exceeds the max length
+      if (transcript.length > maxLength) {
+        transcript = transcript.substring(0, maxLength);
+      }
+
+      const inputField = document.getElementById(inputId);
+
+      // Update the input field with recognized speech
+      inputField.value = transcript;
+
+      // Update character counter
+      const remaining = maxLength - transcript.length;
+      const charCount = document.getElementById(charCountId);
+      charCount.textContent = `${remaining} characters remaining`;
+      charCount.style.color = remaining < 0 ? "red" : "gray";
+
+      console.log("Recognized text (truncated):", transcript);
+    };
+
+    recognition.onerror = function (event) {
+      console.error("Speech recognition error:", event.error);
+      alert("An error occurred during speech recognition. Please try again.");
+    };
+
+    recognition.onend = function () {
+      console.log("Speech recognition ended.");
+    };
+  });
+}
+
+// Add Speech-to-Text for Task Name and Task Description
+addSpeechToText("speechTaskName", "taskNameInput", "taskCharCount", 20);
+addSpeechToText(
+  "speechTaskDescription",
+  "taskDescriptionInput",
+  "descriptionCharCount",
+  200
+);
+
+// Speech-to-Text for category name input
+document.getElementById("speechButton").addEventListener("click", function () {
+  if (!("webkitSpeechRecognition" in window)) {
+    alert("Speech-to-Text is not supported in this browser.");
+    return;
+  }
+
+  const maxLength = 20; // Character limit for the input field
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = "en-US"; // Set language
+  recognition.interimResults = false; // Only final results
+
+  recognition.start();
+
+  recognition.onstart = function () {
+    console.log("Speech recognition started...");
+  };
+
+  recognition.onresult = function (event) {
+    let transcript = event.results[0][0].transcript;
+
+    // Truncate the transcript if it exceeds the max length
+    if (transcript.length > maxLength) {
+      transcript = transcript.substring(0, maxLength);
+    }
+
+    const categoryNameInput = document.getElementById("categoryNameInput");
+
+    // Update the input field with recognized speech
+    categoryNameInput.value = transcript;
+
+    // Update character counter
+    const remaining = maxLength - transcript.length;
+    const cateCharCount = document.getElementById("cateCharCount");
+    cateCharCount.textContent = `${remaining} characters remaining`;
+    cateCharCount.style.color = remaining < 0 ? "red" : "gray";
+
+    console.log("Recognized text (truncated):", transcript);
+  };
+
+  recognition.onerror = function (event) {
+    console.error("Speech recognition error:", event.error);
+    alert("An error occurred during speech recognition. Please try again.");
+  };
+
+  recognition.onend = function () {
+    console.log("Speech recognition ended.");
+  };
+});
 
 
 
