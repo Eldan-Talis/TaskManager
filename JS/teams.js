@@ -5,6 +5,7 @@ const sub = sessionStorage.getItem('sub');
 //const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 //const sub = "e408d428-a041-7069-ace8-579db3cbd3a7";
 //const sub = "34d83408-40b1-707b-f80b-cbdc8e287b90";
+//const sub = "e4b8d4e8-d0a1-70c1-73b2-4e8ed0338fc5";
 const firstName = sessionStorage.getItem("first_name");
 const user = sub;
 console.log("Sub:", sub);
@@ -733,6 +734,16 @@ async function deleteCategoryFromBackend(teamId, categoryName) {
     return false;
   }
 }
+
+// Set the minimum date for the task date input to today's date
+document.getElementById("taskDateInput").addEventListener("focus", function () {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(today.getDate()).padStart(2, "0");
+  const minDate = `${year}-${month}-${day}`;
+  this.setAttribute("min", minDate);
+});
 
 // Function to open the task modal
 function openTaskModal(categoryContainer) {
