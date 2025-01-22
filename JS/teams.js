@@ -1,7 +1,9 @@
 const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod";
 
-const sub = sessionStorage.getItem('sub');
+//const sub = sessionStorage.getItem('sub');
+const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 //const sub = "e408d428-a041-7069-ace8-579db3cbd3a7";
+//const sub = "34d83408-40b1-707b-f80b-cbdc8e287b90";
 const firstName = sessionStorage.getItem('first_name');
 const user = sub;
 console.log('Sub:', sub);
@@ -133,7 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Load teams from the backend
-// Load teams from the backend
 async function loadTeams() {
   try {
     const endpoint = `${apiBaseUrl}/GetAllTeams`;
@@ -146,17 +147,30 @@ async function loadTeams() {
       body: JSON.stringify({ userId: user }), // Dynamically pass the user ID
     });
 
-    if (!response.ok) {
+    let teams = [];
+
+    if (response.status === 404) {
+      // No teams found for the user
+      console.warn('No teams found for the user.');
+
+      // Create and append the friendly message container
+      const friendlyMessageContainer = document.getElementById('teams-message');
+      friendlyMessageContainer.innerHTML = '';
+
+      // Set the message text with a line break using <br>
+      friendlyMessageContainer.innerHTML = 'You have no teams yet. &nbsp; Create a new team or join an existing one to get started.';
+
+      return; // Exit the function as there's nothing more to do
+    } else if (!response.ok) {
       throw new Error(`Failed to fetch team data: ${response.statusText}`);
-    }
-
-    const teams = await response.json();
-
-    // Check if teams is an array
-    if (!Array.isArray(teams)) {
-      console.error("Expected teams to be an array:", teams);
-      alert("Unexpected data format received from the server.");
-      return;
+    } else {
+      teams = await response.json();
+      // Ensure teams is an array
+      if (!Array.isArray(teams)) {
+        console.error("Expected teams to be an array:", teams);
+        alert("Unexpected data format received from the server.");
+        return;
+      }
     }
 
     // Sort the teams alphabetically in a case-insensitive manner
@@ -195,17 +209,90 @@ async function loadTeams() {
       // When the team is clicked, set the selected team ID and load categories
       listItem.addEventListener('click', () => {
         setSelectedTeamId(team.teamId); // Store the selected team ID
+
+        // Create and append the friendly message container with 'X' icon
+        const friendlyMessageContainer = document.getElementById('teams-message');
+        friendlyMessageContainer.innerHTML = ''; // Clear previous content
+
+        // Create a container div for the message and 'X' icon
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('d-flex', 'justify-content-between', 'align-items-center');
+
+        // Team message
+        const teamMessage = document.createElement('span');
+        teamMessage.textContent = `Current Team: ${team.teamName} | Invite ID: "${team.teamId}"`;
+        messageContainer.appendChild(teamMessage);
+
+        // 'Open Door' icon/button
+        const leaveTeamBtn = document.createElement('button');
+        leaveTeamBtn.innerHTML = '<i class="bx bxs-exit" ></i>'; // Font Awesome Open Door Icon 
+        leaveTeamBtn.classList.add('leave-team-btn');
+        leaveTeamBtn.title = 'Delete Team'; // Consider updating the title if needed
+
+        // Add event listener to 'Open Door' button
+        leaveTeamBtn.addEventListener('click', (event) => {
+          event.stopPropagation(); // Prevent triggering the parent click event
+          promptDeleteTeam(team);
+        });
+
+        messageContainer.appendChild(leaveTeamBtn);
+
+        friendlyMessageContainer.appendChild(messageContainer);
+
         console.log(`Team selected: ${team.teamName} (ID: ${team.teamId})`);
         loadCategoriesForTeam(team.teamId);  // Call function to load categories
       });
 
       teamsList.appendChild(listItem);
     });
+
+    // Optionally, trigger click on the first team if exists
+    if (teams.length > 0) {
+      const firstTeamItem = teamsList.querySelector('li');
+      firstTeamItem.click();  // Simulate a click on the first team
+    }
+
   } catch (error) {
     console.error('Error loading teams:', error);
     alert("An error occurred while loading teams. Please try again later.");
   }
 }
+
+// Function to prompt deletion of a team
+function promptDeleteTeam(team) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Do you really want to delete the team "${team.teamName}"? This action cannot be undone.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      // Proceed to delete the team
+      const success = await deleteTeamFromBackend(team.teamId);
+
+      if (success) {
+        // Remove the team from the UI
+        removeTeamFromUI(team.teamId);
+        Swal.fire(
+          'Deleted!',
+          `The team "${team.teamName}" has been deleted.`,
+          'success'
+        );
+      } else {
+        Swal.fire(
+          'Error!',
+          'Something went wrong while deleting the team.',
+          'error'
+        );
+      }
+    }
+  });
+}
+
 
 
 // Call the function to load the teams when the page is loaded
