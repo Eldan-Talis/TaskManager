@@ -49,6 +49,6 @@ DynamoDB: Task and category storage
 Cognito: User authentication
 CloudWatch: Logs monitoring
 Contributors
-Eldan Talis - eldan.talis@example.com
-Lidor Machluf - lidor.machluf@example.com
+Eldan Talis - Eldan7070@gmail.com
+Lidor Machluf - Machluflidor@gmail.com
 Din Eliyahu - dinelyahu@gmail.com
