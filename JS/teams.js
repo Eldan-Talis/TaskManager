@@ -293,7 +293,7 @@ async function loadTeams() {
         // Add event listener to 'Open Door' button
         leaveTeamBtn.addEventListener("click", (event) => {
           event.stopPropagation(); // Prevent triggering the parent click event
-          promptDeleteTeam(team);
+          promptLeaveTeam(team);
         });
 
         messageContainer.appendChild(leaveTeamBtn);
@@ -321,41 +321,6 @@ async function loadTeams() {
     console.error("Error loading teams:", error);
     alert("An error occurred while loading teams. Please try again later.");
   }
-}
-
-// Function to prompt deletion of a team
-function promptDeleteTeam(team) {
-  Swal.fire({
-    title: "Are you sure?",
-    text: `Do you really want to leave the team "${team.teamName}"?`,
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Yes, leave!",
-    cancelButtonText: "Cancel",
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      // Proceed to delete the team
-      const success = await deleteTeamFromBackend(team.teamId);
-
-      if (success) {
-        // Remove the team from the UI
-        removeTeamFromUI(team.teamId);
-        Swal.fire(
-          "Deleted!",
-          `The team "${team.teamName}" has been deleted.`,
-          "success"
-        );
-      } else {
-        Swal.fire(
-          "Error!",
-          "Something went wrong while deleting the team.",
-          "error"
-        );
-      }
-    }
-  });
 }
 
 // Call the function to load the teams when the page is loaded
@@ -1517,3 +1482,93 @@ document.addEventListener("DOMContentLoaded", function () {
   // Call the greetUser function
   greetUser();
 });
+
+async function leaveTeamFromBackend(teamId) {
+  if (!teamId) {
+    console.error("Team ID is required to delete a team.");
+    alert("Invalid team ID. Please try again.");
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/LeaveTeam`, {
+      method: "POST", // Ensure this matches your API Gateway setup
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userId: user,    // Assuming 'user' is the userId (from frontend code)
+        teamId: teamId,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error deleting team:", errorData.error);
+      alert(errorData.error || "Failed to delete the team. Please try again.");
+      return false;
+    }
+
+    const data = await response.json();
+    console.log("Team deleted successfully:", data.message);
+    return data.teamDeleted; // Returns true if team was deleted, else false
+  } catch (error) {
+    console.error("Error during API call to delete team:", error);
+    alert("An error occurred while deleting the team. Please try again.");
+    return false;
+  }
+}
+
+
+// Function to remove the deleted team from the UI
+function removeTeamFromUI(teamId) {
+  const teamsList = document.getElementById('teams-list');
+  const teamItem = teamsList.querySelector(`li[data-team-id="${teamId}"]`);
+  if (teamItem) {
+    teamsList.removeChild(teamItem);
+  }
+
+  // Clear the team message if the deleted team was selected
+  const selectedTeamId = getSelectedTeamId();
+  if (selectedTeamId === teamId) {
+    setSelectedTeamId(null);
+    document.getElementById('teams-message').innerHTML = 'You have no teams yet. &nbsp; Create a new team or join an existing one to get started.';
+    document.getElementById('categories-grid').innerHTML = ""; // Clear categories
+  }
+}
+
+
+
+function promptLeaveTeam(team) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Do you really want to delete the team "${team.teamName}"? This action cannot be undone.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      // Proceed to delete the team
+      const success = await leaveTeamFromBackend(team.teamId);
+
+      if (success) {
+        // Remove the team from the UI
+        removeTeamFromUI(team.teamId);
+        Swal.fire(
+          'Deleted!',
+          `The team "${team.teamName}" has been deleted.`,
+          'success'
+        );
+      } else {
+        Swal.fire(
+          'Error!',
+          'Something went wrong while deleting the team.',
+          'error'
+        );
+      }
+    }
+  });
+}
