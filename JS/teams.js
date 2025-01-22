@@ -120,18 +120,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle form submission
   const joinTeamForm = document.getElementById("joinTeamForm");
-  joinTeamForm.addEventListener("submit", (event) => {
+  // Handle form submission for joining a team
+  joinTeamForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+
     const teamCode = teamCodeInput.value.trim();
 
     // Validate team code length
     if (teamCode.length !== 8) {
       teamCodeError.style.display = "block";
-    } else {
-      teamCodeError.style.display = "none";
-      console.log(`Joining team with code: ${teamCode}`);
-      // Add logic here to verify the team code and join the team.
-      // For example, send the code to the backend to validate.
+      return;
+    }
+
+    teamCodeError.style.display = "none";
+
+    // Prepare the request payload
+    const payload = {
+      teamId: teamCode,
+      userId: sub, // User's sub (from your frontend logic)
+    };
+
+    try {
+      // Make the API call to join the team
+      const response = await fetch(`${apiBaseUrl}/JoinTeam`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error joining team:", errorData.message);
+        alert(errorData.message || "Failed to join the team.");
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Successfully joined the team:", data.message);
+
+      // Reload the teams to reflect the changes
+      await loadTeams();
 
       // Reset the form
       teamCodeInput.value = "";
@@ -141,8 +171,14 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("joinTeamModal")
       );
       joinTeamModal.hide();
+
+      alert("Successfully joined the team!");
+    } catch (error) {
+      console.error("Error during API call to join team:", error);
+      alert("An error occurred while trying to join the team. Please try again.");
     }
   });
+
 
   // Hide error message on input
   teamCodeInput.addEventListener("input", () => {
