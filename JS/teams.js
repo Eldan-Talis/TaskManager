@@ -24,6 +24,38 @@ function setSelectedTeamId(teamId) {
   selectedTeamId = teamId;
 }
 
+document.addEventListener("DOMContentLoaded", async () => {
+  const authUrl =
+    `${config.domain}/login?` +
+    // response_type=code +
+    "response_type=token" +
+    `&client_id=${config.clientId}` +
+    `&redirect_uri=${encodeURIComponent(config.redirectUri)}` +
+    "&scope=openid+aws.cognito.signin.user.admin";
+  if (!sub) {
+    console.error("User ID (sub) is missing. Redirecting to login.");
+    // Redirect to login if the sub is not available
+    window.location.href = authUrl;
+    return;
+  }
+
+  try {
+    // Load teams first
+  await loadTeams();
+
+  // Once teams are loaded, trigger the click event on the first item
+  const teamsList = document.getElementById("teams-list");
+  const teams = teamsList.querySelectorAll("li");
+
+  if (teams.length > 0) {
+    const firstTeamItem = teams[0];
+    firstTeamItem.click(); // Simulate a click on the first team
+  }
+  } catch (error) {
+    console.error("Failed to load user data:", error);
+  }
+});
+
 // Function to toggle the color picker visibility
 function toggleColorPicker() {
   const colorPicker = document.getElementById("colorPicker");
@@ -104,7 +136,7 @@ colorButtons.forEach((button) => {
 function logout() {
   // Construct the Cognito logout URL
   const logoutUrl =
-    "https://us-east-1doxbvaqzz.auth.us-east-1.amazoncognito.com/logout?client_id=646mieltk0s1nidal6scivrlc0&logout_uri=https://taskmanager-led.s3.us-east-1.amazonaws.com/index.html";
+    "https://us-east-1doxbvaqzz.auth.us-east-1.amazoncognito.com/logout?client_id=646mieltk0s1nidal6scivrlc0&logout_uri=https://taskeld.s3.us-east-1.amazonaws.com/index.html";
 
   // Clear the session
   clearStorage();
@@ -112,6 +144,19 @@ function logout() {
 
   // Redirect to the Cognito logout URL
   window.location.href = logoutUrl;
+}
+
+// Helper functions to clear cookies and storage
+function clearCookies() {
+  document.cookie.split(";").forEach((cookie) => {
+    const name = cookie.split("=")[0].trim();
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+  });
+}
+
+function clearStorage() {
+  sessionStorage.clear();
+  localStorage.clear();
 }
 
 // Handle joining a team
@@ -359,21 +404,6 @@ async function loadTeams() {
     alert("An error occurred while loading teams. Please try again later.");
   }
 }
-
-// Call the function to load the teams when the page is loaded
-document.addEventListener("DOMContentLoaded", async () => {
-  // Load teams first
-  await loadTeams();
-
-  // Once teams are loaded, trigger the click event on the first item
-  const teamsList = document.getElementById("teams-list");
-  const teams = teamsList.querySelectorAll("li");
-
-  if (teams.length > 0) {
-    const firstTeamItem = teams[0];
-    firstTeamItem.click(); // Simulate a click on the first team
-  }
-});
 
 // Handle creating a new category
 document.addEventListener("DOMContentLoaded", () => {
