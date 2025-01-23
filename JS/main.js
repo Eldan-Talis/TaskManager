@@ -475,9 +475,23 @@ function addTaskToCategory(
   taskInfo.appendChild(taskTitle);
 
   // Task Description
+  // 1) Sanitize the description
+  // 2) Replace newlines with <br>
+  const sanitizedDescription = description
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>");
+  // hereeeeeeee
   const taskDesc = document.createElement("p");
-  taskDesc.textContent = description;
+  // Use `innerHTML` because we’re inserting <br> tags
+  taskDesc.innerHTML = sanitizedDescription;
   taskInfo.appendChild(taskDesc);
+
+  // Append the task info to the task container
+  taskDiv.appendChild(taskInfo);
+
+  // ...
 
   // Task Date
   if (date) {
@@ -664,52 +678,70 @@ function editTask(taskDiv) {
   // Check if the task is marked as done
   if (taskDiv.classList.contains("task-done")) {
     alert("You cannot edit a task that is marked as done!");
-    return; // Exit the function
+    return;
   }
 
-  // Set task to edit
-  selectedTaskDiv = taskDiv; // Store the task being edited
+  // Set the task div as the currently edited task
+  selectedTaskDiv = taskDiv;
 
   // Get the category container
-  selectedCategoryContainer = taskDiv.closest(".category-card"); // Set the category container
+  selectedCategoryContainer = taskDiv.closest(".category-card");
 
-  // Get existing task details
+  // Grab the existing task title
   const taskTitle = taskDiv.querySelector("h5").textContent;
-  const taskDesc = taskDiv.querySelector("p").textContent;
-  const taskDate =
-    taskDiv.querySelector(".task-date")?.textContent.replace("Due: ", "") || "";
+  
+  // *** NEW PART *** 
+  // Because you replaced newlines with <br> in `addTaskToCategory`,
+  // the <p> tag currently contains HTML with <br> tags. We use .innerHTML:
+  const rawHtmlDescription = taskDiv.querySelector("p").innerHTML || "";
 
-  // Populate the modal fields
+  // Convert <br> back to \n, and unescape any HTML-escaped characters
+  const originalDescription = rawHtmlDescription
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+
+  // If there's a date:
+  const taskDateSpan = taskDiv.querySelector(".task-date");
+  const taskDate = taskDateSpan
+    ? taskDateSpan.textContent.replace("Due: ", "")
+    : "";
+
+  // Populate your modal fields
   const taskNameInput = document.getElementById("taskNameInput");
   const taskDescriptionInput = document.getElementById("taskDescriptionInput");
+  const taskDateInput = document.getElementById("taskDateInput");
 
   taskNameInput.value = taskTitle;
-  taskDescriptionInput.value = taskDesc;
-  document.getElementById("taskDateInput").value = taskDate;
+  taskDescriptionInput.value = originalDescription; // Now has newline chars
+  taskDateInput.value = taskDate;
 
   // Update counters based on existing values
   const taskCharCount = document.getElementById("taskCharCount");
   const descriptionCharCount = document.getElementById("descriptionCharCount");
 
+  // Update Task Name counter
   taskCharCount.textContent = `${20 - taskTitle.length} characters remaining`;
   taskCharCount.style.color = taskTitle.length > 15 ? "red" : "gray";
 
+  // Update Description counter
   descriptionCharCount.textContent = `${
-    200 - taskDesc.length
+    200 - originalDescription.length
   } characters remaining`;
-  descriptionCharCount.style.color = taskDesc.length > 180 ? "red" : "gray";
+  descriptionCharCount.style.color =
+    originalDescription.length > 180 ? "red" : "gray";
 
-  // Update the modal title and button text
+  // Update the modal title and the submit button text
   document.getElementById("addTaskModalLabel").textContent = "Edit Task";
   document.querySelector("#addTaskForm button[type='submit']").textContent =
     "Save Changes";
 
-  // Show the modal
-  const taskModal = new bootstrap.Modal(
-    document.getElementById("addTaskModal")
-  );
+  // Finally, show the modal
+  const taskModal = new bootstrap.Modal(document.getElementById("addTaskModal"));
   taskModal.show();
 }
+
 
 // Function to Show Task Details
 function showTaskDetails(taskDiv) {
@@ -721,19 +753,28 @@ function showTaskDetails(taskDiv) {
     : "No due date provided.";
 
   // Get the category name
-  const categoryCard = taskDiv.closest(".category-card"); // Find the closest category card
-  const categoryName = categoryCard.querySelector("h4").textContent; // Get the category name
+  const categoryCard = taskDiv.closest(".category-card");
+  const categoryName = categoryCard.querySelector("h4").textContent;
 
-  // Update the modal content
-  document.getElementById(
-    "taskDetailsModalLabel"
-  ).textContent = `Category: ${categoryName}`; // Change modal title
-  document.getElementById("taskDetailTitle").textContent = taskTitle;
-  document.getElementById("taskDetailDescription").textContent =
-    taskDescription;
-  document.getElementById(
-    "taskDetailDate"
-  ).textContent = `Due Date: ${taskDate}`;
+  // Reference the elements in the modal
+  const modalTitle = document.getElementById("taskDetailsModalLabel");
+  const modalTaskTitle = document.getElementById("taskDetailTitle");
+  const modalTaskDescription = document.getElementById("taskDetailDescription");
+  const modalTaskDate = document.getElementById("taskDetailDate");
+
+  // Convert newlines to <br>, and also sanitize for safety
+  const sanitizedDescription = taskDescription
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>");
+
+  // Update modal content
+  modalTitle.textContent = `Category: ${categoryName}`;
+  modalTaskTitle.textContent = taskTitle;
+  // Use innerHTML because we’re inserting <br> tags
+  modalTaskDescription.innerHTML = sanitizedDescription;
+  modalTaskDate.textContent = `Due Date: ${taskDate}`;
 
   // Show the modal
   const taskDetailsModal = new bootstrap.Modal(
@@ -1418,3 +1459,8 @@ document.getElementById("speechButton").addEventListener("click", function () {
     console.log("Speech recognition ended.");
   };
 });
+
+
+//for bullets
+
+

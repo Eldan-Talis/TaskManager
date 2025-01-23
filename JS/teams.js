@@ -1679,7 +1679,7 @@ function promptLeaveTeam(team) {
   });
 }
 
-//speechToText
+//speechToText for category
 
 document.addEventListener("DOMContentLoaded", () => {
   const speechButton = document.getElementById("speechCategoryName");
