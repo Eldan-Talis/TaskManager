@@ -18,7 +18,7 @@ body {
     display: flex;
     align-items: center;
     padding: 0 20px;
-    z-index: 1000;
+    z-index: 1001;
 }
 
 .navbar .nav-link {
@@ -435,12 +435,17 @@ body {
 }  
 
 @media (max-width: 767px) {
+
+    .navbar .nav-link:nth-child(1){
+        margin-left: 0px;
+    }
+
     .navbar-center-image:nth-child(1){
         display: none !important;
     }
 
     .Logo-Container{
-        left: 90%;
+        left: 87.5%;
     }
     
     .sidebar{
