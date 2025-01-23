@@ -942,7 +942,6 @@ function displayCategoriesWithTasks(categories) {
       noTasksMessage.textContent = "No tasks available for this category.";
       noTasksMessage.classList.add("text-muted");
       taskList.appendChild(noTasksMessage);
-      return; // Exit the current iteration
     }
 
     // If tasks exist, iterate and add them to the category
