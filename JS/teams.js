@@ -1,8 +1,8 @@
 const apiBaseUrl =
   "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod";
 
-const sub = sessionStorage.getItem('sub');
-//const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
+//const sub = sessionStorage.getItem('sub');
+const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 //const sub = "e408d428-a041-7069-ace8-579db3cbd3a7";
 //const sub = "34d83408-40b1-707b-f80b-cbdc8e287b90";
 //const sub = "e4b8d4e8-d0a1-70c1-73b2-4e8ed0338fc5";
@@ -41,16 +41,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     // Load teams first
-  await loadTeams();
+    await loadTeams();
 
-  // Once teams are loaded, trigger the click event on the first item
-  const teamsList = document.getElementById("teams-list");
-  const teams = teamsList.querySelectorAll("li");
+    // Once teams are loaded, trigger the click event on the first item
+    const teamsList = document.getElementById("teams-list");
+    const teams = teamsList.querySelectorAll("li");
 
-  if (teams.length > 0) {
-    const firstTeamItem = teams[0];
-    firstTeamItem.click(); // Simulate a click on the first team
-  }
+    if (teams.length > 0) {
+      const firstTeamItem = teams[0];
+      firstTeamItem.click(); // Simulate a click on the first team
+    }
   } catch (error) {
     console.error("Failed to load user data:", error);
   }
@@ -221,10 +221,11 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Successfully joined the team!");
     } catch (error) {
       console.error("Error during API call to join team:", error);
-      alert("An error occurred while trying to join the team. Please try again.");
+      alert(
+        "An error occurred while trying to join the team. Please try again."
+      );
     }
   });
-
 
   // Hide error message on input
   teamCodeInput.addEventListener("input", () => {
@@ -266,7 +267,8 @@ async function loadTeams() {
       teamMessage.classList.add("team-message"); // Add a specific class for styling
 
       // Add the team name using innerHTML to interpret HTML entities
-      teamMessage.innerHTML = "You have no teams yet.&nbsp; Create a new team or join an existing one to get started.";
+      teamMessage.innerHTML =
+        "You have no teams yet.&nbsp; Create a new team or join an existing one to get started.";
 
       // Append the message to the container
       messageContainer.appendChild(teamMessage);
@@ -348,8 +350,8 @@ async function loadTeams() {
         // Make the Invite ID clickable
         const inviteIdLink = document.createElement("a");
         inviteIdLink.textContent = `${team.teamId}`;
-        inviteIdLink.href = "#"; 
-        inviteIdLink.classList.add("invite-id-link"); 
+        inviteIdLink.href = "#";
+        inviteIdLink.classList.add("invite-id-link");
         inviteIdLink.title = "Click to copy Invite ID";
 
         // Add click event to copy the Invite ID to the clipboard
@@ -376,7 +378,6 @@ async function loadTeams() {
               });
             });
         });
-        
 
         // Append the Invite ID link to the team message
         teamMessage.appendChild(inviteIdLink);
@@ -388,13 +389,25 @@ async function loadTeams() {
         const leaveTeamBtn = document.createElement("button");
         leaveTeamBtn.innerHTML = '<i class="bx bxs-exit"></i>';
         leaveTeamBtn.classList.add("leave-team-btn");
-        leaveTeamBtn.title = "Leave Team";
+        leaveTeamBtn.title = "Leave";
 
         // Add event listener to 'Open Door' button
         leaveTeamBtn.addEventListener("click", (event) => {
           event.stopPropagation(); // Prevent triggering the parent click event
           promptLeaveTeam(team);
         });
+
+        // Add a small text under the button
+        const leaveTeamText = document.createElement("span");
+        leaveTeamText.textContent = "Leave"; // Add your descriptive text
+        leaveTeamText.classList.add("leave-team-text"); // Add a class for styling
+        leaveTeamText.style.fontSize = "0.8rem"; // Adjust the font size
+        leaveTeamText.style.display = "block"; // Ensure it's displayed on a new line
+        leaveTeamText.style.textAlign = "center"; // Center the text under the button
+
+        // Append the button and text to the container
+        messageContainer.appendChild(leaveTeamBtn);
+        messageContainer.appendChild(leaveTeamText); // Add the descriptive text
 
         messageContainer.appendChild(leaveTeamBtn);
 
@@ -1589,10 +1602,10 @@ async function leaveTeamFromBackend(teamId) {
     const response = await fetch(`${apiBaseUrl}/LeaveTeam`, {
       method: "POST", // Ensure this matches your API Gateway setup
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId: user,    // Assuming 'user' is the userId (from frontend code)
+        userId: user, // Assuming 'user' is the userId (from frontend code)
         teamId: teamId,
       }),
     });
@@ -1614,10 +1627,9 @@ async function leaveTeamFromBackend(teamId) {
   }
 }
 
-
 // Function to remove the deleted team from the UI
 function removeTeamFromUI(teamId) {
-  const teamsList = document.getElementById('teams-list');
+  const teamsList = document.getElementById("teams-list");
   const teamItem = teamsList.querySelector(`li[data-team-id="${teamId}"]`);
   if (teamItem) {
     teamsList.removeChild(teamItem);
@@ -1627,23 +1639,22 @@ function removeTeamFromUI(teamId) {
   const selectedTeamId = getSelectedTeamId();
   if (selectedTeamId === teamId) {
     setSelectedTeamId(null);
-    document.getElementById('teams-message').innerHTML = 'You have no teams yet. &nbsp; Create a new team or join an existing one to get started.';
-    document.getElementById('categories-grid').innerHTML = ""; // Clear categories
+    document.getElementById("teams-message").innerHTML =
+      "You have no teams yet. &nbsp; Create a new team or join an existing one to get started.";
+    document.getElementById("categories-grid").innerHTML = ""; // Clear categories
   }
 }
 
-
-
 function promptLeaveTeam(team) {
   Swal.fire({
-    title: 'Are you sure?',
+    title: "Are you sure?",
     text: `Do you really want to delete the team "${team.teamName}"? This action cannot be undone.`,
-    icon: 'warning',
+    icon: "warning",
     showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
   }).then(async (result) => {
     if (result.isConfirmed) {
       // Proceed to delete the team
@@ -1653,17 +1664,133 @@ function promptLeaveTeam(team) {
         // Remove the team from the UI
         removeTeamFromUI(team.teamId);
         Swal.fire(
-          'Deleted!',
+          "Deleted!",
           `The team "${team.teamName}" has been deleted.`,
-          'success'
+          "success"
         );
       } else {
         Swal.fire(
-          'Error!',
-          'Something went wrong while deleting the team.',
-          'error'
+          "Error!",
+          "Something went wrong while deleting the team.",
+          "error"
         );
       }
     }
   });
 }
+
+//speechToText
+
+document.addEventListener("DOMContentLoaded", () => {
+  const speechButton = document.getElementById("speechCategoryName");
+  const categoryNameInput = document.getElementById("categoryNameInput");
+  const cateCharCount = document.getElementById("cateCharCount");
+
+  if (!speechButton || !categoryNameInput || !cateCharCount) {
+    console.error("Required elements for category speech-to-text are missing.");
+    return;
+  }
+
+  speechButton.addEventListener("click", function () {
+    if (!("webkitSpeechRecognition" in window)) {
+      alert("Speech-to-Text is not supported in this browser.");
+      return;
+    }
+
+    const maxLength = 20; // Maximum character limit for category name
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = "en-US"; // Set the language
+    recognition.interimResults = false; // Only final results
+
+    recognition.start();
+
+    recognition.onstart = function () {
+      console.log("Speech recognition started for category input...");
+    };
+
+    recognition.onresult = function (event) {
+      let transcript = event.results[0][0].transcript;
+
+      // Truncate the transcript if it exceeds the max length
+      if (transcript.length > maxLength) {
+        transcript = transcript.substring(0, maxLength);
+      }
+
+      // Update the input field with recognized text
+      categoryNameInput.value = transcript;
+
+      // Update character count dynamically
+      const remaining = maxLength - transcript.length;
+      cateCharCount.textContent = `${remaining} characters remaining`;
+      cateCharCount.style.color = remaining < 0 ? "red" : "gray";
+
+      console.log("Recognized text (truncated):", transcript);
+    };
+
+    recognition.onerror = function (event) {
+      console.error("Speech recognition error:", event.error);
+      alert("An error occurred during speech recognition. Please try again.");
+    };
+
+    recognition.onend = function () {
+      console.log("Speech recognition ended.");
+    };
+  });
+});
+
+// Helper function for Speech-to-Text for tasks
+function addSpeechToText(buttonId, inputId, charCountId, maxLength) {
+  const button = document.getElementById(buttonId);
+  if (!button) return;
+
+  button.addEventListener("click", () => {
+    if (!("webkitSpeechRecognition" in window)) {
+      alert("Speech-to-Text is not supported in this browser.");
+      return;
+    }
+
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+
+    recognition.start();
+
+    recognition.onstart = () => console.log("Speech recognition started...");
+    recognition.onresult = (event) => {
+      let transcript = event.results[0][0].transcript;
+
+      // Truncate to max length
+      transcript = transcript.substring(0, maxLength);
+
+      const inputField = document.getElementById(inputId);
+      inputField.value = transcript;
+
+      // Update character counter
+      const remaining = maxLength - transcript.length;
+      const charCount = document.getElementById(charCountId);
+      if (charCount) {
+        charCount.textContent = `${remaining} characters remaining`;
+        charCount.style.color = remaining < 0 ? "red" : "gray";
+      }
+
+      console.log("Recognized text:", transcript);
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      alert("Speech recognition failed. Please try again.");
+    };
+
+    recognition.onend = () => console.log("Speech recognition ended.");
+  });
+}
+
+// Initialize Speech-to-Text for all relevant inputs
+addSpeechToText("speechButton", "categoryNameInput", "cateCharCount", 20);
+addSpeechToText("speechTaskName", "taskNameInput", "taskCharCount", 20);
+addSpeechToText(
+  "speechTaskDescription",
+  "taskDescriptionInput",
+  "descriptionCharCount",
+  200
+);
