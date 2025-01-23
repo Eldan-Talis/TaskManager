@@ -44,6 +44,7 @@ body {
     margin-top: 60px !important; /* Space below the fixed navbar */
     height: calc(100vh - 60px); /* Full viewport height minus navbar */
     font-size: 50px;
+    background: linear-gradient(180deg, #ffffff, var(--navbar-color));
 }
 
 .welcome-text {
@@ -117,14 +118,14 @@ body {
 
 /* Gradient Text */
 .welcome-text i{
-    background: linear-gradient(180deg, #ffffff, var(--navbar-color));
+    background-color: white;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     transition: background 0.3s ease; /* Smooth transition */
     margin-left: 20px;
 }
 .welcome-text span {
-    background: linear-gradient(180deg, #ffffff, var(--navbar-color));
+    background-color: white;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     transition: background 0.3s ease; /* Smooth transition */
@@ -138,15 +139,16 @@ body {
     font-size: 0.6em !important;
     padding: 12px 24px;
     border-radius: 0px !important;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: transform 0.2s ease;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    border-bottom: solid 2px var(--navbar-color) !important;
+    border-bottom: solid 2px white !important;
     justify-content: center;
     position: relative; /* To ensure proper stacking context */
     overflow: hidden; /* To contain the gradient effect */
-
+    animation-duration: 0.5s; /* Duration for keyframe animations */
+    animation-fill-mode: forwards; /* Retain the end state of the animation */
 }
 
 /* Gradient Text for "Log In" */
@@ -156,7 +158,6 @@ body {
     background-clip: text; /* For Firefox */
     text-fill-color: transparent; /* For Firefox */
     display: inline-block; /* Ensures the gradient applies correctly */
-    transition: background 0.3s ease; /* Smooth transition for dynamic changes */
 }
 
 .btn-login i {
@@ -168,16 +169,17 @@ body {
     transform: translateX(5px);
 }
 
-/* Active/Focus States */
-.btn-login:active,
-.btn-login:focus {
-    outline: none;
-    border: none !important
-}
 
 /* Hover effect: change background and add a subtle shadow */
 .btn-login:hover {
     transform: scale(1.1);
+    transition: transform 0.5s ease-in, transform 0.5s ease-out;
+    animation-name: hoverIn; /* Play hover-in animation */
+
+}
+
+.btn-login:not(:hover) {
+    animation-name: hoverOut; /* Play hover-out animation */
 }
 
 /* Responsive Adjustments */
@@ -204,3 +206,65 @@ body {
         left: 87.5%;
     }   
 }  
+
+/* Define keyframes for hover-in */
+@keyframes hoverIn {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+/* Define keyframes for hover-out */
+@keyframes hoverOut {
+    0% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 767px) {
+    /* Make the navbar adjust for small screens */
+    .navbar {
+        height: auto; /* Let the height adjust automatically */
+        flex-direction: column; /* Stack items vertically */
+        align-items: flex-start; /* Align items to the left */
+        padding: 10px; /* Add padding for spacing */
+    }
+
+    /* Container for links and color picker */
+    .navbar .d-flex {
+        width: 100%; /* Take full width */
+        flex-direction: column; /* Stack links and color picker */
+        align-items: flex-start; /* Align to the left */
+    }
+
+    /* Display color picker below the links */
+    .color-picker {
+        display: flex !important; /* Ensure visibility */
+        flex-wrap: wrap; /* Allow buttons to wrap if necessary */
+        margin-top: 10px; /* Add spacing */
+    }
+
+    .color-picker button {
+        margin: 5px; /* Add spacing between buttons */
+    }
+
+    /* Keep the logo on the far right and centered vertically */
+    .Logo-Container {
+        position: absolute;
+        top: 10px; /* Adjust as needed to align vertically */
+        right: 20px; /* Keep it on the far right */
+    }
+
+    /* Adjust navbar links */
+    .navbar .nav-link {
+        font-size: 1em; /* Slightly reduce font size */
+        margin: 5px 0; /* Add spacing between links */
+    }
+}
+

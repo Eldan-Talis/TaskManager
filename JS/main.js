@@ -254,22 +254,30 @@ function addCategoryToSidebar(categoryName) {
   sidebarList.appendChild(sidebarCategory);
 }
 
+// Function to toggle the color picker visibility and navbar height
 function toggleColorPicker() {
   const colorPicker = document.getElementById("colorPicker");
+  const navbar = document.querySelector(".navbar");
+  const sidebar = document.querySelector(".sidebar");
 
   // Check the current display style
-  const currentDisplay = window
-    .getComputedStyle(colorPicker)
-    .getPropertyValue("display");
+  const currentDisplay = window.getComputedStyle(colorPicker).getPropertyValue("display");
 
   if (currentDisplay === "none") {
-    // Show the color picker with !important
-    colorPicker.style.setProperty("display", "flex", "important");
+      // Show the color picker
+      colorPicker.style.setProperty("display", "flex", "important");
+      // Add the 'expanded' class to the navbar
+      sidebar.classList.add("sidebar-extented");
+      navbar.classList.add("expanded");
   } else {
-    // Hide the color picker with !important
-    colorPicker.style.setProperty("display", "none", "important");
+      // Hide the color picker
+      colorPicker.style.setProperty("display", "none", "important");
+      // Remove the 'expanded' class from the navbar
+      sidebar.classList.remove("sidebar-extented");
+      navbar.classList.remove("expanded");
   }
 }
+
 
 // Function to set the user's name and display a greeting
 document.addEventListener("DOMContentLoaded", function () {

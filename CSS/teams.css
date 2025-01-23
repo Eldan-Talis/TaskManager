@@ -505,9 +505,13 @@ body {
     .search-container .search-icon {
         left: 8.5% !important; /* Position the icon inside the input field */
     }
-}  
+}   
 
 @media (max-width: 767px) {
+    /* Existing Adjustments */
+    .navbar-row{
+        margin-top: 4px !important;
+    }
 
     .navbar .nav-link:nth-child(1){
         margin-left: 0px;
@@ -519,11 +523,17 @@ body {
 
     .Logo-Container{
         left: 87.5%;
+        top: 1%;
+        position: fixed;
     }
     
     .sidebar{
         position: relative;
         height: auto;
+    }
+
+    .sidebar-extented{
+        margin-top: 60px !important;
     }
 
     .search-container {
@@ -540,7 +550,32 @@ body {
 
     #greetingText {
         display: none;
-    } 
-}  
+    }
 
-  
+    /* **New Adjustments for Responsive Navbar** */
+    /* 1. Define Styles When Navbar is Expanded */
+    .navbar.expanded {
+        flex-direction: column;          /* Stack navbar items vertically */
+        height: 120px;                   /* Double the original height of 60px */
+    }
+
+    /* 2. Adjust the Navigation Links Container */
+    .navbar .d-flex {
+        width: 100%;                      /* Make the container full width */
+        justify-content: left;          /* Center the navigation links */
+        flex-wrap: wrap;                  /* Allow items to wrap to the next line */
+    }
+
+    /* 3. Position the Color Picker Below Navigation Links */
+    #colorPicker {
+        width: 100%;                      /* Full width to align under nav links */
+        display: flex !important;         /* Ensure it's displayed when toggled */
+        justify-content: left !important;          /* Center the color buttons */
+        margin-top: 10px;                 /* Add space above the color buttons */
+    }
+
+    /* 4. Style the Color Buttons for Better Spacing */
+    .color-picker button {
+        margin-top: 10px;                      /* Space between individual color buttons */
+    }
+}
