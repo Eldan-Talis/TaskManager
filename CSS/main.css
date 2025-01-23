@@ -416,4 +416,26 @@ body {
     }
 }  
 
+@media (max-width: 767px) {
+    .sidebar{
+        position: relative;
+        height: auto;
+    }
 
+    .search-container {
+        min-width: 100%; /* Adjust as needed */
+    }
+
+    .search-container .search-icon {
+        left: 7.2% !important; /* Position the icon inside the input field */
+    }
+
+    .main-container {
+        margin-left: 0;
+    }
+
+    #greetingText {
+        display: none;
+    } 
+    
+} 

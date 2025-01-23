@@ -2,8 +2,8 @@ let selectedCategoryContainer = null; // Tracks the category container for task 
 
 const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod"
 
-const sub = sessionStorage.getItem('sub');;
-//sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
+//const sub = sessionStorage.getItem('sub');;
+sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 const firstName = sessionStorage.getItem("first_name");
 const user = sub;
 console.log("Sub:", sub);
@@ -941,7 +941,6 @@ function displayCategoriesWithTasks(categories) {
       noTasksMessage.textContent = "No tasks available for this category.";
       noTasksMessage.classList.add("text-muted");
       taskList.appendChild(noTasksMessage);
-      return; // Exit the current iteration
     }
 
     // If tasks exist, iterate and add them to the category

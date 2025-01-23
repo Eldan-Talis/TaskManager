@@ -407,15 +407,6 @@ body {
     margin-top: 5px;
   }
   
-@media (min-width: 1662px) {
-    .search-container {
-        min-width: 100%; /* Adjust as needed */
-    }
-
-    .search-container .search-icon {
-        left: 8.5% !important; /* Position the icon inside the input field */
-    }
-}  
 /* Styles for the message container */
 .team-container {
     display: flex;
@@ -488,6 +479,37 @@ body {
     text-decoration: none; 
 }
 
+@media (min-width: 1662px) {
+    .search-container {
+        min-width: 100%; /* Adjust as needed */
+    }
 
+    .search-container .search-icon {
+        left: 8.5% !important; /* Position the icon inside the input field */
+    }
+}  
+
+@media (max-width: 767px) {
+    .sidebar{
+        position: relative;
+        height: auto;
+    }
+
+    .search-container {
+        min-width: 100%; /* Adjust as needed */
+    }
+
+    .search-container .search-icon {
+        left: 7.2% !important; /* Position the icon inside the input field */
+    }
+
+    .main-container {
+        margin-left: 0;
+    }
+
+    #greetingText {
+        display: none;
+    } 
+}  
 
   
