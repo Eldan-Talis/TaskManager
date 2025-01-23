@@ -405,6 +405,24 @@ body {
     color: gray;
     margin-top: 5px;
   }
+
+.Logo-Container{
+    position: absolute;
+    left: 44%;
+}
+
+.navbar-center-image:nth-child(1) {
+    height: 46px;
+}
+
+.navbar-center-image {
+    transition: transform 0.3s ease;
+    height: 40px;
+}
+
+.navbar-center-image:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
   
 @media (min-width: 1662px) {
     .search-container {
@@ -417,6 +435,14 @@ body {
 }  
 
 @media (max-width: 767px) {
+    .navbar-center-image:nth-child(1){
+        display: none !important;
+    }
+
+    .Logo-Container{
+        left: 90%;
+    }
+    
     .sidebar{
         position: relative;
         height: auto;

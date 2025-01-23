@@ -427,6 +427,24 @@ body {
     padding: 10px;
 }
 
+.Logo-Container{
+    position: absolute;
+    left: 44%;
+}
+
+.navbar-center-image:nth-child(1) {
+    height: 46px;
+}
+
+.navbar-center-image {
+    transition: transform 0.3s ease;
+    height: 40px;
+}
+
+.navbar-center-image:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
 /* Styles for the Leave Team Button */
 /* Base styling for the leave team button */
 .leave-team-btn {
@@ -490,6 +508,14 @@ body {
 }  
 
 @media (max-width: 767px) {
+    .navbar-center-image:nth-child(1){
+        display: none !important;
+    }
+
+    .Logo-Container{
+        left: 90%;
+    }
+    
     .sidebar{
         position: relative;
         height: auto;
