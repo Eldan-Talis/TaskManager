@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task Manager</title>
-    <link rel="stylesheet" href="/CSS/main.css" />
+    <link rel="stylesheet" href="/CSS/welcome.css" />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
@@ -13,6 +13,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
@@ -21,15 +22,6 @@
     <div class="navbar d-flex align-items-center">
       <div class="container-fluid">
         <div class="d-flex">
-          <a href="#" class="nav-link" title="Personal">
-            <i class="fas fa-user"></i> <!-- Font Awesome tasks icon -->
-          </a>
-          <a href="/HTML/teams.html" class="nav-link" title="Teams">
-            <i class="fas fa-users"></i> <!-- Font Awesome settings icon -->
-          </a>
-          <a href="#" onclick="logout()" class="nav-link" title="Log Out">
-            <i class="fas fa-sign-out-alt"></i>
-          </a>
           <a href="#" onclick="toggleColorPicker()" class="nav-link" title="Colors">
             <i class="fas fa-palette"></i> <!-- Font Awesome color palette icon -->
           </a>
@@ -39,38 +31,32 @@
               class="btn btn-sm"
               style="background-color: #1a1b18"
               data-navbar-color="#1a1b18"
-              data-sidebar-color="#3C3D37"
-              data-category-color="#e6e7e4"
             ></button>
             <button
               class="btn btn-sm"
               style="background-color: #8d89a6"
               data-navbar-color="#8D89A6"
-              data-sidebar-color="#A69AB9"
-              data-category-color="#e3e2e9"
             ></button>
             <button
               class="btn btn-sm"
               style="background-color: #a35c7a"
               data-navbar-color="#A35C7A"
-              data-sidebar-color="#C890A7"
-              data-category-color="#eddee4"
             ></button>
             <button
               class="btn btn-sm"
               style="background-color: #c57b57"
               data-navbar-color="#C57B57"
-              data-sidebar-color="#f1b08e"
-              data-category-color="#f1e2da"
             ></button>
             <button
               class="btn btn-sm"
               style="background-color: #7695ff"
               data-navbar-color="#7695ff"
-              data-sidebar-color="#9DBDFF"
-              data-category-color="#e6ebff"
             ></button>
           </div>
+        </div>
+        <div class="Logo-Container align-items-center">
+          <img src="/Images/TaskELD Name Logo.png" alt="Logo 1" class="navbar-center-image me-3" />
+          <img src="/Images/TaskELD Logo.png" alt="Logo 2" class="navbar-center-image" />
         </div>
         <!-- User Greeting -->
         <div id="userGreeting" class="greeting">
@@ -81,235 +67,18 @@
 
     <!-- Main Layout -->
     <div class="container-fluid">
-      <div class="row">
-        <!-- Sidebar Panel -->
-        <div class="col-md-2 p-4 sidebar">
-          <h3 class="text-center">My Categories</h3>
-          <button
-            id="add-category-btn"
-            class="btn btn-black mt-3"
-            data-bs-toggle="modal"
-            data-bs-target="#addCategoryModal"
-          >
-            <i class="fas fa-plus icon-spacing"> </i>
-            <!-- Font Awesome plus icon -->
-            Add
-          </button>
-          <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input
-              type="text"
-              id="categorySearch"
-              placeholder="Search"
-              class="search-input"
-            />
-          </div>
-          <div class="search-separator"></div>
-          <ul id="category-list" class="list-group">
-            <!-- Categories will be added here dynamically -->
-          </ul>
-        </div>
-
+      <div class="row main-container">
         <!-- Main Content -->
-        <div class="col-md-10 main-container">
-          <div id="categories-grid" class="row g-4">
-            <!-- Categories and tasks will be displayed here -->
-          </div>
+        <div class="welcome-text text-center">
+          <span>Welcome To TaskELD<br></span>
+          <a onclick="login()" class="btn btn-login mt-2">
+            <span>Log In</span><i class="fas fa-sign-in-alt me-2"></i> 
+          </a>
         </div>
       </div>
     </div>
-
-    <!-- Add Category Modal -->
-    <div
-    class="modal fade"
-    id="addCategoryModal"
-    tabindex="-1"
-    aria-labelledby="addCategoryModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addCategoryModalLabel">
-            Create New Category
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <form id="addCategoryForm">
-            <div class="mb-3">
-              <label for="categoryNameInput" class="form-label">Category Name</label>
-              <div style="display: flex; align-items: center;">
-                <input
-                  type="text"
-                  class="form-control"
-                  id="categoryNameInput"
-                  placeholder="Enter category name"
-                  required
-                  maxlength="20"
-                />
-                <button
-                  type="button"
-                  id="speechButton"
-                  class="btn btn-outline-secondary"
-                  style="margin-left: 10px;"
-                  title="Click to dictate"
-                >
-                  <i class="fa fa-microphone"></i>
-                </button>
-              </div>
-              <small id="cateCharCount" class="form-text text-muted">
-                20 characters remaining
-              </small>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              Create Category
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  
-
-<!-- Add Task Modal -->
-<div
-  class="modal fade"
-  id="addTaskModal"
-  tabindex="-1"
-  aria-labelledby="addTaskModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <form id="addTaskForm">
-          <!-- Task Name Input -->
-          <div class="mb-3">
-            <label for="taskNameInput" class="form-label">Task Name</label>
-            <div style="display: flex; align-items: center;">
-              <input
-                type="text"
-                class="form-control"
-                id="taskNameInput"
-                placeholder="Enter task name"
-                required
-                maxlength="20"
-              />
-              <button
-                type="button"
-                id="speechTaskName"
-                class="btn btn-outline-secondary"
-                style="margin-left: 10px;"
-                title="Click to dictate task name"
-              >
-                <i class="fa fa-microphone"></i>
-              </button>
-            </div>
-            <small id="taskCharCount" class="form-text text-muted">
-              20 characters remaining
-            </small>
-          </div>
-
-          <!-- Task Description Input -->
-          <div class="mb-3">
-            <label for="taskDescriptionInput" class="form-label"
-              >Task Description</label
-            >
-            <div style="display: flex; align-items: center;">
-              <textarea
-                class="form-control"
-                id="taskDescriptionInput"
-                rows="3"
-                placeholder="Enter task description"
-                required
-                maxlength="200"
-              ></textarea>
-              <button
-                type="button"
-                id="speechTaskDescription"
-                class="btn btn-outline-secondary"
-                style="margin-left: 10px;"
-                title="Click to dictate task description"
-              >
-                <i class="fa fa-microphone"></i>
-              </button>
-            </div>
-            <small id="descriptionCharCount" class="form-text text-muted">
-              200 characters remaining
-            </small>
-          </div>
-
-          <!-- Due Date Input -->
-          <div class="mb-3">
-            <label for="taskDateInput" class="form-label">Due Date (Optional)</label>
-            <input type="date" class="form-control" id="taskDateInput" />
-          </div>
-
-          <!-- Submit Button -->
-          <button type="submit" class="btn btn-primary">Add Task</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-    <!-- Task Details Modal -->
-    <div
-      class="modal fade"
-      id="taskDetailsModal"
-      tabindex="-1"
-      aria-labelledby="taskDetailsModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <!-- Added modal-lg -->
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="taskDetailsModalLabel"></h5>
-            <!-- Dynamic title -->
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <h4 id="taskDetailTitle"></h4>
-            <p id="taskDetailDescription"></p>
-            <p id="taskDetailDate"></p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script src="/JS/main.js"></script>
+    
+    <script src="/JS/welcome.js"></script>
     <script src="/JS/config.js"></script>
   </body>
 </html>

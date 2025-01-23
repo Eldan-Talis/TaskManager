@@ -1,10 +1,11 @@
 const apiBaseUrl =
   "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod";
 
-//const sub = sessionStorage.getItem('sub');
-const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
+const sub = sessionStorage.getItem('sub');
+//const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 //const sub = "e408d428-a041-7069-ace8-579db3cbd3a7";
 //const sub = "34d83408-40b1-707b-f80b-cbdc8e287b90";
+//const sub = "e4b8d4e8-d0a1-70c1-73b2-4e8ed0338fc5";
 const firstName = sessionStorage.getItem("first_name");
 const user = sub;
 console.log("Sub:", sub);
@@ -22,6 +23,38 @@ function getSelectedTeamId() {
 function setSelectedTeamId(teamId) {
   selectedTeamId = teamId;
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const authUrl =
+    `${config.domain}/login?` +
+    // response_type=code +
+    "response_type=token" +
+    `&client_id=${config.clientId}` +
+    `&redirect_uri=${encodeURIComponent(config.redirectUri)}` +
+    "&scope=openid+aws.cognito.signin.user.admin";
+  if (!sub) {
+    console.error("User ID (sub) is missing. Redirecting to login.");
+    // Redirect to login if the sub is not available
+    window.location.href = authUrl;
+    return;
+  }
+
+  try {
+    // Load teams first
+  await loadTeams();
+
+  // Once teams are loaded, trigger the click event on the first item
+  const teamsList = document.getElementById("teams-list");
+  const teams = teamsList.querySelectorAll("li");
+
+  if (teams.length > 0) {
+    const firstTeamItem = teams[0];
+    firstTeamItem.click(); // Simulate a click on the first team
+  }
+  } catch (error) {
+    console.error("Failed to load user data:", error);
+  }
+});
 
 // Function to toggle the color picker visibility
 function toggleColorPicker() {
@@ -103,7 +136,7 @@ colorButtons.forEach((button) => {
 function logout() {
   // Construct the Cognito logout URL
   const logoutUrl =
-    "https://us-east-1doxbvaqzz.auth.us-east-1.amazoncognito.com/logout?client_id=646mieltk0s1nidal6scivrlc0&logout_uri=https://taskmanager-led.s3.us-east-1.amazonaws.com/index.html";
+    "https://us-east-1doxbvaqzz.auth.us-east-1.amazoncognito.com/logout?client_id=646mieltk0s1nidal6scivrlc0&logout_uri=https://taskeld.s3.us-east-1.amazonaws.com/index.html";
 
   // Clear the session
   clearStorage();
@@ -113,6 +146,19 @@ function logout() {
   window.location.href = logoutUrl;
 }
 
+// Helper functions to clear cookies and storage
+function clearCookies() {
+  document.cookie.split(";").forEach((cookie) => {
+    const name = cookie.split("=")[0].trim();
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+  });
+}
+
+function clearStorage() {
+  sessionStorage.clear();
+  localStorage.clear();
+}
+
 // Handle joining a team
 document.addEventListener("DOMContentLoaded", () => {
   const teamCodeInput = document.getElementById("teamCodeInput");
@@ -120,18 +166,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle form submission
   const joinTeamForm = document.getElementById("joinTeamForm");
-  joinTeamForm.addEventListener("submit", (event) => {
+  // Handle form submission for joining a team
+  joinTeamForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+
     const teamCode = teamCodeInput.value.trim();
 
     // Validate team code length
     if (teamCode.length !== 8) {
       teamCodeError.style.display = "block";
-    } else {
-      teamCodeError.style.display = "none";
-      console.log(`Joining team with code: ${teamCode}`);
-      // Add logic here to verify the team code and join the team.
-      // For example, send the code to the backend to validate.
+      return;
+    }
+
+    teamCodeError.style.display = "none";
+
+    // Prepare the request payload
+    const payload = {
+      teamId: teamCode,
+      userId: sub, // User's sub (from your frontend logic)
+    };
+
+    try {
+      // Make the API call to join the team
+      const response = await fetch(`${apiBaseUrl}/JoinTeam`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error joining team:", errorData.message);
+        alert(errorData.message || "Failed to join the team.");
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Successfully joined the team:", data.message);
+
+      // Reload the teams to reflect the changes
+      await loadTeams();
 
       // Reset the form
       teamCodeInput.value = "";
@@ -141,8 +217,14 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("joinTeamModal")
       );
       joinTeamModal.hide();
+
+      alert("Successfully joined the team!");
+    } catch (error) {
+      console.error("Error during API call to join team:", error);
+      alert("An error occurred while trying to join the team. Please try again.");
     }
   });
+
 
   // Hide error message on input
   teamCodeInput.addEventListener("input", () => {
@@ -171,13 +253,31 @@ async function loadTeams() {
       // No teams found for the user
       console.warn("No teams found for the user.");
 
-      // Create and append the friendly message container
+      // Create and append the friendly message container with 'X' icon
       const friendlyMessageContainer = document.getElementById("teams-message");
-      friendlyMessageContainer.innerHTML = "";
+      friendlyMessageContainer.innerHTML = ""; // Clear previous content
 
-      // Set the message text with a line break using <br>
-      friendlyMessageContainer.innerHTML =
-        "You have no teams yet. &nbsp; Create a new team or join an existing one to get started.";
+      // Create a container div for the message and 'X' icon
+      const messageContainer = document.createElement("div");
+      messageContainer.classList.add("team-container");
+
+      // Team message
+      const teamMessage = document.createElement("span");
+      teamMessage.classList.add("team-message"); // Add a specific class for styling
+
+      // Add the team name using innerHTML to interpret HTML entities
+      teamMessage.innerHTML = "You have no teams yet.&nbsp; Create a new team or join an existing one to get started.";
+
+      // Append the message to the container
+      messageContainer.appendChild(teamMessage);
+
+      // Append the container to the friendlyMessageContainer
+      friendlyMessageContainer.appendChild(messageContainer);
+
+      // Add an <hr> under the team container
+      const separator = document.createElement("hr");
+      separator.classList.add("team-separator"); // Add a CSS class for styling
+      friendlyMessageContainer.appendChild(separator);
 
       return; // Exit the function as there's nothing more to do
     } else if (!response.ok) {
@@ -293,7 +393,7 @@ async function loadTeams() {
         // Add event listener to 'Open Door' button
         leaveTeamBtn.addEventListener("click", (event) => {
           event.stopPropagation(); // Prevent triggering the parent click event
-          promptDeleteTeam(team);
+          promptLeaveTeam(team);
         });
 
         messageContainer.appendChild(leaveTeamBtn);
@@ -322,56 +422,6 @@ async function loadTeams() {
     alert("An error occurred while loading teams. Please try again later.");
   }
 }
-
-// Function to prompt deletion of a team
-function promptDeleteTeam(team) {
-  Swal.fire({
-    title: "Are you sure?",
-    text: `Do you really want to leave the team "${team.teamName}"?`,
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Yes, leave!",
-    cancelButtonText: "Cancel",
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      // Proceed to delete the team
-      const success = await deleteTeamFromBackend(team.teamId);
-
-      if (success) {
-        // Remove the team from the UI
-        removeTeamFromUI(team.teamId);
-        Swal.fire(
-          "Deleted!",
-          `The team "${team.teamName}" has been deleted.`,
-          "success"
-        );
-      } else {
-        Swal.fire(
-          "Error!",
-          "Something went wrong while deleting the team.",
-          "error"
-        );
-      }
-    }
-  });
-}
-
-// Call the function to load the teams when the page is loaded
-document.addEventListener("DOMContentLoaded", async () => {
-  // Load teams first
-  await loadTeams();
-
-  // Once teams are loaded, trigger the click event on the first item
-  const teamsList = document.getElementById("teams-list");
-  const teams = teamsList.querySelectorAll("li");
-
-  if (teams.length > 0) {
-    const firstTeamItem = teams[0];
-    firstTeamItem.click(); // Simulate a click on the first team
-  }
-});
 
 // Handle creating a new category
 document.addEventListener("DOMContentLoaded", () => {
@@ -732,6 +782,16 @@ async function deleteCategoryFromBackend(teamId, categoryName) {
     return false;
   }
 }
+
+// Set the minimum date for the task date input to today's date
+document.getElementById("taskDateInput").addEventListener("focus", function () {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(today.getDate()).padStart(2, "0");
+  const minDate = `${year}-${month}-${day}`;
+  this.setAttribute("min", minDate);
+});
 
 // Function to open the task modal
 function openTaskModal(categoryContainer) {
@@ -1517,3 +1577,93 @@ document.addEventListener("DOMContentLoaded", function () {
   // Call the greetUser function
   greetUser();
 });
+
+async function leaveTeamFromBackend(teamId) {
+  if (!teamId) {
+    console.error("Team ID is required to delete a team.");
+    alert("Invalid team ID. Please try again.");
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/LeaveTeam`, {
+      method: "POST", // Ensure this matches your API Gateway setup
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userId: user,    // Assuming 'user' is the userId (from frontend code)
+        teamId: teamId,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error deleting team:", errorData.error);
+      alert(errorData.error || "Failed to delete the team. Please try again.");
+      return false;
+    }
+
+    const data = await response.json();
+    console.log("Team deleted successfully:", data.message);
+    return data.teamDeleted; // Returns true if team was deleted, else false
+  } catch (error) {
+    console.error("Error during API call to delete team:", error);
+    alert("An error occurred while deleting the team. Please try again.");
+    return false;
+  }
+}
+
+
+// Function to remove the deleted team from the UI
+function removeTeamFromUI(teamId) {
+  const teamsList = document.getElementById('teams-list');
+  const teamItem = teamsList.querySelector(`li[data-team-id="${teamId}"]`);
+  if (teamItem) {
+    teamsList.removeChild(teamItem);
+  }
+
+  // Clear the team message if the deleted team was selected
+  const selectedTeamId = getSelectedTeamId();
+  if (selectedTeamId === teamId) {
+    setSelectedTeamId(null);
+    document.getElementById('teams-message').innerHTML = 'You have no teams yet. &nbsp; Create a new team or join an existing one to get started.';
+    document.getElementById('categories-grid').innerHTML = ""; // Clear categories
+  }
+}
+
+
+
+function promptLeaveTeam(team) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Do you really want to delete the team "${team.teamName}"? This action cannot be undone.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      // Proceed to delete the team
+      const success = await leaveTeamFromBackend(team.teamId);
+
+      if (success) {
+        // Remove the team from the UI
+        removeTeamFromUI(team.teamId);
+        Swal.fire(
+          'Deleted!',
+          `The team "${team.teamName}" has been deleted.`,
+          'success'
+        );
+      } else {
+        Swal.fire(
+          'Error!',
+          'Something went wrong while deleting the team.',
+          'error'
+        );
+      }
+    }
+  });
+}

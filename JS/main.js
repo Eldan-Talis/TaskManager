@@ -1,9 +1,10 @@
 let selectedCategoryContainer = null; // Tracks the category container for task creation
 
-const apiBaseUrl = "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod"
+const apiBaseUrl =
+  "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod";
 
-//const sub = sessionStorage.getItem('sub');;
-sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
+const sub = sessionStorage.getItem('sub');;
+//sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 const firstName = sessionStorage.getItem("first_name");
 const user = sub;
 console.log("Sub:", sub);
@@ -941,7 +942,6 @@ function displayCategoriesWithTasks(categories) {
       noTasksMessage.textContent = "No tasks available for this category.";
       noTasksMessage.classList.add("text-muted");
       taskList.appendChild(noTasksMessage);
-      return; // Exit the current iteration
     }
 
     // If tasks exist, iterate and add them to the category
@@ -965,7 +965,6 @@ function displayCategoriesWithTasks(categories) {
     );
   });
 }
-
 
 // Function to handle Add Category Form Submission
 document
@@ -1017,8 +1016,11 @@ document
         cateCharCount.textContent = `${maxLength} characters remaining`;
         cateCharCount.style.color = "gray";
       } else {
-        alert(data.error || "Failed to add category.");
-        console.error("Backend Error:", data.error);
+        Swal.fire({
+          icon: "error",
+          title: "Whoops",
+          text: data.error || "Failed to add category.",
+        });
       }
     } catch (error) {
       alert("An error occurred while adding the category. Please try again.");
@@ -1030,9 +1032,7 @@ async function addTaskToBackend(categoryName, taskName, description, dueDate) {
   try {
     const response = await fetch(`${apiBaseUrl}/AddTask`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId: user,
         categoryName,
@@ -1044,20 +1044,22 @@ async function addTaskToBackend(categoryName, taskName, description, dueDate) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Error from backend:", errorData.error);
+      Swal.fire({
+        icon: "error",
+        title: "Whoops",
+        text: errorData.error || "Failed to add the task.",
+      });
       return null;
     }
 
     const data = await response.json();
-
-    // Close all dropdowns when a task is added
-    const taskLists = document.querySelectorAll(".task-item, .non-task");
-    taskLists.forEach((taskList) => {
-      taskList.classList.add("d-none"); // Hide each task list or non-task element
-    });
-
-    return data.task; // Ensure this matches the backend's response structure
+    return data.task;
   } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "API Call Error",
+      text: "An error occurred while adding the task. Please try again.",
+    });
     console.error("Error during API call to add task:", error);
     return null;
   }
@@ -1416,6 +1418,3 @@ document.getElementById("speechButton").addEventListener("click", function () {
     console.log("Speech recognition ended.");
   };
 });
-
-
-

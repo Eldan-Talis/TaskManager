@@ -18,7 +18,7 @@ body {
     display: flex;
     align-items: center;
     padding: 0 20px;
-    z-index: 1000;
+    z-index: 1001;
 }
 
 .navbar .nav-link {
@@ -405,6 +405,24 @@ body {
     color: gray;
     margin-top: 5px;
   }
+
+.Logo-Container{
+    position: absolute;
+    left: 44%;
+}
+
+.navbar-center-image:nth-child(1) {
+    height: 46px;
+}
+
+.navbar-center-image {
+    transition: transform 0.3s ease;
+    height: 40px;
+}
+
+.navbar-center-image:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
   
 @media (min-width: 1662px) {
     .search-container {
@@ -416,4 +434,39 @@ body {
     }
 }  
 
+@media (max-width: 767px) {
 
+    .navbar .nav-link:nth-child(1){
+        margin-left: 0px;
+    }
+
+    .navbar-center-image:nth-child(1){
+        display: none !important;
+    }
+
+    .Logo-Container{
+        left: 87.5%;
+    }
+    
+    .sidebar{
+        position: relative;
+        height: auto;
+    }
+
+    .search-container {
+        min-width: 100%; /* Adjust as needed */
+    }
+
+    .search-container .search-icon {
+        left: 7.2% !important; /* Position the icon inside the input field */
+    }
+
+    .main-container {
+        margin-left: 0;
+    }
+
+    #greetingText {
+        display: none;
+    } 
+    
+} 
