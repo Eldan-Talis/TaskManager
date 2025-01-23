@@ -1,0 +1,193 @@
+:root {
+    --navbar-color: #1a1b18; /* Default navbar color */
+}
+
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+/* Navbar Styling */
+.navbar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: var(--navbar-color, #1a1b18); /* Use CSS variable with fallback */
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000;
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.navbar .nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 130%;
+    margin-left: 10px;
+    margin-right: 15px; /* Space between links */
+    padding: 5px 10px;
+}
+
+/* Main Content Styling */
+.main-container {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center;    /* Centers vertically */
+    margin-top: 60px !important; /* Space below the fixed navbar */
+    height: calc(100vh - 60px); /* Full viewport height minus navbar */
+    font-size: 50px;
+}
+
+.welcome-text {
+    text-align: center;
+    font-size: 2.7em;
+    color: #333; /* Darker text color for better contrast */
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.2); /* Lighter shadow */
+    position: relative;
+    opacity: 0; /* Initial state for animation */
+    transform: translateY(50px); /* Initial position for animation */
+    animation: slideUp 1s forwards; /* Animation properties */
+    transition: background 0.3s ease; /* Smooth transition for gradient */
+    display: flex; /* Enable flexbox */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+}
+
+.navbar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.3); /* Subtle hover background */
+    border-radius: 5px;
+    transform: scale(1.1);
+}
+
+.color-picker{
+    margin-left: 5px;
+}
+
+.color-picker button {
+    width: 30px;
+    height: 30px;
+    margin: 0 5px;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Make the buttons circular */
+    transition: transform 0.2s ease;
+}
+
+.color-picker button:hover {
+    transform: scale(1.2); /* Slightly enlarge the button on hover */
+}
+
+.btn-sm{
+    border: solid 2px white !important;
+}
+
+.Logo-Container{
+    position: absolute;
+    left: 44%;
+}
+
+.navbar-center-image:nth-child(1) {
+    height: 46px;
+}
+
+.navbar-center-image {
+    transition: transform 0.3s ease;
+    height: 40px;
+}
+
+.navbar-center-image:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
+/* Animation Keyframes */
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Gradient Text */
+.welcome-text i{
+    background: linear-gradient(180deg, #ffffff, var(--navbar-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: background 0.3s ease; /* Smooth transition */
+    margin-left: 20px;
+}
+.welcome-text span {
+    background: linear-gradient(180deg, #ffffff, var(--navbar-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: background 0.3s ease; /* Smooth transition */
+}
+
+/* Log In Button Styling with Gradient Text */
+.btn-login {
+    /* Existing gradient background */
+    color: #ffffff; /* Fallback color */
+    font-weight: bold;
+    font-size: 0.6em !important;
+    padding: 12px 24px;
+    border-radius: 0px !important;
+    transition: background 0.3s ease, transform 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    border-bottom: solid 2px var(--navbar-color) !important;
+    justify-content: center;
+    position: relative; /* To ensure proper stacking context */
+    overflow: hidden; /* To contain the gradient effect */
+
+}
+
+/* Gradient Text for "Log In" */
+.btn-login span {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text; /* For Firefox */
+    text-fill-color: transparent; /* For Firefox */
+    display: inline-block; /* Ensures the gradient applies correctly */
+    transition: background 0.3s ease; /* Smooth transition for dynamic changes */
+}
+
+.btn-login i {
+    transition: transform 0.3s ease;
+}
+
+/* Animate the arrow icon on hover */
+.btn-login:hover .fa-arrow-right {
+    transform: translateX(5px);
+}
+
+/* Active/Focus States */
+.btn-login:active,
+.btn-login:focus {
+    outline: none;
+    border: none !important
+}
+
+/* Hover effect: change background and add a subtle shadow */
+.btn-login:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+    .btn-login {
+        padding: 8px 16px;
+        font-size: 0.9em;
+        }
+    
+    .btn-login span {
+        background: linear-gradient(180deg, #ffffff, var(--navbar-color));
+    }
+}
