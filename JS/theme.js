@@ -3,6 +3,8 @@
 // Define a unique key for storing the theme in localStorage
 const THEME_STORAGE_KEY = "userTheme";
 
+let selectedCategoryContainerColor = null;
+
 // Function to save the selected theme to localStorage
 function saveUserTheme(navbarColor, sidebarColor, categoryColor) {
     const theme = {
@@ -85,7 +87,7 @@ colorButtons.forEach((button) => {
         const selectedNavbarColor = button.getAttribute("data-navbar-color");
         const selectedSidebarColor = button.getAttribute("data-sidebar-color");
         const selectedCategoryColor = button.getAttribute("data-category-color");
-
+        
         // Apply the selected colors using CSS variables
         if (selectedNavbarColor) {
             document.documentElement.style.setProperty("--navbar-color", selectedNavbarColor);
@@ -96,13 +98,11 @@ colorButtons.forEach((button) => {
         }
 
         if (selectedCategoryColor) {
+            console.log(selectedCategoryColor);
             document.documentElement.style.setProperty("--category-color", selectedCategoryColor);
         }
 
         // Save the selected theme to localStorage
         saveUserTheme(selectedNavbarColor, selectedSidebarColor, selectedCategoryColor);
-
-        // Update the global selectedCategoryContainerColor if applicable
-        window.selectedCategoryContainerColor = selectedCategoryColor;
     });
 });

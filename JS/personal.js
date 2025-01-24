@@ -9,7 +9,6 @@ const firstName = sessionStorage.getItem("first_name");
 const user = sub;
 console.log("Sub:", sub);
 let isCategoryClicked = false;
-let selectedCategoryContainerColor = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   const authUrl =
@@ -57,6 +56,22 @@ function clearCookies() {
 
 function clearStorage() {
   sessionStorage.clear();
+}
+
+// Function to show the loading spinner
+function showLoadingSpinner() {
+  const spinner = document.getElementById("loadingSpinner");
+  if (spinner) {
+    spinner.style.display = "flex";
+  }
+}
+
+// Function to hide the loading spinner
+function hideLoadingSpinner() {
+  const spinner = document.getElementById("loadingSpinner");
+  if (spinner) {
+    spinner.style.display = "none";
+  }
 }
 
 // Function to Add a Category Dynamically
@@ -201,6 +216,7 @@ function addCategoryToSidebar(categoryName) {
 
     // Fetch tasks for the category
     try {
+      showLoadingSpinner();
       const tasks = await fetchTasksForCategory(user, categoryName);
 
       // Add tasks to the dropdown
@@ -244,6 +260,9 @@ function addCategoryToSidebar(categoryName) {
         error
       );
       alert("Unable to fetch tasks. Please try again later.");
+    }finally {
+      // Hide the loading spinner after the API call completes
+      hideLoadingSpinner();
     }
 
     // Toggle dropdown visibility
@@ -379,6 +398,13 @@ document
     }
 
     try {
+
+      // Close the modal and reset the form
+      const taskModal = bootstrap.Modal.getInstance(
+        document.getElementById("addTaskModal")
+      );
+      taskModal.hide();
+
       const categoryName =
         selectedCategoryContainer.querySelector("h4").textContent;
 
@@ -414,12 +440,6 @@ document
           console.warn("Failed to add the task to the backend.");
         }
       }
-
-      // Close the modal and reset the form
-      const taskModal = bootstrap.Modal.getInstance(
-        document.getElementById("addTaskModal")
-      );
-      taskModal.hide();
 
       selectedTaskDiv = null; // Clear the editing state
       document.getElementById("addTaskForm").reset();
@@ -879,6 +899,8 @@ async function fetchAllCategories() {
   try {
     const url = `${apiBaseUrl}/GetAllCategories?userId=${user}`;
 
+    showLoadingSpinner();
+
     const response = await fetch(url, {
       method: "GET",
     });
@@ -895,6 +917,10 @@ async function fetchAllCategories() {
   } catch (error) {
     console.error("Error fetching categories:", error);
     alert("Unable to fetch categories. Please try again later.");
+  }
+  finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
   }
 }
 
@@ -949,13 +975,6 @@ function displayCategoriesWithTasks(categories) {
         );
       });
     }
-
-    // **Set the Background Color for the Current Category Card Only**
-    categoryCard.style.setProperty(
-      "background-color",
-      selectedCategoryContainerColor,
-      "important"
-    );
   });
 }
 
@@ -977,6 +996,13 @@ document
     }
 
     try {
+
+      // Close the modal programmatically
+      const addCategoryModal = bootstrap.Modal.getInstance(
+        document.getElementById("addCategoryModal")
+      );
+      addCategoryModal.hide();
+      showLoadingSpinner();
       // Make API call to add the category
       const response = await fetch(`${apiBaseUrl}/AddCategory`, {
         method: "POST",
@@ -992,11 +1018,6 @@ document
       const data = await response.json();
 
       if (response.ok) {
-        // Close the modal programmatically
-        const addCategoryModal = bootstrap.Modal.getInstance(
-          document.getElementById("addCategoryModal")
-        );
-        addCategoryModal.hide();
 
         // Synchronize with the backend for sorting
         await fetchAllCategories();
@@ -1018,11 +1039,15 @@ document
     } catch (error) {
       alert("An error occurred while adding the category. Please try again.");
       console.error("Error:", error);
+    } finally {
+      // Hide the loading spinner after the API call completes
+      hideLoadingSpinner();
     }
   });
 
 async function addTaskToBackend(categoryName, taskName, description, dueDate) {
   try {
+    showLoadingSpinner();
     const response = await fetch(`${apiBaseUrl}/AddTask`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1055,6 +1080,9 @@ async function addTaskToBackend(categoryName, taskName, description, dueDate) {
     });
     console.error("Error during API call to add task:", error);
     return null;
+  } finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
   }
 }
 
@@ -1126,6 +1154,7 @@ async function refreshCategoryTasks(categoryContainer, categoryName) {
 
 async function deleteCategoryFromBackend(categoryName) {
   try {
+    showLoadingSpinner();
     const response = await fetch(`${apiBaseUrl}/DeleteCategory`, {
       method: "DELETE",
       headers: {
@@ -1151,11 +1180,15 @@ async function deleteCategoryFromBackend(categoryName) {
     console.error("Error during API call to delete category:", error);
     alert("An error occurred while deleting the category. Please try again.");
     return false;
+  } finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
   }
 }
 
 async function deleteTaskFromBackend(categoryName, taskName) {
   try {
+    showLoadingSpinner();
     const response = await fetch(`${apiBaseUrl}/DeleteTask`, {
       method: "DELETE",
       headers: {
@@ -1189,6 +1222,9 @@ async function deleteTaskFromBackend(categoryName, taskName) {
     console.error("Error during API call to delete task:", error);
     alert("An error occurred while deleting the task. Please try again.");
     return false;
+  } finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
   }
 }
 
@@ -1200,6 +1236,7 @@ async function updateTaskInBackend(
   dueDate
 ) {
   try {
+    showLoadingSpinner();
     const payload = {
       UserId: user,
       categoryName: categoryName, // Backend expects "categoryName"
@@ -1233,6 +1270,9 @@ async function updateTaskInBackend(
     console.error("Error during API call to update task:", error);
     alert("An error occurred while updating the task. Please try again.");
     return false;
+  } finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
   }
 }
 

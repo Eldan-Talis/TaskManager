@@ -10,7 +10,6 @@ const firstName = sessionStorage.getItem("first_name");
 const user = sub;
 console.log("Sub:", sub);
 
-let selectedCategoryContainerColor = null;
 let selectedTeamId = null; // Store the selected team ID
 let loadingCounter = 0;
 
@@ -21,6 +20,7 @@ function getSelectedTeamId() {
 
 // Function to set the selected team ID when a team is clicked
 function setSelectedTeamId(teamId) {
+  showLoadingSpinner();
   selectedTeamId = teamId;
 }
 
@@ -129,6 +129,17 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
+      // Reset the form
+      teamCodeInput.value = "";
+      
+      // Close the modal
+      const joinTeamModal = bootstrap.Modal.getInstance(
+        document.getElementById("joinTeamModal")
+      );
+
+      joinTeamModal.hide();
+      
+      showLoadingSpinner();
       // Make the API call to join the team
       const response = await fetch(`${apiBaseUrl}/JoinTeam`, {
         method: "POST",
@@ -141,26 +152,30 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error joining team:", errorData.message);
-        alert(errorData.message || "Failed to join the team.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: errorData.message || "Failed to join the team.",
+          confirmButtonText: 'OK'
+        });
         return;
       }
-
+      
       const data = await response.json();
       console.log("Successfully joined the team:", data.message);
+      
+      // Replace the standard alert with Swal.fire
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Successfully joined the team!',
+        timer: 2000, // Optional: Auto-close after 2 seconds
+        showConfirmButton: false // Optional: Hide the confirm button
+      });
 
       // Reload the teams to reflect the changes
       await loadTeams();
-
-      // Reset the form
-      teamCodeInput.value = "";
-
-      // Close the modal
-      const joinTeamModal = bootstrap.Modal.getInstance(
-        document.getElementById("joinTeamModal")
-      );
-      joinTeamModal.hide();
-
-      alert("Successfully joined the team!");
+      
     } catch (error) {
       console.error("Error during API call to join team:", error);
       alert(
@@ -177,10 +192,29 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// Function to show the loading spinner
+function showLoadingSpinner() {
+  const spinner = document.getElementById("loadingSpinner");
+  if (spinner) {
+    spinner.style.display = "flex";
+  }
+}
+
+// Function to hide the loading spinner
+function hideLoadingSpinner() {
+  const spinner = document.getElementById("loadingSpinner");
+  if (spinner) {
+    spinner.style.display = "none";
+  }
+}
+
 // Load teams from the backend
 async function loadTeams() {
   try {
     const endpoint = `${apiBaseUrl}/GetAllTeams`;
+
+    // Show the loading spinner before starting the API call
+    showLoadingSpinner();
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -256,6 +290,8 @@ async function loadTeams() {
     teams.forEach((team) => {
       const listItem = document.createElement("li");
       listItem.classList.add("list-group-item", "teams-link");
+      listItem.dataset.teamId = team.teamId; // Store the teamId
+
       const teamContainer = document.createElement("div");
       teamContainer.classList.add("d-flex", "align-items-center", "gap-2");
 
@@ -270,18 +306,41 @@ async function loadTeams() {
       teamContainer.appendChild(teamNameElement);
 
       listItem.appendChild(teamContainer);
-      listItem.dataset.teamId = team.teamId; // Store the teamId
+
+      // **Add Dropdown Container**
+      const userDropdown = document.createElement("div");
+      userDropdown.classList.add("user-dropdown");
+      userDropdown.style.display = "none"; // Hidden by default
+      userDropdown.style.marginTop = "10px"; // Space above the dropdown
+      userDropdown.style.paddingLeft = "20px"; // Indent the dropdown
+      userDropdown.style.backgroundColor = "rgba(255, 255, 255, 0.1)"; // Slight background
+      userDropdown.style.borderRadius = "5px"; // Rounded corners
+      userDropdown.style.padding = "10px"; // Padding inside the dropdown
+
+      listItem.appendChild(userDropdown); // Append the dropdown to the list item
 
       // When the team is clicked, set the selected team ID and load categories
-      listItem.addEventListener("click", () => {
+      listItem.addEventListener("click", async () => {
         setSelectedTeamId(team.teamId); // Store the selected team ID
 
         // Manage Active Class
         if (activeTeamItem) {
           activeTeamItem.classList.remove("active");
+          // Hide its dropdown
+          const activeDropdown = activeTeamItem.querySelector(".user-dropdown");
+          if (activeDropdown) {
+            activeDropdown.style.display = "none";
+          }
         }
         listItem.classList.add("active");
         activeTeamItem = listItem;
+
+        // Fetch and display user names in the dropdown
+        await populateUserDropdown(team.teamId, userDropdown);
+
+        // Toggle dropdown visibility
+        userDropdown.style.display =
+          userDropdown.style.display === "none" ? "block" : "none";
 
         // Create and append the friendly message container with 'X' icon
         const friendlyMessageContainer =
@@ -316,7 +375,7 @@ async function loadTeams() {
                 icon: "success",
                 title: "Copied!",
                 text: "Invite ID copied to clipboard!",
-                timer: 1000, // Auto-close after 2 seconds
+                timer: 1000, // Auto-close after 1 second
                 showConfirmButton: false, // No confirmation button
               });
             })
@@ -325,7 +384,7 @@ async function loadTeams() {
                 icon: "error",
                 title: "Oops...",
                 text: "Failed to copy Invite ID.",
-                timer: 1000, // Auto-close after 2 seconds
+                timer: 1000, // Auto-close after 1 second
                 showConfirmButton: false, // No confirmation button
               });
             });
@@ -337,7 +396,7 @@ async function loadTeams() {
         // Append the team message to the container
         messageContainer.appendChild(teamMessage);
 
-       // 'Leave Team' button with icon and text
+        // 'Leave Team' button with icon and text
         const leaveTeamBtn = document.createElement("button");
         leaveTeamBtn.classList.add("leave-team-btn");
         leaveTeamBtn.title = "Leave Team";
@@ -372,7 +431,7 @@ async function loadTeams() {
         // Append the button to the message container
         messageContainer.appendChild(leaveTeamBtn);
 
-
+        // Append the container to the friendlyMessageContainer
         friendlyMessageContainer.appendChild(messageContainer);
 
         // Add an <hr> under the team container
@@ -397,6 +456,73 @@ async function loadTeams() {
     alert("An error occurred while loading teams. Please try again later.");
   }
 }
+
+
+// Function to fetch and populate user names in the dropdown
+async function populateUserDropdown(teamId, dropdownElement) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/GetTeamUserFullNames`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ team_id: teamId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error fetching user names:", errorData.error);
+      dropdownElement.innerHTML =
+        "<p style='color: red;'>Failed to load team members.</p>";
+      return;
+    }
+
+    const userNames = await response.json(); // Assuming the response is a JSON array
+
+    if (!Array.isArray(userNames)) {
+      console.error("Expected userNames to be an array:", userNames);
+      dropdownElement.innerHTML =
+        "<p style='color: red;'>Unexpected data format received.</p>";
+      return;
+    }
+
+    if (userNames.length === 0) {
+      dropdownElement.innerHTML = "<p>No members in this team.</p>";
+      return;
+    }
+
+    // Clear existing content
+    dropdownElement.innerHTML = "";
+
+    // Create a list to display user names
+    const userList = document.createElement("ul");
+    userList.style.listStyle = "none";
+    userList.style.padding = "0";
+    userList.style.margin = "0";
+
+    userNames.forEach((name) => {
+      const userItem = document.createElement("li");
+      userItem.textContent = name;
+      userItem.style.padding = "5px 0";
+      userItem.style.borderBottom = "1px solid rgba(255, 255, 255, 0.2)";
+      userItem.style.color = "white"; // Ensure text is visible against the background
+
+      // Remove the border for the last item
+      if (name === userNames[userNames.length - 1]) {
+        userItem.style.borderBottom = "none";
+      }
+
+      userList.appendChild(userItem);
+    });
+
+    dropdownElement.appendChild(userList);
+  } catch (error) {
+    console.error("Error during API call to fetch user names:", error);
+    dropdownElement.innerHTML =
+      "<p style='color: red;'>An error occurred while loading team members.</p>";
+  }
+}
+
 
 // Handle creating a new category
 document.addEventListener("DOMContentLoaded", () => {
@@ -492,6 +618,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Request body being sent:", JSON.stringify(requestBody)); // Log the request body
 
     try {
+      showLoadingSpinner();
       // Make API call to Lambda function to create a new team
       const response = await fetch(`${apiBaseUrl}/CreateTeam`, {
         method: "POST",
@@ -561,6 +688,7 @@ async function addCategory(categoryName) {
 // Function to add a category to the backend
 async function addCategoryToBackend(teamId, categoryName) {
   try {
+    showLoadingSpinner();
     const response = await fetch(`${apiBaseUrl}/AddTeamCategory`, {
       method: "POST",
       headers: {
@@ -593,6 +721,8 @@ async function addCategoryToBackend(teamId, categoryName) {
 async function loadCategoriesForTeam(teamId) {
   try {
     const endpoint = `${apiBaseUrl}/GetTeamCategories`;
+
+    showLoadingSpinner();
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -635,6 +765,10 @@ async function loadCategoriesForTeam(teamId) {
   } catch (error) {
     console.error("Error loading categories:", error);
   }
+  finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
+  }
 }
 
 // Function to display category on the UI
@@ -650,10 +784,6 @@ function addCategoryToUI(categoryName) {
   // Fetch the saved theme
   const savedTheme = loadUserTheme(); // Ensure loadUserTheme is accessible here, possibly via theme.js
   const categoryColor = savedTheme ? savedTheme.categoryColor : null;
-
-  if (categoryColor) {
-      categoryCard.style.setProperty("background-color", categoryColor, "important");
-  }
 
   const categoryHeader = document.createElement("h4");
   categoryHeader.textContent = categoryName;
@@ -912,6 +1042,8 @@ async function addTaskToBackend(
 ) {
   const apiEndpoint = `${apiBaseUrl}/AddTeamTask`; // Update with your API Gateway endpoint
 
+  showLoadingSpinner();
+
   const payload = {
     teamId: teamId,
     categoryName: categoryName,
@@ -944,6 +1076,10 @@ async function addTaskToBackend(
     console.error("Error during API call to add task:", error);
     alert("An error occurred while adding the task. Please try again.");
     return null;
+  }
+  finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
   }
 }
 
@@ -1241,6 +1377,8 @@ async function deleteTaskFromBackend(teamId, categoryName, taskName) {
 
   const apiEndpoint = `${apiBaseUrl}/DeleteTeamTask`; // Replace with your API endpoint
 
+  showLoadingSpinner();
+
   const payload = {
     teamId: teamId,
     categoryName: categoryName,
@@ -1272,6 +1410,10 @@ async function deleteTaskFromBackend(teamId, categoryName, taskName) {
     console.error("Error during API call to delete task:", error);
     alert("An error occurred while deleting the task. Please try again.");
     return false; // Indicate failure
+  }
+  finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
   }
 }
 
@@ -1544,6 +1686,8 @@ async function updateTaskInBackend(
       dueDate: dueDate || null,
     };
 
+    showLoadingSpinner();
+
     console.log("Updating task with payload:", payload);
 
     const response = await fetch(`${apiBaseUrl}/UpdateTeamTask`, {
@@ -1568,6 +1712,10 @@ async function updateTaskInBackend(
     console.error("Error during API call to update task:", error);
     alert("An error occurred while updating the task. Please try again.");
     return false;
+  }
+  finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
   }
 }
 
@@ -1601,6 +1749,7 @@ async function leaveTeamFromBackend(teamId) {
   }
 
   try {
+    showLoadingSpinner();
     const response = await fetch(`${apiBaseUrl}/LeaveTeam`, {
       method: "POST", // Ensure this matches your API Gateway setup
       headers: {
@@ -1621,11 +1770,14 @@ async function leaveTeamFromBackend(teamId) {
 
     const data = await response.json();
     console.log("Team deleted successfully:", data.message);
-    return data.teamDeleted; // Returns true if team was deleted, else false
+    return true; // Returns true if team was deleted, else false
   } catch (error) {
     console.error("Error during API call to delete team:", error);
     alert("An error occurred while deleting the team. Please try again.");
     return false;
+  }finally {
+    // Hide the loading spinner after the API call completes
+    loadTeams();
   }
 }
 
