@@ -43,14 +43,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Load teams first
     await loadTeams();
 
-    // Once teams are loaded, trigger the click event on the first item
-    const teamsList = document.getElementById("teams-list");
-    const teams = teamsList.querySelectorAll("li");
-
-    if (teams.length > 0) {
-      const firstTeamItem = teams[0];
-      firstTeamItem.click(); // Simulate a click on the first team
-    }
   } catch (error) {
     console.error("Failed to load user data:", error);
   }
@@ -257,6 +249,9 @@ async function loadTeams() {
 
     teamsList.innerHTML = ""; // Clear current list
 
+    // Variable to keep track of the currently active team
+    let activeTeamItem = null;
+
     // Populate the list with sorted teams
     teams.forEach((team) => {
       const listItem = document.createElement("li");
@@ -280,6 +275,13 @@ async function loadTeams() {
       // When the team is clicked, set the selected team ID and load categories
       listItem.addEventListener("click", () => {
         setSelectedTeamId(team.teamId); // Store the selected team ID
+
+        // Manage Active Class
+        if (activeTeamItem) {
+          activeTeamItem.classList.remove("active");
+        }
+        listItem.classList.add("active");
+        activeTeamItem = listItem;
 
         // Create and append the friendly message container with 'X' icon
         const friendlyMessageContainer =
@@ -335,31 +337,41 @@ async function loadTeams() {
         // Append the team message to the container
         messageContainer.appendChild(teamMessage);
 
-        // 'Open Door' icon/button
+       // 'Leave Team' button with icon and text
         const leaveTeamBtn = document.createElement("button");
-        leaveTeamBtn.innerHTML = '<i class="bx bxs-exit"></i>';
         leaveTeamBtn.classList.add("leave-team-btn");
-        leaveTeamBtn.title = "Leave";
+        leaveTeamBtn.title = "Leave Team";
+        leaveTeamBtn.setAttribute("aria-label", "Leave Team");
 
-        // Add event listener to 'Open Door' button
+        // Create a container within the button to arrange icon and text vertically
+        const leaveButtonContent = document.createElement("div");
+        leaveButtonContent.classList.add("leave-button-content");
+
+        // Create the icon element
+        const leaveIcon = document.createElement("i");
+        leaveIcon.classList.add("bx", "bxs-exit"); // Ensure you're using the correct Boxicons classes
+
+        // Create the text element
+        const leaveText = document.createElement("span");
+        leaveText.textContent = "Leave";
+        leaveText.classList.add("leave-team-text");
+
+        // Append icon and text to the content container
+        leaveButtonContent.appendChild(leaveIcon);
+        leaveButtonContent.appendChild(leaveText);
+
+        // Append the content container to the button
+        leaveTeamBtn.appendChild(leaveButtonContent);
+
+        // Add event listener to the button
         leaveTeamBtn.addEventListener("click", (event) => {
-          event.stopPropagation(); // Prevent triggering the parent click event
+          event.stopPropagation(); // Prevent triggering parent events
           promptLeaveTeam(team);
         });
 
-        // Add a small text under the button
-        const leaveTeamText = document.createElement("span");
-        leaveTeamText.textContent = "Leave"; // Add your descriptive text
-        leaveTeamText.classList.add("leave-team-text"); // Add a class for styling
-        leaveTeamText.style.fontSize = "0.8rem"; // Adjust the font size
-        leaveTeamText.style.display = "block"; // Ensure it's displayed on a new line
-        leaveTeamText.style.textAlign = "center"; // Center the text under the button
-
-        // Append the button and text to the container
+        // Append the button to the message container
         messageContainer.appendChild(leaveTeamBtn);
-        messageContainer.appendChild(leaveTeamText); // Add the descriptive text
 
-        messageContainer.appendChild(leaveTeamBtn);
 
         friendlyMessageContainer.appendChild(messageContainer);
 
@@ -1638,36 +1650,35 @@ function removeTeamFromUI(teamId) {
 function promptLeaveTeam(team) {
   Swal.fire({
     title: "Are you sure?",
-    text: `Do you really want to delete the team "${team.teamName}"? This action cannot be undone.`,
+    text: `Do you really want to leave the team "${team.teamName}"? This action cannot be undone.`,
     icon: "warning",
     showCancelButton: true,
-    confirmButtonText: "Yes, delete it!",
+    confirmButtonText: "Yes, leave it!",
     cancelButtonText: "Cancel",
     confirmButtonColor: "#d33",
     cancelButtonColor: "#3085d6",
   }).then(async (result) => {
     if (result.isConfirmed) {
-      // Proceed to delete the team
       const success = await leaveTeamFromBackend(team.teamId);
 
       if (success) {
-        // Remove the team from the UI
         removeTeamFromUI(team.teamId);
         Swal.fire(
-          "Deleted!",
-          `The team "${team.teamName}" has been deleted.`,
+          "Left!",
+          `You have successfully left the team "${team.teamName}".`,
           "success"
         );
       } else {
         Swal.fire(
           "Error!",
-          "Something went wrong while deleting the team.",
+          "Something went wrong while leaving the team.",
           "error"
         );
       }
     }
   });
 }
+
 
 //speechToText for category
 
