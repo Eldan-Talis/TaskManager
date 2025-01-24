@@ -3,8 +3,8 @@ let selectedCategoryContainer = null; // Tracks the category container for task 
 const apiBaseUrl =
   "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod";
 
-const sub = sessionStorage.getItem('sub');;
-//sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
+//const sub = sessionStorage.getItem('sub');;
+sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 const firstName = sessionStorage.getItem("first_name");
 const user = sub;
 console.log("Sub:", sub);
@@ -57,7 +57,6 @@ function clearCookies() {
 
 function clearStorage() {
   sessionStorage.clear();
-  localStorage.clear();
 }
 
 // Function to Add a Category Dynamically
@@ -792,61 +791,6 @@ function showTaskDetails(taskDiv) {
 }
 
 //color picker for background ----------------------------------------
-
-// Select all color picker buttons
-const colorButtons = document.querySelectorAll(".color-picker button");
-
-// Add click event listener to each button
-colorButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const selectedNavbarColor = button.getAttribute("data-navbar-color");
-    const selectedSidebarColor = button.getAttribute("data-sidebar-color");
-    selectedCategoryContainerColor = button.getAttribute("data-category-color");
-
-    const navbar = document.querySelector(".navbar");
-    const sidebar = document.querySelector(".sidebar");
-    const categoryCards = document.querySelectorAll(".category-card");
-
-    // Set the background color directly for navbar and sidebar
-    navbar.style.setProperty(
-      "background-color",
-      selectedNavbarColor,
-      "important"
-    );
-    sidebar.style.setProperty(
-      "background-color",
-      selectedSidebarColor,
-      "important"
-    );
-
-    // Set the background color for all category cards
-    categoryCards.forEach((categoryCard) => {
-      categoryCard.style.setProperty(
-        "background-color",
-        selectedCategoryContainerColor,
-        "important"
-      );
-    });
-  });
-});
-
-// Function to set the theme based on user preferences
-function applyUserTheme() {
-  // Check if the user prefers dark mode
-  const prefersDarkMode = window.matchMedia(
-    "(prefers-color-scheme: dark)"
-  ).matches;
-
-  // Select the black and blue buttons
-  const blackButton = document.querySelector("[data-navbar-color='#1a1b18']");
-  const blueButton = document.querySelector("[data-navbar-color='#7695ff']");
-
-  if (prefersDarkMode && blackButton) {
-    blackButton.click(); // Simulate a click on the black button
-  } else if (blueButton) {
-    blueButton.click(); // Simulate a click on the blue button
-  }
-}
 
 // Call the function when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", applyUserTheme);

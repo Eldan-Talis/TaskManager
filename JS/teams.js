@@ -1,8 +1,8 @@
 const apiBaseUrl =
   "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod";
 
-const sub = sessionStorage.getItem('sub');
-//const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
+//const sub = sessionStorage.getItem('sub');
+const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 //const sub = "e408d428-a041-7069-ace8-579db3cbd3a7";
 //const sub = "34d83408-40b1-707b-f80b-cbdc8e287b90";
 //const sub = "e4b8d4e8-d0a1-70c1-73b2-4e8ed0338fc5";
@@ -80,64 +80,8 @@ function toggleColorPicker() {
   }
 }
 
-
-// Function to set the theme based on user preferences
-function applyUserTheme() {
-  // Check if the user prefers dark mode
-  const prefersDarkMode = window.matchMedia(
-    "(prefers-color-scheme: dark)"
-  ).matches;
-
-  // Select the black and blue buttons
-  const blackButton = document.querySelector("[data-navbar-color='#1a1b18']");
-  const blueButton = document.querySelector("[data-navbar-color='#7695ff']");
-
-  if (prefersDarkMode && blackButton) {
-    blackButton.click(); // Simulate a click on the black button
-  } else if (blueButton) {
-    blueButton.click(); // Simulate a click on the blue button
-  }
-}
-
 // Call the function when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", applyUserTheme);
-
-// Select all color picker buttons
-const colorButtons = document.querySelectorAll(".color-picker button");
-
-// Add click event listener to each button
-colorButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const selectedNavbarColor = button.getAttribute("data-navbar-color");
-    const selectedSidebarColor = button.getAttribute("data-sidebar-color");
-    selectedCategoryContainerColor = button.getAttribute("data-category-color");
-
-    const navbar = document.querySelector(".navbar");
-    const sidebar = document.querySelector(".sidebar");
-    const categoryCards = document.querySelectorAll(".category-card");
-
-    // Set the background color directly for navbar and sidebar
-    navbar.style.setProperty(
-      "background-color",
-      selectedNavbarColor,
-      "important"
-    );
-    sidebar.style.setProperty(
-      "background-color",
-      selectedSidebarColor,
-      "important"
-    );
-
-    // Set the background color for all category cards
-    categoryCards.forEach((categoryCard) => {
-      categoryCard.style.setProperty(
-        "background-color",
-        selectedCategoryContainerColor,
-        "important"
-      );
-    });
-  });
-});
 
 // Logout function
 function logout() {
@@ -163,7 +107,6 @@ function clearCookies() {
 
 function clearStorage() {
   sessionStorage.clear();
-  localStorage.clear();
 }
 
 // Handle joining a team
@@ -683,28 +626,34 @@ async function loadCategoriesForTeam(teamId) {
 }
 
 // Function to display category on the UI
+// JS/teams.js
+
+// Function to display category on the UI
 function addCategoryToUI(categoryName) {
   const categoriesGrid = document.getElementById("categories-grid");
 
   const categoryCard = document.createElement("div");
   categoryCard.classList.add("category-card", "position-relative");
-  categoryCard.style.setProperty(
-    "background-color",
-    selectedCategoryContainerColor,
-    "important"
-  );
+
+  // Fetch the saved theme
+  const savedTheme = loadUserTheme(); // Ensure loadUserTheme is accessible here, possibly via theme.js
+  const categoryColor = savedTheme ? savedTheme.categoryColor : null;
+
+  if (categoryColor) {
+      categoryCard.style.setProperty("background-color", categoryColor, "important");
+  }
 
   const categoryHeader = document.createElement("h4");
   categoryHeader.textContent = categoryName;
 
   const buttonContainer = document.createElement("div");
   buttonContainer.classList.add(
-    "position-absolute",
-    "top-0",
-    "end-0",
-    "m-2",
-    "d-flex",
-    "gap-1"
+      "position-absolute",
+      "top-0",
+      "end-0",
+      "m-2",
+      "d-flex",
+      "gap-1"
   );
 
   // Add Task Button
@@ -712,7 +661,7 @@ function addCategoryToUI(categoryName) {
   addTaskIcon.innerHTML = "+";
   addTaskIcon.classList.add("btn", "btn-primary", "p-1");
   addTaskIcon.addEventListener("click", function () {
-    openTaskModal(categoryCard);
+      openTaskModal(categoryCard);
   });
 
   // Delete Category Button
@@ -720,42 +669,42 @@ function addCategoryToUI(categoryName) {
   deleteCategoryIcon.innerHTML = "×";
   deleteCategoryIcon.classList.add("btn", "text-danger", "p-1");
   deleteCategoryIcon.addEventListener("click", async function () {
-    // SweetAlert2 confirmation dialog
-    Swal.fire({
-      title: `Are you sure?`,
-      text: `Do you really want to delete the category "${categoryName}"? This action cannot be undone.`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        console.log("Category to delete:", categoryName);
-        const success = await deleteCategoryFromBackend(
-          selectedTeamId,
-          categoryName
-        );
+      // SweetAlert2 confirmation dialog
+      Swal.fire({
+          title: `Are you sure?`,
+          text: `Do you really want to delete the category "${categoryName}"? This action cannot be undone.`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, delete it!",
+          cancelButtonText: "Cancel",
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+      }).then(async (result) => {
+          if (result.isConfirmed) {
+              console.log("Category to delete:", categoryName);
+              const success = await deleteCategoryFromBackend(
+                  selectedTeamId,
+                  categoryName
+              );
 
-        if (success) {
-          // Remove category from the UI
-          categoriesGrid.removeChild(categoryCard);
-          console.log(`Category "${categoryName}" removed from UI.`);
-          Swal.fire(
-            "Deleted!",
-            `The category "${categoryName}" has been deleted.`,
-            "success"
-          );
-        } else {
-          Swal.fire(
-            "Error!",
-            "Something went wrong while deleting the category.",
-            "error"
-          );
-        }
-      }
-    });
+              if (success) {
+                  // Remove category from the UI
+                  categoriesGrid.removeChild(categoryCard);
+                  console.log(`Category "${categoryName}" removed from UI.`);
+                  Swal.fire(
+                      "Deleted!",
+                      `The category "${categoryName}" has been deleted.`,
+                      "success"
+                  );
+              } else {
+                  Swal.fire(
+                      "Error!",
+                      "Something went wrong while deleting the category.",
+                      "error"
+                  );
+              }
+          }
+      });
   });
 
   buttonContainer.appendChild(addTaskIcon);
@@ -766,6 +715,7 @@ function addCategoryToUI(categoryName) {
 
   return categoryCard; // Return the created category card
 }
+
 
 // Function to delete a category from the backend
 async function deleteCategoryFromBackend(teamId, categoryName) {

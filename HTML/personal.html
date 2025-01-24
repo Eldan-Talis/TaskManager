@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task Manager</title>
-    <link rel="stylesheet" href="/CSS/main.css" />
+    <link rel="stylesheet" href="/CSS/personal.css" />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
@@ -314,7 +314,9 @@
       </div>
     </div>
 
-    <script src="/JS/main.js"></script>
+    <!-- Correct Script Loading Order -->
     <script src="/JS/config.js"></script>
+    <script src="/JS/theme.js"></script> <!-- Load theme.js before personal.js -->
+    <script src="/JS/personal.js"></script> <!-- Then load personal.js -->
   </body>
 </html>

@@ -1,19 +1,3 @@
-// Function to set the theme based on user preferences
-function applyUserTheme() {
-    // Check if the user prefers dark mode
-    const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    // Select the black and blue buttons
-    const blackButton = document.querySelector("[data-navbar-color='#1a1b18']");
-    const blueButton = document.querySelector("[data-navbar-color='#7695ff']");
-
-    if (prefersDarkMode && blackButton) {
-        blackButton.click(); // Simulate a click on the black button
-    } else if (blueButton) {
-        blueButton.click(); // Simulate a click on the blue button
-    }
-}
-
 function login(){
     const authUrl =
     `${config.domain}/login?` +
@@ -44,25 +28,6 @@ function toggleColorPicker() {
     }
 }
 
-// Select all color picker buttons
-const colorButtons = document.querySelectorAll(".color-picker button");
-
-// Add click event listener to each button
-colorButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-        const selectedNavbarColor = button.getAttribute("data-navbar-color");
-
-        // Update the CSS variable --navbar-color
-        document.documentElement.style.setProperty('--navbar-color', selectedNavbarColor);
-
-        // Re-trigger the animation on welcome-text
-        const welcomeText = document.querySelector('.welcome-text');
-        welcomeText.style.animation = 'none'; // Remove the animation
-        // Trigger reflow to restart the animation
-        void welcomeText.offsetWidth;
-        welcomeText.style.animation = ''; // Re-apply the animation
-    });
-});
 
 // Helper functions to clear cookies and storage
 function clearCookies() {
