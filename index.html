@@ -16,6 +16,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      (function() {
+        const themeJSON = localStorage.getItem("userTheme");
+        if (themeJSON) {
+          try {
+            const theme = JSON.parse(themeJSON);
+            const root = document.documentElement;
+            if (theme.navbarColor) {
+              root.style.setProperty("--navbar-color", theme.navbarColor);
+            }
+            if (theme.sidebarColor) {
+              root.style.setProperty("--sidebar-color", theme.sidebarColor);
+            }
+            if (theme.categoryColor) {
+              root.style.setProperty("--category-color", theme.categoryColor);
+            }
+          } catch (e) {
+            console.error("Failed to preload theme:", e);
+          }
+        }
+      })();
+    </script>
   </head>
   <body>
     <!-- Navbar -->
@@ -31,36 +53,36 @@
               class="btn btn-sm"
               style="background-color: #1a1b18"
               data-navbar-color="#1a1b18"
-              data-sidebar-color="#1a1b18"
-              data-category-color="#1a1b18"
+              data-sidebar-color="#3C3D37"
+              data-category-color="#e6e7e4"
             ></button>
             <button
               class="btn btn-sm"
               style="background-color: #8d89a6"
               data-navbar-color="#8D89A6"
-              data-sidebar-color="#8D89A6"
-              data-category-color="#8D89A6"
+              data-sidebar-color="#A69AB9"
+              data-category-color="#e3e2e9"
             ></button>
             <button
               class="btn btn-sm"
               style="background-color: #a35c7a"
               data-navbar-color="#A35C7A"
-              data-sidebar-color="#A35C7A"
-              data-category-color="#A35C7A"
+              data-sidebar-color="#C890A7"
+              data-category-color="#eddee4"
             ></button>
             <button
               class="btn btn-sm"
               style="background-color: #c57b57"
               data-navbar-color="#C57B57"
-              data-sidebar-color="#C57B57"
-              data-category-color="#C57B57"
+              data-sidebar-color="#f1b08e"
+              data-category-color="#f1e2da"
             ></button>
             <button
               class="btn btn-sm"
               style="background-color: #7695ff"
               data-navbar-color="#7695ff"
-              data-sidebar-color="#7695ff"
-              data-category-color="#7695ff"
+              data-sidebar-color="#9DBDFF"
+              data-category-color="#e6ebff"
             ></button>
           </div>
         </div>
@@ -92,5 +114,6 @@
     <script src="/JS/config.js"></script>
     <script src="/JS/theme.js"></script> <!-- Load theme.js first -->
     <script src="/JS/welcome.js"></script> <!-- Then load welcome.js -->
+
   </body>
 </html>

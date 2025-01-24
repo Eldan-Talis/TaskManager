@@ -71,7 +71,7 @@ function applyUserTheme() {
     }
 }
 
-// Add event listener for DOMContentLoaded to apply theme
+// Apply theme on DOMContentLoaded
 document.addEventListener("DOMContentLoaded", applyUserTheme);
 
 // === Color Picker Button Event Listeners ===

@@ -1,8 +1,8 @@
 const apiBaseUrl =
   "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod";
 
-//const sub = sessionStorage.getItem('sub');
-const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
+const sub = sessionStorage.getItem('sub');
+//const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 //const sub = "e408d428-a041-7069-ace8-579db3cbd3a7";
 //const sub = "34d83408-40b1-707b-f80b-cbdc8e287b90";
 //const sub = "e4b8d4e8-d0a1-70c1-73b2-4e8ed0338fc5";

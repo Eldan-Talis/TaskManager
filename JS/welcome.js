@@ -1,16 +1,17 @@
 function login(){
     const authUrl =
     `${config.domain}/login?` +
-    // response_type=code +
     "response_type=token" +
     `&client_id=${config.clientId}` +
     `&redirect_uri=${encodeURIComponent(config.redirectUri)}` +
     "&scope=openid+aws.cognito.signin.user.admin";
-    window.location.href = authUrl;
+
+    // Optional: Ensure theme is saved before redirect
+    setTimeout(() => {
+        window.location.href = authUrl;
+    }, 100); // 100 milliseconds delay
 }
 
-// Call the function when the DOM is fully loaded
-document.addEventListener("DOMContentLoaded", applyUserTheme);
 
 // Function to toggle the color picker visibility
 function toggleColorPicker() {
