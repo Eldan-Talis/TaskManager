@@ -98,7 +98,7 @@
         <!-- Center Section: Two Images -->
       <div class="Logo-Container align-items-center">
         <img src="/Images/TaskELD Name Logo.png" alt="Logo 1" class="navbar-center-image me-3" />
-        <img src="/Images/TaskELD Logo.png" alt="Logo 2" class="navbar-center-image" />
+        <img id="taskeldLogo" src="/Images/TaskELD Logo.png"  alt="Logo 2"  class="navbar-center-image"/>
       </div>
         <!-- User Greeting -->
         <div id="userGreeting" class="greeting">
@@ -336,6 +336,45 @@
         </div>
       </div>
     </div>
+
+    <!-- User Management Modal -->
+    <div
+    class="modal fade"
+    id="userManagementModal"
+    tabindex="-1"
+    aria-labelledby="userManagementModalLabel"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog modal-xl modal-fullscreen-sm-down modal-dialog-scrollable"> <!-- modal-lg if you want a bigger modal -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userManagementModalLabel">Manage Users</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- This is where you'll inject or display user data -->
+          <div id="userManagementContent">
+            <!-- e.g., a table of users, user details, etc. -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+    </div>
+
 
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="loading-spinner" style="display: none;">

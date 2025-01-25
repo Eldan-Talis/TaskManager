@@ -12,12 +12,14 @@ function saveTokenData(params) {
             const firstName = decodedIdToken.given_name || "User";
             const email = decodedIdToken.email || "Unknown";
             const sub = decodedIdToken.sub || "Unknown"; // Extract the unique sub identifier
+            const groups = decodedIdToken["cognito:groups"] || [];
 
             // Save to sessionStorage
             sessionStorage.setItem('id_token', params.id_token);
             sessionStorage.setItem('first_name', firstName);
             sessionStorage.setItem('email', email);
             sessionStorage.setItem('sub', sub); // Save the sub value
+            sessionStorage.setItem('groups', JSON.stringify(groups));
 
             console.log("Saved user information:", { firstName, email, sub });
         } catch (error) {

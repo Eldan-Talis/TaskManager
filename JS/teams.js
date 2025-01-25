@@ -3,12 +3,8 @@ const apiBaseUrl =
 
 const sub = sessionStorage.getItem('sub');
 //const sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
-//const sub = "e408d428-a041-7069-ace8-579db3cbd3a7";
-//const sub = "34d83408-40b1-707b-f80b-cbdc8e287b90";
-//const sub = "e4b8d4e8-d0a1-70c1-73b2-4e8ed0338fc5";
 const firstName = sessionStorage.getItem("first_name");
 const user = sub;
-console.log("Sub:", sub);
 
 let selectedTeamId = null; // Store the selected team ID
 let loadingCounter = 0;
@@ -162,7 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       
       const data = await response.json();
-      console.log("Successfully joined the team:", data.message);
       
       // Replace the standard alert with Swal.fire
       Swal.fire({
@@ -439,7 +434,6 @@ async function loadTeams() {
         separator.classList.add("team-separator"); // Add a CSS class for styling
         friendlyMessageContainer.appendChild(separator);
 
-        console.log(`Team selected: ${team.teamName} (ID: ${team.teamId})`);
         loadCategoriesForTeam(team.teamId); // Call function to load categories
       });
 
@@ -548,7 +542,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    console.log("Category name captured:", categoryName); // Debugging output
 
     const teamId = getSelectedTeamId(); // Ensure a team is selected
 
@@ -601,7 +594,6 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault(); // Prevent default form submission behavior
     const teamName = teamNameInput.value.trim(); // Get trimmed input value
 
-    console.log("Team name captured:", teamName); // Debugging output
 
     // Check if the team name is empty
     if (!teamName) {
@@ -615,7 +607,6 @@ document.addEventListener("DOMContentLoaded", () => {
       sub, // User's sub (userId)
     };
 
-    console.log("Request body being sent:", JSON.stringify(requestBody)); // Log the request body
 
     try {
       showLoadingSpinner();
@@ -627,7 +618,6 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         body: JSON.stringify(requestBody), // Directly pass the stringified object
       });
-      console.log("API Response Status:", response.status); // Debugging log for response status
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -635,7 +625,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const data = await response.json();
-      console.log("Team created successfully:", data);
 
       loadTeams();
 
@@ -708,7 +697,6 @@ async function addCategoryToBackend(teamId, categoryName) {
       return false;
     }
 
-    console.log("Category added successfully:", data.message);
     return true;
   } catch (error) {
     console.error("Error during API call to add category:", error);
@@ -823,7 +811,6 @@ function addCategoryToUI(categoryName) {
           cancelButtonColor: "#3085d6",
       }).then(async (result) => {
           if (result.isConfirmed) {
-              console.log("Category to delete:", categoryName);
               const success = await deleteCategoryFromBackend(
                   selectedTeamId,
                   categoryName
@@ -832,7 +819,6 @@ function addCategoryToUI(categoryName) {
               if (success) {
                   // Remove category from the UI
                   categoriesGrid.removeChild(categoryCard);
-                  console.log(`Category "${categoryName}" removed from UI.`);
                   Swal.fire(
                       "Deleted!",
                       `The category "${categoryName}" has been deleted.`,
@@ -862,10 +848,6 @@ function addCategoryToUI(categoryName) {
 // Function to delete a category from the backend
 async function deleteCategoryFromBackend(teamId, categoryName) {
   try {
-    console.log("Payload sent to backend:", {
-      teamId: teamId,
-      categoryName: categoryName,
-    });
 
     const response = await fetch(`${apiBaseUrl}/DeleteTeamCategory`, {
       method: "DELETE",
@@ -886,7 +868,6 @@ async function deleteCategoryFromBackend(teamId, categoryName) {
     }
 
     const data = await response.json();
-    console.log("Category deleted successfully:", data.message);
     return true;
   } catch (error) {
     console.error("Error during API call to delete category:", error);
@@ -1070,7 +1051,6 @@ async function addTaskToBackend(
     }
 
     const data = await response.json();
-    console.log("Task added successfully:", data.message);
     return data; // Return the added task details
   } catch (error) {
     console.error("Error during API call to add task:", error);
@@ -1305,7 +1285,6 @@ function deleteTask(taskDivOrTaskObject) {
   if (taskDivOrTaskObject instanceof HTMLElement) {
     categoryName = taskDivOrTaskObject.dataset.categoryName;
     taskName = taskDivOrTaskObject.querySelector("h5").textContent;
-    console.log("Deleting Task via DOM Element:", { categoryName, taskName });
   } else if (
     typeof taskDivOrTaskObject === "object" &&
     taskDivOrTaskObject.taskName
@@ -1313,7 +1292,6 @@ function deleteTask(taskDivOrTaskObject) {
     // If you must handle task objects, ensure they include categoryName
     categoryName = taskDivOrTaskObject.categoryName;
     taskName = taskDivOrTaskObject.taskName;
-    console.log("Deleting Task via Task Object:", { categoryName, taskName });
   } else {
     console.error("Invalid input passed to deleteTask:", taskDivOrTaskObject);
     return;
@@ -1346,9 +1324,6 @@ function deleteTask(taskDivOrTaskObject) {
             if (taskDivOrTaskObject instanceof HTMLElement) {
               taskDivOrTaskObject.remove();
             }
-            console.log(
-              `Task "${taskName}" removed from category "${categoryName}".`
-            );
             Swal.fire(
               "Deleted!",
               `The task "${taskName}" has been deleted.`,
@@ -1385,7 +1360,6 @@ async function deleteTaskFromBackend(teamId, categoryName, taskName) {
     taskName: taskName,
   };
 
-  console.log("Payload being sent to API:", payload);
 
   try {
     const response = await fetch(apiEndpoint, {
@@ -1404,7 +1378,6 @@ async function deleteTaskFromBackend(teamId, categoryName, taskName) {
     }
 
     const data = await response.json();
-    console.log("Task deleted successfully:", data.message);
     return true; // Indicate success
   } catch (error) {
     console.error("Error during API call to delete task:", error);
@@ -1568,7 +1541,6 @@ async function updateTaskStatus(categoryName, taskName, newStatus) {
     status: newStatus,
   };
 
-  console.log("Payload being sent to API for status update:", payload);
 
   try {
     const response = await fetch(apiEndpoint, {
@@ -1587,7 +1559,6 @@ async function updateTaskStatus(categoryName, taskName, newStatus) {
     }
 
     const data = await response.json();
-    console.log("Task status updated successfully:", data.message);
     return true;
   } catch (error) {
     console.error("Error during API call to update task status:", error);
@@ -1688,7 +1659,6 @@ async function updateTaskInBackend(
 
     showLoadingSpinner();
 
-    console.log("Updating task with payload:", payload);
 
     const response = await fetch(`${apiBaseUrl}/UpdateTeamTask`, {
       method: "PUT", // Changed to PUT as per REST conventions
@@ -1706,7 +1676,6 @@ async function updateTaskInBackend(
     }
 
     const data = await response.json();
-    console.log("Task updated successfully:", data.message);
     return true;
   } catch (error) {
     console.error("Error during API call to update task:", error);
@@ -1769,7 +1738,6 @@ async function leaveTeamFromBackend(teamId) {
     }
 
     const data = await response.json();
-    console.log("Team deleted successfully:", data.message);
     return true; // Returns true if team was deleted, else false
   } catch (error) {
     console.error("Error during API call to delete team:", error);
@@ -1947,3 +1915,182 @@ addSpeechToText(
   "descriptionCharCount",
   200
 );
+
+document.addEventListener("DOMContentLoaded", () => {
+  const logo = document.getElementById("taskeldLogo");
+  
+  if (userIsAdmin()) {
+    // Make logo clickable
+    logo.style.cursor = "pointer";
+    logo.addEventListener("click", openUserManagementForm);
+  } else {
+    logo.style.cursor = "default";
+  }
+});
+
+
+function userIsAdmin() {
+  const groupsRaw = sessionStorage.getItem('groups');
+  if (!groupsRaw) return false;
+  try {
+    const groups = JSON.parse(groupsRaw);
+    return groups.includes("Admins");
+  } catch (err) {
+    console.error("Failed to parse user groups from storage:", err);
+    return false;
+  }
+}
+
+
+/**
+ * Triggered when the TaskELD Logo is clicked.
+ * Fetches Cognito users, populates the modal, then shows it.
+ */
+function openUserManagementForm() {
+  fetchUserData()
+    .then(users => {
+      // Populate the modal with the user data
+      populateUserManagementModal(users);
+
+      hideLoadingSpinner();
+
+      // Show the Bootstrap modal
+      const userModal = new bootstrap.Modal(
+        document.getElementById("userManagementModal")
+      );
+      userModal.show();
+    })
+    .catch(error => {
+      console.error("Error fetching user data:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Load Users",
+        text: "Unable to retrieve user data at this time."
+      });
+    });
+}
+
+/**
+ * Fetches all Cognito users from your backend
+ * which internally calls the "GetAllCognitoUsers" Lambda.
+ */
+async function fetchUserData() {
+  showLoadingSpinner();
+  // This endpoint should invoke your Lambda that returns { "users": [...] }
+  const response = await fetch(`${apiBaseUrl}/GetAllCognitoUsers`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" }
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch user data");
+  }
+
+  const data = await response.json();
+  // Expecting data to look like: { "users": [{ sub, email, first_name, last_name }, ...] }
+  return data.users; 
+}
+
+/**
+ * Builds an HTML table (or any UI) of user info (sub, email, etc.),
+ * plus a "Delete" button that calls deleteUser(sub).
+ */
+function populateUserManagementModal(usersArray) {
+  const container = document.getElementById("userManagementContent");
+  container.innerHTML = ""; // Clear old data
+
+  if (!Array.isArray(usersArray) || usersArray.length === 0) {
+    container.innerHTML = "<p>No users found.</p>";
+    return;
+  }
+
+  // Create a table
+  const table = document.createElement("table");
+  table.classList.add("table", "table-striped", "table-hover");
+
+  // Table header
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th>sub</th>
+      <th>Email</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Action</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+
+  // Table body
+  const tbody = document.createElement("tbody");
+  usersArray.forEach(user => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${user.sub || ""}</td>
+      <td>${user.email || ""}</td>
+      <td>${user.first_name || ""}</td>
+      <td>${user.last_name || ""}</td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.sub}')">
+          Delete
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+
+  // Finally, attach the table to the container
+  container.appendChild(table);
+}
+
+/**
+ * Deletes the user from Cognito. This calls your backend,
+ * which in turn calls Cognito's AdminDeleteUser or similar.
+ */
+async function deleteUser(sub) {
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "This will permanently delete the user from Cognito.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete user"
+  });
+
+  if (!result.isConfirmed) {
+    return; // user canceled
+  }
+
+  try {
+    showLoadingSpinner();
+    const response = await fetch(`${apiBaseUrl}/DeleteCognitoUser`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sub: sub })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to delete user");
+    }
+
+    Swal.fire("Deleted!", "User has been deleted from Cognito.", "success");
+
+    // Refresh the table to show updated list
+    const updatedUsers = await fetchUserData();
+    populateUserManagementModal(updatedUsers);
+
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Deletion Failed",
+      text: error.message || "Could not delete user."
+    });
+  } finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
+  }
+}

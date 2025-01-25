@@ -7,7 +7,6 @@ const sub = sessionStorage.getItem('sub');;
 //sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 const firstName = sessionStorage.getItem("first_name");
 const user = sub;
-console.log("Sub:", sub);
 let isCategoryClicked = false;
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -139,7 +138,6 @@ function addCategory(categoryName) {
           // Remove category from the UI
           categoriesGrid.removeChild(categoryCard);
           removeCategoryFromSidebar(categoryName);
-          console.log(`Category "${categoryName}" removed from UI.`);
           Swal.fire(
             "Deleted!",
             `The category "${categoryName}" has been deleted.`,
@@ -335,7 +333,6 @@ function removeCategoryFromSidebar(categoryName) {
 
   if (categoryItem) {
     sidebarList.removeChild(categoryItem);
-    console.log(`Removed category "${categoryName}" from the sidebar.`);
   } else {
     console.warn(`Category "${categoryName}" not found in the sidebar.`);
   }
@@ -680,9 +677,6 @@ function deleteTask(taskDiv) {
         if (success) {
           // Remove task from the UI
           taskDiv.remove();
-          console.log(
-            `Task "${taskName}" removed from category "${categoryName}".`
-          );
           Swal.fire(
             "Deleted!",
             `The task "${taskName}" has been deleted.`,
@@ -1174,7 +1168,6 @@ async function deleteCategoryFromBackend(categoryName) {
     }
 
     const data = await response.json();
-    console.log("Category deleted successfully:", data.message);
     return true;
   } catch (error) {
     console.error("Error during API call to delete category:", error);
@@ -1216,7 +1209,6 @@ async function deleteTaskFromBackend(categoryName, taskName) {
       taskList.classList.add("d-none"); // Hide each task list or non-task element
     });
 
-    console.log("Task deleted successfully:", data.message);
     return true;
   } catch (error) {
     console.error("Error during API call to delete task:", error);
@@ -1246,7 +1238,6 @@ async function updateTaskInBackend(
       dueDate: dueDate || null,
     };
 
-    console.log("Updating task with payload:", payload);
 
     const response = await fetch(`${apiBaseUrl}/UpdateTask`, {
       method: "PUT",
@@ -1264,7 +1255,6 @@ async function updateTaskInBackend(
     }
 
     const data = await response.json();
-    console.log("Task updated successfully:", data.message);
     return true;
   } catch (error) {
     console.error("Error during API call to update task:", error);
@@ -1287,7 +1277,6 @@ async function updateTaskStatus(categoryName, taskName, newStatus) {
       status: newStatus, // Ensure status is being passed
     };
 
-    console.log("Payload being sent:", payload); // Debug the payload
 
     // Send the PUT request to update the task status
     const response = await fetch(`${apiBaseUrl}/updateTaskStatus`, {
@@ -1306,7 +1295,6 @@ async function updateTaskStatus(categoryName, taskName, newStatus) {
     }
 
     const data = await response.json();
-    console.log("Task status updated successfully:", data.message);
 
     // Update the task status in the UI after success
     const taskElement = document.querySelector(`#task-${taskName}`);
@@ -1379,7 +1367,6 @@ function addSpeechToText(buttonId, inputId, charCountId, maxLength) {
       charCount.textContent = `${remaining} characters remaining`;
       charCount.style.color = remaining < 0 ? "red" : "gray";
 
-      console.log("Recognized text (truncated):", transcript);
     };
 
     recognition.onerror = function (event) {
@@ -1453,6 +1440,182 @@ document.getElementById("speechButton").addEventListener("click", function () {
 });
 
 
-//for bullets
+/**
+ * Triggered when the TaskELD Logo is clicked.
+ * Fetches Cognito users, populates the modal, then shows it.
+ */
+function openUserManagementForm() {
+  fetchUserData()
+    .then(users => {
+      // Populate the modal with the user data
+      populateUserManagementModal(users);
+
+      hideLoadingSpinner();
+
+      // Show the Bootstrap modal
+      const userModal = new bootstrap.Modal(
+        document.getElementById("userManagementModal")
+      );
+      userModal.show();
+    })
+    .catch(error => {
+      console.error("Error fetching user data:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Load Users",
+        text: "Unable to retrieve user data at this time."
+      });
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const logo = document.getElementById("taskeldLogo");
+  
+  if (userIsAdmin()) {
+    // Make logo clickable
+    logo.style.cursor = "pointer";
+    logo.addEventListener("click", openUserManagementForm);
+  } else {
+    logo.style.cursor = "default";
+  }
+});
+
+
+function userIsAdmin() {
+  const groupsRaw = sessionStorage.getItem('groups');
+  if (!groupsRaw) return false;
+  try {
+    const groups = JSON.parse(groupsRaw);
+    return groups.includes("Admins");
+  } catch (err) {
+    console.error("Failed to parse user groups from storage:", err);
+    return false;
+  }
+}
+
+/**
+ * Fetches all Cognito users from your backend
+ * which internally calls the "GetAllCognitoUsers" Lambda.
+ */
+async function fetchUserData() {
+  showLoadingSpinner();
+  // This endpoint should invoke your Lambda that returns { "users": [...] }
+  const response = await fetch(`${apiBaseUrl}/GetAllCognitoUsers`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" }
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch user data");
+  }
+
+  const data = await response.json();
+  // Expecting data to look like: { "users": [{ sub, email, first_name, last_name }, ...] }
+  return data.users; 
+}
+
+/**
+ * Builds an HTML table (or any UI) of user info (sub, email, etc.),
+ * plus a "Delete" button that calls deleteUser(sub).
+ */
+function populateUserManagementModal(usersArray) {
+  const container = document.getElementById("userManagementContent");
+  container.innerHTML = ""; // Clear old data
+
+  if (!Array.isArray(usersArray) || usersArray.length === 0) {
+    container.innerHTML = "<p>No users found.</p>";
+    return;
+  }
+
+  // Create a table
+  const table = document.createElement("table");
+  table.classList.add("table", "table-striped", "table-hover");
+
+  // Table header
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th>sub</th>
+      <th>Email</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Action</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+
+  // Table body
+  const tbody = document.createElement("tbody");
+  usersArray.forEach(user => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${user.sub || ""}</td>
+      <td>${user.email || ""}</td>
+      <td>${user.first_name || ""}</td>
+      <td>${user.last_name || ""}</td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.sub}')">
+          Delete
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+
+  // Finally, attach the table to the container
+  container.appendChild(table);
+}
+
+/**
+ * Deletes the user from Cognito. This calls your backend,
+ * which in turn calls Cognito's AdminDeleteUser or similar.
+ */
+async function deleteUser(sub) {
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "This will permanently delete the user from Cognito.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete user"
+  });
+
+  if (!result.isConfirmed) {
+    return; // user canceled
+  }
+
+  try {
+    showLoadingSpinner();
+    const response = await fetch(`${apiBaseUrl}/DeleteCognitoUser`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sub: sub })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to delete user");
+    }
+
+    Swal.fire("Deleted!", "User has been deleted from Cognito.", "success");
+
+    // Refresh the table to show updated list
+    const updatedUsers = await fetchUserData();
+    populateUserManagementModal(updatedUsers);
+
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Deletion Failed",
+      text: error.message || "Could not delete user."
+    });
+  } finally {
+    // Hide the loading spinner after the API call completes
+    hideLoadingSpinner();
+  }
+}
 
 
