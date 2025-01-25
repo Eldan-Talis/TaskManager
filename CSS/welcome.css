@@ -111,7 +111,7 @@ body {
     }
 
     .Logo-Container{
-        left: 87.5%;
+        left: 87.5% !important; 
     }   
 }  
 
@@ -176,7 +176,7 @@ body {
     }
 }
 h1 {
-    color: var(--category-color, #e6e7e4); /* Default to a light color */
+    color: var(--navbar-color, #1a1b18) !important; /* Default to a light color */
 }
 
 .Logo-Container{
@@ -185,18 +185,17 @@ h1 {
 }
 
 .btn-login {
-    background-color: var(--category-color, #007bff); /* Default to blue */
-    border: 1px solid var(--category-color, #007bff); /* Match background */
+    background-color: var(--navbar-color, #1a1b18) !important; /* Default to blue */
+    border: 1px solid var(--navbar-color, #1a1b18) !important; /* Match background */
 }
 
   /* Style the login button */
   .btn-login {
     color: white !important;
-    background-color: #007bff !important; /* Bootstrap primary blue color */
     border: none;
     border-radius: 8px;
     padding: 12px 24px;
-    font-size: 1.2rem;
+    font-size: 1.6rem !important;
     font-weight: bold;
     transition: transform 0.2s ease, background-color 0.3s ease;
     cursor: pointer;
@@ -204,7 +203,8 @@ h1 {
   }
   
   .btn-login:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    background-color: var(--navbar-color, #1a1b18) !important; /* Darker blue on hover */
+    opacity: 0.9 !important;
     transform: scale(1.05); /* Slight zoom on hover */
   }
   

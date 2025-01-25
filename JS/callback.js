@@ -50,7 +50,7 @@ window.onload = function () {
     if (params.access_token && params.id_token) {
         setTimeout(() => {
             window.location.href = '/HTML/personal.html'; // Example redirection to dashboard
-        }, 2000); // Delay for user to see token info briefly
+        }, 1600); // Delay for user to see token info briefly
     } else {
         console.warn("Access token or ID token missing.");
     }

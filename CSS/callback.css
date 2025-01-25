@@ -2,12 +2,12 @@ body {
     font-family: Arial, sans-serif;
     text-align: center;
     padding: 20px;
-    background-color: grey;
+    background-color: var(--sidebar-color, #1a1b18);
 }
 
 .loader {
     border: 8px solid #f3f3f3; /* Light gray */
-    border-top: 8px solid #3498db; /* Blue */
+    border-top: 8px solid var(--navbar-color, #1a1b18); /* Blue */
     border-radius: 50%;
     width: 180px;
     height: 180px;
