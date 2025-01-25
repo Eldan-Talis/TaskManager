@@ -91,25 +91,35 @@
           <img src="/Images/TaskELD Name Logo.png" alt="Logo 1" class="navbar-center-image me-3" />
           <img src="/Images/TaskELD Logo.png" alt="Logo 2" class="navbar-center-image" />
         </div>
-        <!-- User Greeting -->
-        <div id="userGreeting" class="greeting">
-          <p id="greetingText"></p>
-        </div>
       </div>
     </div>
 
     <!-- Main Layout -->
-    <div class="container-fluid">
-      <div class="row main-container">
-        <!-- Main Content -->
-        <div class="welcome-text text-center">
-          <span>Welcome To TaskELD<br></span>
-          <a onclick="login()" class="btn btn-login mt-2">
-            <span>Log In</span><i class="fas fa-sign-in-alt me-2"></i> 
-          </a>
+    <div class="d-flex container justify-content-center align-items-center vh-100">
+      <div class="container text-center">
+        <h1 class="display-4 fw-bold text-primary">Welcome to TaskELD</h1>
+        <p class="lead text-secondary">Track your tasks, work together, and achieve goals effortlessly.</p>
+        <hr class="my-4" />
+        <div class="row mt-5">
+          <div class="col-md-4">
+            <h3 class="fw-bold text-secondary">Manage Tasks</h3>
+            <p>Stay organized and efficient with intuitive task management tools.</p>
+          </div>
+          <div class="col-md-4">
+            <h3 class="fw-bold text-secondary">Collaborate</h3>
+            <p>Seamlessly work with your team for optimal productivity.</p>
+          </div>
+          <div class="col-md-4">
+            <h3 class="fw-bold text-secondary">Track Progress</h3>
+            <p>Stay on point and set dates to complete your tasks.</p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <a onclick="login()" class="btn btn-login mt-4 btn-lg">Login</a>
         </div>
       </div>
     </div>
+    
     
     <!-- Scripts -->
     <script src="/JS/config.js"></script>
