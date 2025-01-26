@@ -4,7 +4,6 @@ const apiBaseUrl =
   "https://s5lu00mr08.execute-api.us-east-1.amazonaws.com/prod";
 
 const sub = sessionStorage.getItem('sub');;
-//sub = "c428e4e8-0001-7059-86d2-4c253a8a6994";
 const firstName = sessionStorage.getItem("first_name");
 const user = sub;
 let isCategoryClicked = false;

@@ -174,7 +174,31 @@ body {
         font-size: 1em; /* Slightly reduce font size */
         margin: 5px 0; /* Add spacing between links */
     }
+
+    .secondery-row{
+        margin-top: 0.2rem !important;
+    }
+
+    .container{
+        margin-top: 60px;
+    }
+
+    .btn-login {
+        margin-bottom: 1rem !important;
+    }
 }
+
+@media (min-width: 768px){
+    .secondery-row{
+        margin-top: 3rem !important;
+    }
+
+    .btn-login {
+        margin-top: 0.5rem !important;
+    }
+
+}
+
 h1 {
     color: var(--navbar-color, #1a1b18) !important; /* Default to a light color */
 }
