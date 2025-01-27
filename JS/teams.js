@@ -250,7 +250,8 @@ async function loadTeams() {
       const separator = document.createElement("hr");
       separator.classList.add("team-separator"); // Add a CSS class for styling
       friendlyMessageContainer.appendChild(separator);
-
+      
+      hideLoadingSpinner();
       return; // Exit the function as there's nothing more to do
     } else if (!response.ok) {
       throw new Error(`Failed to fetch team data: ${response.statusText}`);
