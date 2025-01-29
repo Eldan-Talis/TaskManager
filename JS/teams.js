@@ -153,6 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
           text: errorData.message || "Failed to join the team.",
           confirmButtonText: 'OK'
         });
+        hideLoadingSpinner();
         return;
       }
       
@@ -550,15 +551,16 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // If the category was added successfully, close the modal
+    const addCategoryModal = bootstrap.Modal.getInstance(
+      document.getElementById("addCategoryModal")
+    );
+    addCategoryModal.hide();
+
     // Add the category to the backend
     const response = await addCategoryToBackend(teamId, categoryName);
 
     if (response) {
-      // If the category was added successfully, close the modal
-      const addCategoryModal = bootstrap.Modal.getInstance(
-        document.getElementById("addCategoryModal")
-      );
-      addCategoryModal.hide();
 
       // Reset the input field and character count when the modal is closed
       categoryNameInput.value = ""; // Reset input
@@ -607,6 +609,12 @@ document.addEventListener("DOMContentLoaded", () => {
       sub, // User's sub (userId)
     };
 
+    // Close the modal
+    const newTeamModal = bootstrap.Modal.getInstance(
+      document.getElementById("newTeamModal")
+    );
+    newTeamModal.hide();
+
 
     try {
       showLoadingSpinner();
@@ -632,11 +640,6 @@ document.addEventListener("DOMContentLoaded", () => {
       teamNameInput.value = "";
       teamCharCount.textContent = "20 characters remaining";
 
-      // Close the modal
-      const newTeamModal = bootstrap.Modal.getInstance(
-        document.getElementById("newTeamModal")
-      );
-      newTeamModal.hide();
     } catch (error) {
       console.error("Error creating team:", error);
       alert("Failed to create team. Please try again.");
@@ -943,6 +946,12 @@ document
       return;
     }
 
+    // Close the modal and reset the form
+    const taskModal = bootstrap.Modal.getInstance(
+      document.getElementById("addTaskModal")
+    );
+    taskModal.hide();
+
     try {
       const categoryName =
         selectedCategoryContainer.querySelector("h4").textContent;
@@ -981,11 +990,7 @@ document
         }
       }
 
-      // Close the modal and reset the form
-      const taskModal = bootstrap.Modal.getInstance(
-        document.getElementById("addTaskModal")
-      );
-      taskModal.hide();
+      
 
       selectedTaskDiv = null; // Clear the editing state
       document.getElementById("addTaskForm").reset();
